@@ -22,7 +22,7 @@ class PacketHandler {
         const files = fs.readdirSync(this.handlersDir);
 
         for (const file of files) {
-            if (file.endsWith('.js') || file.endsWith('.ts')) {
+            if (file.endsWith('.js') || file.endsWith('.ts') && !file.endsWith(".d.ts")) {
                 const fullPath = path.join(this.handlersDir, file);
                 const handlerModule = await import(fullPath);
                 const HandlerClass = Object.values(handlerModule)[0] as new () => BaseHandler;

@@ -9,7 +9,6 @@ import { LoginPacket } from "./src/client/packets/game/LoginPacket";
 import { PacketEncryptor } from "./src/client/packets/PacketEncryptor";
 import { Proto } from "./src/client/packets/proto";
 import { Serialize } from "./src/client/packets/serialize";
-import Skin from "./src/client/skin/Skin.json";
 import { Logger } from "./src/utils/Logger"
 
 export {
@@ -24,7 +23,6 @@ export {
     PacketEncryptor,
     Proto,
     Serialize,
-    Skin,
     Logger,
     Client
 }

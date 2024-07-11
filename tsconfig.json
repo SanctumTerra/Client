@@ -6,22 +6,15 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "moduleResolution": "node",
-    "emitDeclarationOnly": true,
+    "declaration": true,
     "outDir": "dist",
     "esModuleInterop": true,
-    "declaration": true,
-    "declarationDir": "dist/types",
-    //"allowSyntheticDefaultImports": true,
     "baseUrl": ".", 
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
       "*": ["./*"]
     }
-  },
-  "ts-node": {
-    "swc": true, 
-    "transpileOnly": true 
   },
   "exclude": [
     "node_modules",
