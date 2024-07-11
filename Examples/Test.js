@@ -1,4 +1,4 @@
-const { Client } = require("../");
+const { Client } = require("../dist");
 
 const client = new Client({
     host: "127.0.0.1",
