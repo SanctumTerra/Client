@@ -1,9 +1,18 @@
 import { EventEmitter } from "events";
 import { RakNetClient, Advertisement } from "@sanctumterra/raknet";
 import { createSocket, Socket } from "dgram";
-import { Frame, Priority, Reliability } from "@serenityjs/raknet";
+import {  Frame, Priority, Reliability } from "@serenityjs/raknet";
 import { GAME_BYTE } from "@serenityjs/network";
-import { ChunkRadiusUpdatePacket, CompressionMethod, DataPacket, Framer, getPacketId, LevelChunkPacket, NetworkChunkPublisherUpdatePacket, NetworkSettingsPacket, Packets, RequestNetworkSettingsPacket, ResourcePacksInfoPacket, ServerToClientHandshakePacket, SetEntityDataPacket, SetTimePacket, StartGamePacket, TextPacket } from "@serenityjs/protocol";
+import { 
+    CompressionMethod,
+    DataPacket, 
+    Framer, 
+    getPacketId, 
+    Packets, 
+    RequestNetworkSettingsPacket, 
+    SetEntityDataPacket, 
+
+} from "@serenityjs/protocol";
 import { deflateRawSync, inflateRawSync } from "zlib";
 import { Logger } from "./utils/Logger";
 import { PacketEncryptor } from "./client/packets/PacketEncryptor";
@@ -11,13 +20,17 @@ import { ClientData } from "./client/ClientData";
 import { authenticate, createOfflineSession } from "./client/auth/Auth";
 import { defaultOptions, Options } from "./client/ClientOptions";
 import { PacketHandler } from "./client/handlers";
+import { Listener } from "./client/Listener";
 
 declare global {
     var _client: Client; // eslint-disable-line
     var _encryptor: PacketEncryptor; // eslint-disable-line
 }
 
-class Client extends EventEmitter {
+
+
+  
+class Client extends Listener {
     public raknet: RakNetClient;
     public socket: Socket;
     public _encryption: boolean = false;
@@ -26,10 +39,14 @@ class Client extends EventEmitter {
     public data: ClientData;
     private packetHandler: PacketHandler;
     
+    
     public runtimeEntityId!: bigint;
 
     public constructor(options: Partial<Options> = {}) {
         super();
+        this.on("UpdateBlockPacket", (a)  =>{
+            console.log()
+        });
         this.options = { ...defaultOptions, ...options };
         if (!this.options.host) throw new Error("Host cannot be undefined");
         if (!this.options.port) throw new Error("Port cannot be undefined");
@@ -43,11 +60,12 @@ class Client extends EventEmitter {
         this.raknet.on("encapsulated", (frame) => {
             this.handlePacket(frame);
         })
-       
-        setInterval(() => {}, 50);
 
+        setInterval(() => {}, 50);
         
     }
+
+
 
     connect() {
         this.raknet.on("connect", () => {
@@ -170,27 +188,12 @@ class Client extends EventEmitter {
                 Logger.warn("Packet with ID " + id + " not found");
                 break;
             }
-            const ignoreDebugPackets = [
-                LevelChunkPacket.name,
-                StartGamePacket.name,
-                TextPacket.name,
-                ServerToClientHandshakePacket.name,
-                NetworkSettingsPacket.name,
-                SetTimePacket.name,
-                SetEntityDataPacket.name,
-                NetworkChunkPublisherUpdatePacket.name,
-                ChunkRadiusUpdatePacket.name,
-                ResourcePacksInfoPacket.name
-            ]
-            if(!ignoreDebugPackets.includes(packet.name)) Logger.debug(packet.name)
-
+ 
             if(packet.name == SetEntityDataPacket.name) return; // Is broken ig?
-            const instance = new packet(frame).deserialize();
-            
-            
-            if(!ignoreDebugPackets.includes(packet.name)) Logger.debug(instance)
+            const instance = new packet(frame).deserialize();            
             this.emit(Packets[id].name, instance);
         }
     }
+ 
 }
 export default Client
