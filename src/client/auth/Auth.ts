@@ -18,7 +18,7 @@ async function createOfflineSession (client: Client): Promise<{profile: {name: s
 }
 
 async function authenticate (client: Client) {
-    const authflow = new Authflow(client.options.username, __dirname + "/../tokens/", { 
+    const authflow = new Authflow(client.options.username, client.options.tokensFolder, { 
         authTitle: Titles.MinecraftNintendoSwitch, 
         flow: "live",
         deviceType: 'Nintendo'

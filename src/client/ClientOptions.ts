@@ -6,6 +6,7 @@ type Options = {
     port: number;
     skinData: object | null;
     debug: boolean;
+    tokensFolder: string;
 }
 
 const defaultOptions: Required<Options> = {
@@ -15,7 +16,8 @@ const defaultOptions: Required<Options> = {
     host: "127.0.0.1",
     port: 19132,
     skinData: null,
-    debug: false
+    debug: false,
+    tokensFolder: process.cwd() + "/tokens"
 };
 
 export { Options, defaultOptions };

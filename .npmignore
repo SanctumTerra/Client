@@ -8,3 +8,4 @@ package-lock.json
 !dist/*
 .github/
 build.js
+tokens/
