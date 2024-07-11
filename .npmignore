@@ -1,0 +1,10 @@
+node_modules
+src
+Tests
+build
+.gitignore
+index.ts
+package-lock.json
+!dist/*
+.github/
+build.js

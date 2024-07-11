@@ -1,0 +1,33 @@
+{
+  "name": "@sanctumterra/client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "scripts": {
+    "start": "node ./dist/index.js",
+    "tsc": "tsc",
+    "build": "tsc --build tsconfig.json && node ./build.js",
+    "dev": "node ./build.js && node ./dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@sanctumterra/raknet": "^1.0.8",
+    "@serenityjs/binarystream": "^2.6.6",
+    "@serenityjs/network": "^0.3.5",
+    "@serenityjs/raknet": "^0.3.6",
+    "@swc/helpers": "^0.5.11",
+    "jsonwebtoken": "^9.0.2",
+    "prismarine-auth": "^2.5.0",
+    "typescript": "^5.5.3"
+  },
+  "devDependencies": {
+    "@swc/core": "^1.6.13",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/node": "^20.14.10",
+    "@types/uuid-1345": "^0.99.25"
+  }
+}
