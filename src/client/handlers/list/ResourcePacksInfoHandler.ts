@@ -15,6 +15,8 @@ class ResourcePacksInfoHandler extends BaseHandler {
         response.response = ResourcePackResponse.Completed;
         response.packs = [];
         _client.sendPacket(response, Priority.Immediate);
+
+
     }
 }
 

@@ -17,6 +17,7 @@ class NetworkSettingsHandler extends BaseHandler {
         const encodedChain = JSON.stringify({ chain });
 
         const login = new LoginPacket();
+        
         login.protocol = _client.protocol;
         login.tokens = new LoginTokens(userChain, encodedChain);
 

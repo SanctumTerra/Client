@@ -27,8 +27,6 @@ declare global {
     var _encryptor: PacketEncryptor; // eslint-disable-line
 }
 
-
-
   
 class Client extends Listener {
     public raknet: RakNetClient;
@@ -43,9 +41,6 @@ class Client extends Listener {
 
     public constructor(options: Partial<Options> = {}) {
         super();
-        this.on("UpdateBlockPacket", (a)  =>{
-            console.log()
-        });
         this.options = { ...defaultOptions, ...options };
         if (!this.options.host) throw new Error("Host cannot be undefined");
         if (!this.options.port) throw new Error("Port cannot be undefined");
