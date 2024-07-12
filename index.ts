@@ -10,7 +10,7 @@ import { PacketEncryptor } from "./src/client/packets/PacketEncryptor";
 import { Proto } from "./src/client/packets/proto";
 import { Serialize } from "./src/client/packets/serialize";
 import { Logger } from "./src/utils/Logger"
-import { CacheStatusPacket } from "src/client/packets/game/CacheStatus";
+import { CacheStatusPacket } from "./src/client/packets/game/CacheStatus";
 
 export {
     authenticate,
