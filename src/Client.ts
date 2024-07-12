@@ -37,8 +37,7 @@ class Client extends Listener {
     public readonly protocol: number = 685;
     public options: Options;
     public data: ClientData;
-    private packetHandler: PacketHandler;
-    
+    public packetHandler: PacketHandler;
     
     public runtimeEntityId!: bigint;
 
