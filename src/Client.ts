@@ -119,7 +119,7 @@ class Client extends Listener {
                 }
                 payload = Buffer.concat([Buffer.from([GAME_BYTE]), deflated]);
             }
-    
+            
             const frame = new Frame();
             frame.reliability = Reliability.ReliableOrdered;
             frame.orderChannel = 0;
@@ -135,25 +135,28 @@ class Client extends Listener {
             case GAME_BYTE:
                 this.handleGamePacket(frame.payload);
                 break;
-        
-        
-        
+            default: 
+                Logger.debug("Unknown header " + header)
         }
     }
 
     private async handleGamePacket(buffer: Buffer): Promise<void> {
         let decrypted = buffer.subarray(1);
+
         if(this._encryption){
-            try {decrypted = _encryptor.decryptPacket(decrypted)} catch(error) {
-                //console.log(error)
+            try {decrypted = _encryptor.decryptPacket(decrypted)} catch(error: any) {
+                Logger.error(error?.message ?? error)
                 return;
             }
         }
-        const algorithm: CompressionMethod = CompressionMethod[ decrypted[0] as number ]
-        ? decrypted.readUint8()
-        : CompressionMethod.NotPresent;
+        
+        const algorithm: CompressionMethod = CompressionMethod[
+                decrypted[0] as number
+            ] ? decrypted.readUint8()
+            : CompressionMethod.NotPresent;
 
-        if (algorithm !== CompressionMethod.NotPresent) decrypted = decrypted.subarray(1);
+        if (algorithm !== CompressionMethod.NotPresent)
+            decrypted = decrypted.subarray(1);
         let inflated: Buffer;
 
         switch (algorithm) {
@@ -178,17 +181,28 @@ class Client extends Listener {
         try { frames = Framer.unframe(inflated) }  catch (error) {
             console.log("\n\n\nCAN NOT UNFRAME\n\n\n")
         }       
-        if(!frames) return;
+        if(!frames) {
+            Logger.warn("Did not unframe correctly!");
+            return;    
+        }
+        if (frames.length > 32) {
+            Logger.warn("Too many packets received in one frame!");
+            return;
+        }
         for (const frame of frames) {
             const id = getPacketId(frame);
             const packet = Packets[id];
             if(!packet){
                 Logger.warn("Packet with ID " + id + " not found");
-                break;
+                continue;
             }
- 
-            if(packet.name == SetEntityDataPacket.name) return; // Is broken ig?
-            const instance = new packet(frame).deserialize();            
+            let instance;
+            try {
+                instance = new packet(frame).deserialize();     
+            } catch(error: any) { 
+                Logger.warn(`Offset is out of bounds on packet ${id}!`)
+                continue;
+            }
             this.emit(Packets[id].name, instance);
         }
     }

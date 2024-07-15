@@ -1,6 +1,6 @@
 {
   "name": "@sanctumterra/client",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -15,11 +15,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@sanctumterra/client": "^1.0.11",
     "@sanctumterra/raknet": "^1.0.8",
     "@serenityjs/binarystream": "^2.6.6",
     "@serenityjs/network": "^0.3.5",
     "@serenityjs/protocol": "^0.3.6",
-    "@serenityjs/raknet": "^0.3.6",
+    "@serenityjs/raknet": "0.4.0-beta-20240715032912",
     "@swc/helpers": "^0.5.11",
     "jsonwebtoken": "^9.0.2",
     "prismarine-auth": "^2.5.0",
