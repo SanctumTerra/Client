@@ -1,7 +1,7 @@
 import { EventEmitter } from "events";
 import { RakNetClient, Advertisement } from "@sanctumterra/raknet";
 import { createSocket, Socket } from "dgram";
-import {  Frame, Priority, Reliability } from "@serenityjs/raknet";
+import { Frame, Priority, Reliability } from "@serenityjs/raknet";
 import { GAME_BYTE } from "@serenityjs/network";
 import { 
     CompressionMethod,
@@ -104,8 +104,9 @@ class Client extends Listener {
         framed = Framer.frame(serialized);
 
         if(this._encryption){        
-            const encryptedFrame = _encryptor.encryptPacket(framed);
-            this.raknet.queue.sendFrame(encryptedFrame, priority);
+            const encryptedFrame = _encryptor.encryptPacket(framed) as Frame;
+            // @ts-ignore idk why
+            this.raknet.queue.sendFrame(encryptedFrame, priority); 
         } else {
             let payload;
             if (!this.data.sendDeflated) {
@@ -124,7 +125,7 @@ class Client extends Listener {
             frame.reliability = Reliability.ReliableOrdered;
             frame.orderChannel = 0;
             frame.payload = payload;
-           
+            // @ts-ignore idk why
             this.raknet.queue.sendFrame(frame, priority);
         }   
     }
@@ -185,10 +186,7 @@ class Client extends Listener {
             Logger.warn("Did not unframe correctly!");
             return;    
         }
-        if (frames.length > 32) {
-            Logger.warn("Too many packets received in one frame!");
-            return;
-        }
+        
         for (const frame of frames) {
             const id = getPacketId(frame);
             const packet = Packets[id];
