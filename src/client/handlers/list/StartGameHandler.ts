@@ -11,7 +11,6 @@ class StartGameHandler extends BaseHandler {
         radius.maxRadius = 10;
         _client.runtimeEntityId = packet.runtimeEntityId;
         _client.sendPacket(radius, Priority.Immediate);
-        _client.emit("spawn");
     }
 }
 

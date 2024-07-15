@@ -21,6 +21,7 @@ class PlayerStatusHandler extends BaseHandler {
         const init = new SetLocalPlayerAsInitializedPacket()
         init.runtimeEntityId = _client.runtimeEntityId;
         _client.sendPacket(init);
+        _client.emit("spawn");
     }
 }
 
