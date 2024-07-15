@@ -9,3 +9,4 @@ package-lock.json
 .github/
 build.js
 tokens/
+.vscode/

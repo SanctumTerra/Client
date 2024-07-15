@@ -49,7 +49,11 @@ class Client extends Listener {
 
         this.data = new ClientData(this);
         this.packetHandler= new PacketHandler(this);
-        this.raknet = new RakNetClient("127.0.0.1", 19132);
+        if(this.options.raknetClass){
+            this.raknet = new this.options.raknetClass(this.options.host, this.options.port)
+        } else {
+            this.raknet = new RakNetClient(this.options.host, this.options.port);
+        }
 
         this.raknet.on("encapsulated", (frame) => {
             this.handlePacket(frame);

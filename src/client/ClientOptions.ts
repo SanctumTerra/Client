@@ -1,3 +1,5 @@
+type RakNetConstructor = new (host: string, port: number) => any;
+
 type Options = {
     version: string;
     offline: boolean;
@@ -7,6 +9,7 @@ type Options = {
     skinData: object | null;
     debug: boolean;
     tokensFolder: string;
+    raknetClass: RakNetConstructor | null; 
 }
 
 const defaultOptions: Required<Options> = {
@@ -17,7 +20,8 @@ const defaultOptions: Required<Options> = {
     port: 19132,
     skinData: null,
     debug: false,
-    tokensFolder: process.cwd() + "/tokens"
+    tokensFolder: process.cwd() + "/tokens",
+    raknetClass: null
 };
 
 export { Options, defaultOptions };
