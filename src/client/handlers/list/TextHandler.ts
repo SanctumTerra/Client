@@ -18,9 +18,11 @@ class StartGameHandler extends BaseHandler {
             case TextPacketType.Translation:
                     this.handleTranslationChat(packet);
                 break;
-        
+            case TextPacketType.Raw:
+                    Logger.chat(packet.message)
+                break;
             default:
-                Logger.debug("Unhandeled packet type!" + packet.type)
+                Logger.warn("Unhandeled packet type!" + packet.type)
                 break;
         }
     }
@@ -34,8 +36,17 @@ class StartGameHandler extends BaseHandler {
                 Logger.chat(`[${packet?.parameters[0]}] ${packet?.parameters[1]}`)
                 break;
             }
+            case "commands.help.header": 
+                if(!packet.parameters || packet.parameters.length < 1) return;
+                Logger.chat(`§l§7Viewing page ${packet.parameters[0]} out of ${packet.parameters[1]}.`)
+                break;;
+            case "commands.players.list": 
+                if(!packet.parameters || packet.parameters.length < 1) return;
+                Logger.chat(`§l§7There are ${packet.parameters[0]} out of ${packet.parameters[1]} players online.`)
+                break;
             default:
-                Logger.debug("Unhandeled packet message! " + packet.message)
+                Logger.chat(packet.message)
+                Logger.warn("Unhandeled packet message! ")
                 break;
         }
     }

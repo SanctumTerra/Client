@@ -23,7 +23,6 @@ class NetworkSettingsHandler extends BaseHandler {
 
         _client.sendPacket(login, Priority.Immediate);
     }
-
 }
 
 export { NetworkSettingsHandler };

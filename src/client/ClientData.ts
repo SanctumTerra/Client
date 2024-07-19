@@ -5,6 +5,7 @@ import * as skin from "./skin/Skin.json";
 import Client from "../Client";
 import { AnimatedImageData, PersonaPieces, PieceTintColors } from "./skin/Skin";
 import { Advertisement } from "@sanctumterra/raknet";
+import { Commands } from "@serenityjs/protocol";
 
 type LoginData = {
     ecdhKeyPair: KeyPairKeyObjectResult;
@@ -87,6 +88,7 @@ class ClientData {
     public compressionThreshold!: number;
     public sharedSecret!: Buffer;
     public secretKeyBytes!: Buffer;
+    public commands: Array<Commands> = [];
 
     constructor(client: Client){
         this.client = client;

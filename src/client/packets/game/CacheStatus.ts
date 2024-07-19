@@ -1,11 +1,11 @@
-import { DataPacket } from "@serenityjs/protocol";
+import { DataPacket } from "../DataPacket";
 import { Bool } from "@serenityjs/binarystream";
-import { Proto } from "../proto";
-import { Serialize } from "../serialize";
+import { Proto, Serialize } from "@serenityjs/raknet";
+import 'reflect-metadata';
 
 @Proto(129)
 class CacheStatusPacket extends DataPacket {
-	@Serialize(Bool) public enabled!: boolean;
+  @Serialize(Bool) public enabled!: boolean;
 }
 
 export { CacheStatusPacket };

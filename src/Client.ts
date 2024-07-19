@@ -9,16 +9,17 @@ import {
     Framer, 
     getPacketId, 
     Packets, 
-    RequestNetworkSettingsPacket, 
-    SetEntityDataPacket, 
-
+    RequestNetworkSettingsPacket,
+    SetScorePacket
 } from "@serenityjs/protocol";
+import * as DATAPACKET from "./client/packets/DataPacket";
+
 import { deflateRawSync, inflateRawSync } from "zlib";
 import { Logger } from "./utils/Logger";
 import { PacketEncryptor } from "./client/packets/PacketEncryptor";
 import { ClientData } from "./client/ClientData";
 import { authenticate, createOfflineSession } from "./client/auth/Auth";
-import { defaultOptions, Options } from "./client/ClientOptions";
+import { defaultOptions, Options, PROTOCOL } from "./client/ClientOptions";
 import { PacketHandler } from "./client/handlers";
 import { Listener } from "./client/Listener";
 
@@ -29,10 +30,10 @@ declare global {
 
   
 class Client extends Listener {
-    public raknet: RakNetClient;
-    public socket: Socket;
+    public raknet!: RakNetClient;
+    public socket!: Socket;
     public _encryption: boolean = false;
-    public readonly protocol: number = 685;
+    public readonly protocol: number;
     public options: Options;
     public data: ClientData;
     public packetHandler: PacketHandler;
@@ -41,29 +42,26 @@ class Client extends Listener {
 
     public constructor(options: Partial<Options> = {}) {
         super();
-        this.options = { ...defaultOptions, ...options };
-        if (!this.options.host) throw new Error("Host cannot be undefined");
-        if (!this.options.port) throw new Error("Port cannot be undefined");
         globalThis._client = this;
-        this.socket = createSocket("udp4");
+        this.options = { ...defaultOptions, ...options };
+        this.protocol = PROTOCOL[this.options.version];
+        this.createClient();
 
         this.data = new ClientData(this);
-        this.packetHandler= new PacketHandler(this);
-        if(this.options.raknetClass){
+        this.packetHandler= new PacketHandler(this);        
+    
+        this.raknet.on("encapsulated", (frame) => {
+            this.handlePacket(frame);
+        })        
+    }
+
+    private createClient(){
+        if(this.options.raknetClass !== null){
             this.raknet = new this.options.raknetClass(this.options.host, this.options.port)
         } else {
             this.raknet = new RakNetClient(this.options.host, this.options.port);
         }
-
-        this.raknet.on("encapsulated", (frame) => {
-            this.handlePacket(frame);
-        })
-
-        setInterval(() => {}, 50);
-        
     }
-
-
 
     connect() {
         this.raknet.on("connect", () => {
@@ -94,7 +92,7 @@ class Client extends Listener {
         })
     }
 
-    sendPacket(packet: DataPacket, priority: Priority = Priority.Normal) {
+    sendPacket(packet: DataPacket | DATAPACKET.DataPacket, priority: Priority = Priority.Normal) {
         const id = packet.getId().toString(16).padStart(2, '0');
         const date = new Date();
         Logger.debug(`Sending a Game PACKET  --> ${packet.getId()}  |  0x${id} ${date.toTimeString().split(' ')[0]}.${date.getMilliseconds().toString().padStart(3, '0')}`);
@@ -103,9 +101,8 @@ class Client extends Listener {
         let framed = Buffer.alloc(0)
         framed = Framer.frame(serialized);
 
-        if(this._encryption){        
+        if(this._encryption){
             const encryptedFrame = _encryptor.encryptPacket(framed) as Frame;
-            // @ts-ignore idk why
             this.raknet.queue.sendFrame(encryptedFrame, priority); 
         } else {
             let payload;
@@ -125,7 +122,6 @@ class Client extends Listener {
             frame.reliability = Reliability.ReliableOrdered;
             frame.orderChannel = 0;
             frame.payload = payload;
-            // @ts-ignore idk why
             this.raknet.queue.sendFrame(frame, priority);
         }   
     }
@@ -189,7 +185,11 @@ class Client extends Listener {
         
         for (const frame of frames) {
             const id = getPacketId(frame);
-            const packet = Packets[id];
+            let o = id as number;
+            let packet =  Packets[id];
+
+            if(SetScorePacket.id == o) continue;
+                        
             if(!packet){
                 Logger.warn("Packet with ID " + id + " not found");
                 continue;

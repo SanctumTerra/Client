@@ -1,7 +1,20 @@
 type RakNetConstructor = new (host: string, port: number) => any;
 
+
+const Versions = [
+    "1.21.0",
+    "1.21.2"
+] as const;
+
+
+
+const PROTOCOL = {
+    "1.21.0": 685,
+    "1.21.2": 686
+} as const;
+
 type Options = {
-    version: string;
+    version: (typeof Versions)[number];
     offline: boolean;
     username: string;
     host: string;
@@ -10,10 +23,13 @@ type Options = {
     debug: boolean;
     tokensFolder: string;
     raknetClass: RakNetConstructor | null; 
+    viewDistance: number;
 }
 
+
+
 const defaultOptions: Required<Options> = {
-    version: "1.21.0",
+    version: "1.21.2",
     offline: false,
     username: "defaultUser",
     host: "127.0.0.1",
@@ -21,7 +37,8 @@ const defaultOptions: Required<Options> = {
     skinData: null,
     debug: false,
     tokensFolder: process.cwd() + "/tokens",
-    raknetClass: null
+    raknetClass: null,
+    viewDistance: 10
 };
 
-export { Options, defaultOptions };
+export { Options, defaultOptions, PROTOCOL };

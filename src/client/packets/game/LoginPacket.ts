@@ -1,8 +1,7 @@
-import { DataPacket, Packet } from "@serenityjs/protocol";
-import { DataType } from "@serenityjs/raknet";
+import { Packet } from "@serenityjs/protocol";
+import { DataType, Proto, Serialize } from "@serenityjs/raknet";
 import { BinaryStream, Endianness, Int32 } from "@serenityjs/binarystream";
-import { Proto } from "../proto";
-import { Serialize } from "../serialize";
+import { DataPacket } from "../DataPacket";
 
 class LoginTokens extends DataType {
 	public client: string;
