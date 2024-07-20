@@ -11,6 +11,11 @@ import { PacketEncryptor } from "./src/client/packets/PacketEncryptor";
 import { Logger } from "./src/utils/Logger"
 import { CacheStatusPacket } from "./src/client/packets/game/CacheStatus";
 
+declare global {
+    var _client: Client; // eslint-disable-line
+    var _encryptor: PacketEncryptor; // eslint-disable-line
+}
+
 export {
     authenticate,
     ClientData,

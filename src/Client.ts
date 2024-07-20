@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
 import { RakNetClient, Advertisement } from "@sanctumterra/raknet";
-import { createSocket, Socket } from "dgram";
+import { Socket } from "dgram";
 import { Frame, Priority, Reliability } from "@serenityjs/raknet";
 import { GAME_BYTE } from "@serenityjs/network";
 import { 
@@ -23,187 +23,192 @@ import { defaultOptions, Options, PROTOCOL } from "./client/ClientOptions";
 import { PacketHandler } from "./client/handlers";
 import { Listener } from "./client/Listener";
 
-declare global {
-    var _client: Client; // eslint-disable-line
-    var _encryptor: PacketEncryptor; // eslint-disable-line
-}
-
-  
 class Client extends Listener {
-    public raknet!: RakNetClient;
-    public socket!: Socket;
-    public _encryption: boolean = false;
+    public raknet: RakNetClient;
+    public socket?: Socket;
+    private _encryption: boolean = false;
     public readonly protocol: number;
     public options: Options;
     public data: ClientData;
     public packetHandler: PacketHandler;
     
     public runtimeEntityId!: bigint;
+    public username?: string;
 
     public constructor(options: Partial<Options> = {}) {
         super();
         globalThis._client = this;
         this.options = { ...defaultOptions, ...options };
         this.protocol = PROTOCOL[this.options.version];
-        this.createClient();
+        this.raknet = this.createClient();
 
         this.data = new ClientData(this);
-        this.packetHandler= new PacketHandler(this);        
-    
-        this.raknet.on("encapsulated", (frame) => {
-            this.handlePacket(frame);
-        })        
+        this.packetHandler = new PacketHandler(this);
+
+        this.raknet.on("encapsulated", this.handlePacket.bind(this));
     }
 
-    private createClient(){
-        if(this.options.raknetClass !== null){
-            this.raknet = new this.options.raknetClass(this.options.host, this.options.port)
-        } else {
-            this.raknet = new RakNetClient(this.options.host, this.options.port);
+    private createClient(): RakNetClient {
+        return this.options.raknetClass 
+            ? new this.options.raknetClass(this.options.host, this.options.port)
+            : new RakNetClient(this.options.host, this.options.port);
+    }
+
+    public connect(): void {
+        this.raknet.on("connect", this.onConnect.bind(this));
+
+        const authPromise = this.options.offline
+            ? createOfflineSession(this)
+            : authenticate(this);
+
+        authPromise.then(this.handleAuthResult.bind(this));
+
+        this.on("session", this.onSession.bind(this));
+    }
+
+    private onConnect(): void {
+        const networksettings = new RequestNetworkSettingsPacket();
+        networksettings.protocol = this.protocol;
+        this.sendPacket(networksettings, Priority.Immediate);
+    }
+
+    private handleAuthResult(result: { profile: any, chains: any }): void {
+        this.data.profile = result.profile;
+        this.data.accessToken = result.chains;
+        this.username = result.profile.name;
+
+        if (!this.options.offline) {
+            this.data.loginData.clientIdentityChain = this.data.createClientChain(null, false);
+            this.data.loginData.clientUserChain = this.data.createClientUserChain(this.data.loginData.ecdhKeyPair.privateKey);
         }
+
+        this.emit("session");
     }
 
-    connect() {
-        this.raknet.on("connect", () => {
-            const networksettings = new RequestNetworkSettingsPacket();
-            networksettings.protocol = this.protocol;
-            this.sendPacket(networksettings, Priority.Immediate);
+    private onSession(): void {
+        this.raknet.connect((ping: Advertisement) => {
+            this.data.serverAdvertisement = ping;
         });
-
-        if (this.options.offline) {
-          createOfflineSession(this).then(i => {
-            this.data.profile = i.profile;
-            this.data.accessToken = i.chains;
-          })
-        } else {
-            authenticate(this).then(i => {
-                this.data.profile = i.profile;
-                this.data.accessToken = i.chains;
-                this.data.loginData.clientIdentityChain = this.data.createClientChain(null, this.options.offline ?? false)
-                this.data.loginData.clientUserChain = this.data.createClientUserChain(this.data.loginData.ecdhKeyPair.privateKey);
-                this.emit("session")
-            })
-        }
-        this.on("session", async () => {
-            this.raknet.connect((ping: Advertisement) => {
-                this.data.serverAdvertisement = ping;
-                //console.log(this.data.serverAdvertisement)
-            });
-        })
     }
 
-    sendPacket(packet: DataPacket | DATAPACKET.DataPacket, priority: Priority = Priority.Normal) {
+    public sendPacket(packet: DataPacket | DATAPACKET.DataPacket, priority: Priority = Priority.Normal): void {
         const id = packet.getId().toString(16).padStart(2, '0');
         const date = new Date();
-        Logger.debug(`Sending a Game PACKET  --> ${packet.getId()}  |  0x${id} ${date.toTimeString().split(' ')[0]}.${date.getMilliseconds().toString().padStart(3, '0')}`);
-        const serialized = packet.serialize();
+        Logger.warn(`Sending a Game PACKET  --> ${packet.getId()}  |  0x${id} ${date.toTimeString().split(' ')[0]}.${date.getMilliseconds().toString().padStart(3, '0')}`);
 
-        let framed = Buffer.alloc(0)
-        framed = Framer.frame(serialized);
+        let serialized: Buffer;
+        try {
+            serialized = packet.serialize();
+        } catch(error: any) {
+            Logger.error(error);
+            return;
+        }
 
-        if(this._encryption){
-            const encryptedFrame = _encryptor.encryptPacket(framed) as Frame;
-            this.raknet.queue.sendFrame(encryptedFrame, priority); 
-        } else {
-            let payload;
-            if (!this.data.sendDeflated) {
-                payload = Buffer.concat([Buffer.from([GAME_BYTE]), framed]);
-            } else {
-                let deflated; 
-                if (framed.byteLength > 256) {
-                    deflated = Buffer.from([CompressionMethod.Zlib, ...deflateRawSync(framed)]);
-                } else {
-                    deflated = Buffer.from([CompressionMethod.None, ...framed]);
-                }
-                payload = Buffer.concat([Buffer.from([GAME_BYTE]), deflated]);
-            }
-            
-            const frame = new Frame();
-            frame.reliability = Reliability.ReliableOrdered;
-            frame.orderChannel = 0;
-            frame.payload = payload;
-            this.raknet.queue.sendFrame(frame, priority);
-        }   
+        const framed = Framer.frame(serialized);
+        const payload = this.preparePayload(framed);
+        
+        const frame = new Frame();
+        frame.reliability = Reliability.ReliableOrdered;
+        frame.orderChannel = 0;
+        frame.payload = payload;
+
+        this.raknet.queue.sendFrame(frame, priority);
     }
 
-    handlePacket(frame: Frame){
-        const header = (frame.payload[0] as number);
-        switch (header) {
-            case GAME_BYTE:
-                this.handleGamePacket(frame.payload);
-                break;
-            default: 
-                Logger.debug("Unknown header " + header)
+    private preparePayload(framed: Buffer): Buffer {
+        if (this._encryption) {
+            return _encryptor.encryptPacket(framed).payload;
+        }
+
+        if (!this.data.sendDeflated) {
+            return Buffer.concat([Buffer.from([GAME_BYTE]), framed]);
+        }
+
+        const deflated = framed.byteLength > 256
+            ? Buffer.from([CompressionMethod.Zlib, ...deflateRawSync(framed)])
+            : Buffer.from([CompressionMethod.None, ...framed]);
+
+        return Buffer.concat([Buffer.from([GAME_BYTE]), deflated]);
+    }
+
+    private handlePacket(frame: Frame): void {
+        const header = frame.payload[0] as number;
+        if (header === GAME_BYTE) {
+            this.handleGamePacket(frame.payload);
+        } else {
+            Logger.debug("Unknown header " + header);
         }
     }
 
     private async handleGamePacket(buffer: Buffer): Promise<void> {
         let decrypted = buffer.subarray(1);
 
-        if(this._encryption){
-            try {decrypted = _encryptor.decryptPacket(decrypted)} catch(error: any) {
-                Logger.error(error?.message ?? error)
+        if (this._encryption) {
+            try {
+                decrypted = _encryptor.decryptPacket(decrypted);
+            } catch(error: any) {
+                Logger.error(error?.message ?? error);
                 return;
             }
         }
         
-        const algorithm: CompressionMethod = CompressionMethod[
-                decrypted[0] as number
-            ] ? decrypted.readUint8()
-            : CompressionMethod.NotPresent;
-
-        if (algorithm !== CompressionMethod.NotPresent)
+        const algorithm = this.getCompressionAlgorithm(decrypted);
+        if (algorithm !== CompressionMethod.NotPresent) {
             decrypted = decrypted.subarray(1);
-        let inflated: Buffer;
-
-        switch (algorithm) {
-            case CompressionMethod.Zlib: {
-                inflated = inflateRawSync(decrypted);
-                break;
-            }
-            case CompressionMethod.None:
-            case CompressionMethod.NotPresent: {
-                inflated = decrypted;
-                break;
-            }
-            default: {
-                return console.error(
-                    `Received invalid compression algorithm !`,
-                    CompressionMethod[algorithm]
-                );
-            }
         }
+
+        const inflated = this.inflatePacket(decrypted, algorithm);
+        if (!inflated) return;
 
         let frames;
-        try { frames = Framer.unframe(inflated) }  catch (error) {
-            console.log("\n\n\nCAN NOT UNFRAME\n\n\n")
-        }       
-        if(!frames) {
-            Logger.warn("Did not unframe correctly!");
-            return;    
+        try {
+            frames = Framer.unframe(inflated);
+        } catch (error) {
+            Logger.warn("Could not unframe packet");
+            return;
         }
-        
-        for (const frame of frames) {
-            const id = getPacketId(frame);
-            let o = id as number;
-            let packet =  Packets[id];
 
-            if(SetScorePacket.id == o) continue;
-                        
-            if(!packet){
-                Logger.warn("Packet with ID " + id + " not found");
-                continue;
-            }
-            let instance;
-            try {
-                instance = new packet(frame).deserialize();     
-            } catch(error: any) { 
-                Logger.warn(`Offset is out of bounds on packet ${id}!`)
-                continue;
-            }
-            this.emit(Packets[id].name, instance);
+        this.processFrames(frames);
+    }
+
+    private getCompressionAlgorithm(buffer: Buffer): CompressionMethod {
+        return CompressionMethod[buffer[0] as number] 
+            ? buffer.readUint8() as CompressionMethod
+            : CompressionMethod.NotPresent;
+    }
+
+    private inflatePacket(buffer: Buffer, algorithm: CompressionMethod): Buffer | null {
+        switch (algorithm) {
+            case CompressionMethod.Zlib:
+                return inflateRawSync(buffer);
+            case CompressionMethod.None:
+            case CompressionMethod.NotPresent:
+                return buffer;
+            default:
+                Logger.error(`Invalid compression algorithm: ${CompressionMethod[algorithm]}`);
+                return null;
         }
     }
- 
+
+    private processFrames(frames: Buffer[]): void {
+        for (const frame of frames) {
+            const id = getPacketId(frame);
+            if (id === SetScorePacket.id) continue;
+
+            const PacketClass = Packets[id];
+            if (!PacketClass) {
+                Logger.warn(`Packet with ID ${id} not found`);
+                continue;
+            }
+
+            try {
+                const instance = new PacketClass(frame).deserialize();
+                this.emit(PacketClass.name, instance);
+            } catch (error) {
+                Logger.warn(`Error processing packet ${id}: ${error}`);
+            }
+        }
+    }
 }
-export default Client
+
+export default Client;

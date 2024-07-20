@@ -1,8 +1,9 @@
 import { TextPacket, TextPacketType } from "@serenityjs/protocol";
 import { Priority } from "@serenityjs/raknet";
-import { Client } from "../index";
+import Client from "../src/Client";
 import { Advertisement } from "@sanctumterra/raknet";
 import * as readline from 'readline';
+import { Logger } from "../src/utils/Logger";
 
 const HOST = process.argv[2] ?? "127.0.0.1";
 const PORT = parseInt(process.argv[3]) ?? 19132;
@@ -17,7 +18,9 @@ const client = new Client({
 client.connect();
 client.raknet.ping().then((ad: Advertisement) => console.log(ad));
 
-client.on("spawn", () => {});
+client.on("spawn", () => {
+    Logger.info(`${client.username} has spawned in!`)
+});
 
 const completer = (line: string) => {
     const suggestions = getCommandSuggestions(line);

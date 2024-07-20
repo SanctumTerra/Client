@@ -1,5 +1,6 @@
 import { PlayStatus, PlayStatusPacket, SetLocalPlayerAsInitializedPacket } from "@serenityjs/protocol";
 import { BaseHandler } from "../BaseHandler";
+import { Priority } from "@serenityjs/raknet";
 
 class PlayerStatusHandler extends BaseHandler {
     public name: string = PlayStatusPacket.name;
@@ -20,7 +21,7 @@ class PlayerStatusHandler extends BaseHandler {
     public playerSpawn(): void {
         const init = new SetLocalPlayerAsInitializedPacket()
         init.runtimeEntityId = _client.runtimeEntityId;
-        _client.sendPacket(init);
+        _client.sendPacket(init, Priority.Immediate);
         _client.emit("spawn");
     }
 }
