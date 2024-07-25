@@ -16,7 +16,6 @@ import * as DATAPACKET from "./client/packets/DataPacket";
 
 import { deflateRawSync, inflateRawSync } from "zlib";
 import { Logger } from "./utils/Logger";
-import { PacketEncryptor } from "./client/packets/PacketEncryptor";
 import { ClientData } from "./client/ClientData";
 import { authenticate, createOfflineSession } from "./client/auth/Auth";
 import { defaultOptions, Options, PROTOCOL } from "./client/ClientOptions";
@@ -26,43 +25,37 @@ import { Listener } from "./client/Listener";
 class Client extends Listener {
     public raknet: RakNetClient;
     public socket?: Socket;
-    private _encryption: boolean = false;
     public readonly protocol: number;
     public options: Options;
     public data: ClientData;
     public packetHandler: PacketHandler;
-    
+    public _encryption: boolean = false;
+
     public runtimeEntityId!: bigint;
     public username?: string;
 
-    public constructor(options: Partial<Options> = {}) {
+    constructor(options: Partial<Options> = {}) {
         super();
         globalThis._client = this;
         this.options = { ...defaultOptions, ...options };
         this.protocol = PROTOCOL[this.options.version];
-        this.raknet = this.createClient();
+        this.raknet = this.options.raknetClass 
+            ? new this.options.raknetClass(this.options.host, this.options.port)
+            : new RakNetClient(this.options.host, this.options.port);
 
         this.data = new ClientData(this);
         this.packetHandler = new PacketHandler(this);
 
         this.raknet.on("encapsulated", this.handlePacket.bind(this));
-    }
-
-    private createClient(): RakNetClient {
-        return this.options.raknetClass 
-            ? new this.options.raknetClass(this.options.host, this.options.port)
-            : new RakNetClient(this.options.host, this.options.port);
+        this.raknet.on("connect", this.onConnect.bind(this));
     }
 
     public connect(): void {
-        this.raknet.on("connect", this.onConnect.bind(this));
-
         const authPromise = this.options.offline
             ? createOfflineSession(this)
             : authenticate(this);
 
         authPromise.then(this.handleAuthResult.bind(this));
-
         this.on("session", this.onSession.bind(this));
     }
 
@@ -72,10 +65,10 @@ class Client extends Listener {
         this.sendPacket(networksettings, Priority.Immediate);
     }
 
-    private handleAuthResult(result: { profile: any, chains: any }): void {
-        this.data.profile = result.profile;
-        this.data.accessToken = result.chains;
-        this.username = result.profile.name;
+    private handleAuthResult({ profile, chains }: { profile: any, chains: any }): void {
+        this.data.profile = profile;
+        this.data.accessToken = chains;
+        this.username = profile.name;
 
         if (!this.options.offline) {
             this.data.loginData.clientIdentityChain = this.data.createClientChain(null, false);
@@ -93,26 +86,22 @@ class Client extends Listener {
 
     public sendPacket(packet: DataPacket | DATAPACKET.DataPacket, priority: Priority = Priority.Normal): void {
         const id = packet.getId().toString(16).padStart(2, '0');
-        const date = new Date();
-        Logger.warn(`Sending a Game PACKET  --> ${packet.getId()}  |  0x${id} ${date.toTimeString().split(' ')[0]}.${date.getMilliseconds().toString().padStart(3, '0')}`);
+        Logger.debug(`Sending Game PACKET --> ${packet.getId()} | 0x${id} ${new Date().toISOString()}`);
 
-        let serialized: Buffer;
         try {
-            serialized = packet.serialize();
+            const serialized = packet.serialize();
+            const framed = Framer.frame(serialized);
+            const payload = this.preparePayload(framed);
+            
+            const frame = new Frame();
+            frame.reliability = Reliability.ReliableOrdered;
+            frame.orderChannel = 0;
+            frame.payload = payload;
+
+            this.raknet.queue.sendFrame(frame, priority);
         } catch(error: any) {
             Logger.error(error);
-            return;
         }
-
-        const framed = Framer.frame(serialized);
-        const payload = this.preparePayload(framed);
-        
-        const frame = new Frame();
-        frame.reliability = Reliability.ReliableOrdered;
-        frame.orderChannel = 0;
-        frame.payload = payload;
-
-        this.raknet.queue.sendFrame(frame, priority);
     }
 
     private preparePayload(framed: Buffer): Buffer {
@@ -160,21 +149,16 @@ class Client extends Listener {
         const inflated = this.inflatePacket(decrypted, algorithm);
         if (!inflated) return;
 
-        let frames;
         try {
-            frames = Framer.unframe(inflated);
+            const frames = Framer.unframe(inflated);
+            this.processFrames(frames);
         } catch (error) {
             Logger.warn("Could not unframe packet");
-            return;
         }
-
-        this.processFrames(frames);
     }
 
     private getCompressionAlgorithm(buffer: Buffer): CompressionMethod {
-        return CompressionMethod[buffer[0] as number] 
-            ? buffer.readUint8() as CompressionMethod
-            : CompressionMethod.NotPresent;
+        return buffer[0] in CompressionMethod ? buffer.readUint8() as CompressionMethod : CompressionMethod.NotPresent;
     }
 
     private inflatePacket(buffer: Buffer, algorithm: CompressionMethod): Buffer | null {

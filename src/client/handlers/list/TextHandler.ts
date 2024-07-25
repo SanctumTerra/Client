@@ -44,9 +44,13 @@ class StartGameHandler extends BaseHandler {
                 if(!packet.parameters || packet.parameters.length < 1) return;
                 Logger.chat(`§l§7There are ${packet.parameters[0]} out of ${packet.parameters[1]} players online.`)
                 break;
+            case "§e%multiplayer.player.joined":
+                console.log('huh') 
+                if(!packet.parameters) return;
+                Logger.chat(`§l§e${packet.parameters[0]} has joined the game.`)
+                break;
             default:
                 Logger.chat(packet.message)
-                Logger.warn("Unhandeled packet message! ")
                 break;
         }
     }

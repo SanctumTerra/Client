@@ -59,7 +59,7 @@ class PacketHandler {
         }
     }
 
-    registerHandler(handler: BaseHandler) {
+    public registerHandler(handler: BaseHandler) {
         this.handlers.set(handler.name, handler);
     }
 }

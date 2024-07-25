@@ -13,3 +13,4 @@ tokens/
 tsconfig.json
 bun.lockb
 .swcrc
+docs/

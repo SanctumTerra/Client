@@ -18,6 +18,7 @@ async function createOfflineSession (client: Client): Promise<{profile: {name: s
 }
 
 async function authenticate (client: Client) {
+    let startTime = Date.now();
     const authflow = new Authflow(client.options.username, client.options.tokensFolder, { 
         authTitle: Titles.MinecraftNintendoSwitch, 
         flow: "live",
@@ -42,7 +43,8 @@ async function authenticate (client: Client) {
       xuid: xboxProfile?.extraData?.XUID || 0
     }
     
-
+    const endTime = Date.now();
+    Logger.info(`Took ${(endTime-startTime)/1000}s to Authenticate with Xbox.`);
     return {profile: profile, chains: chains };
 }
 

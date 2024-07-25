@@ -5,7 +5,9 @@ class Listener extends EventEmitter {
      * 
      * !--------------------------------------! 
      *  
-     * ! PACKET  EVENTS  ARE  Packet.name!
+     *   IF YOU HAVE `serenityjs/protocol` INSTALLED
+     * 
+     *   PACKET  EVENTS  ARE  Packet.name!
      * 
      * !--------------------------------------!
      * @returns {void} 
@@ -17,7 +19,9 @@ class Listener extends EventEmitter {
      * 
      * !--------------------------------------! 
      *  
-     * ! PACKET  EVENTS  ARE  Packet.name!
+     *   IF YOU HAVE `serenityjs/protocol` INSTALLED
+     * 
+     *   PACKET  EVENTS  ARE  Packet.name!
      * 
      * !--------------------------------------!
      * @returns {void} 

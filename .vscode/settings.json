@@ -7,6 +7,7 @@
         "bun.lockb",
         "package-lock.json",
         ".swcrc",
+        "node_modules/prismarine-auth/src/TokenManagers",
         "node_modules"
     ],
     "files.exclude": {
@@ -22,6 +23,12 @@
         ".github/workflows": true,
         "bun.lockb": true,
         "package-lock.json": true,
-        ".swcrc": true
-    }
+        ".swcrc": true,
+        "node_modules/prismarine-auth/src/TokenManagers": true
+    },
+    "CodeGPT.apiKey": "CodeGPT Plus Beta",
+    "CodeGPT.Autocomplete.enabled": true,
+    "CodeGPT.Autocomplete.suggestionDelay": 600,
+    "CodeGPT.Autocomplete.maxTokens": 16,
+    "CodeGPT.Autocomplete.provider": "CodeGPT Plus - Plus"
 }
