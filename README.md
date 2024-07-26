@@ -20,7 +20,7 @@ npm install @sanctumterra/client
 
 | Client Version | Minecraft: Bedrock Edition Version |
 |----------------|-----------------------------------|
-| 1.0.18         | 1.21.2                            |
+| 1.0.19         | 1.21.2                            |
 
 ## Quick Start
 

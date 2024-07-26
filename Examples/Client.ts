@@ -4,10 +4,10 @@ import Client from "../src/Client";
 import { Advertisement } from "@sanctumterra/raknet";
 import * as readline from 'readline';
 import { Logger } from "../src/utils/Logger";
-import { BaseHandler } from "@sanctumterra/client";
+import { BaseHandler } from "src/client/handlers";
 
-const HOST = process.argv[2] ?? "127.0.0.1";
-const PORT = parseInt(process.argv[3]) ?? 19132;
+const HOST = process.argv[2] ? "127.0.0.1" : "127.0.0.1";
+const PORT = parseInt(process.argv[3]) ? 19132 : 19132;
 console.log(PORT);
 let time = Date.now()
 
