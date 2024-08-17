@@ -129,7 +129,6 @@ export class PacketSorter {
             try {
                 const instance = new PacketClass(frame).deserialize();
                 this.client.emit(PacketClass.name, instance);
-                console.log(instance);
             } catch (error) {
                 Logger.warn(`Error processing packet ${id}: ${error instanceof Error ? error.message : String(error)}`);
             }
