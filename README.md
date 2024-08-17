@@ -77,3 +77,13 @@ client.on(TextPacket.name, (packet: TextPacket): void => {
 - This feature allows for **seamless integration** with Minecraft’s native chat system, without the need for third-party color libraries.
 
 ---
+
+
+### ❤️ Credits
+
+| **Project**     | **Description**                                            | **Link**                                     |
+|-----------------|------------------------------------------------------------|----------------------------------------------|
+| **SerenityJS**  | Provides frameworks for processing packets.                 | [GitHub Repository](https://github.com/SerenityJS/serenity) |
+| **PrismarineJS**| Provides the framework needed for authentication.           | [GitHub Repository](https://github.com/PrismarineJS) |
+
+---
