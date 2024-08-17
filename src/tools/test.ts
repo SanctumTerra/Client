@@ -11,7 +11,6 @@ const client = new Client({
 client.connect();
 
 client.on(SetTimePacket.name, () => {
-    console.log('packet')
     client.sendMessage("hey")
 })
 

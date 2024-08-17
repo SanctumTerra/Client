@@ -77,7 +77,6 @@ class Client extends Listener {
     }
 
     sendMessage(text: string): void {
-        console.log("SendMessage ", text)
         const textPacket = new TextPacket();
         textPacket.filtered = '';
         textPacket.message = text.replace(/^\s+/, '');
