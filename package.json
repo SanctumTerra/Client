@@ -1,8 +1,8 @@
 {
   "name": "@sanctumterra/client",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Get started by customizing your environment (defined in the .idx/dev.nix file) with the tools and IDE extensions you'll need for your project!",
-  "main": "index.js",
+  "main": "dist/index.js",
   "type": "commonjs",
   "scripts": {
     "test": "node ./dist/tools/test.js",

@@ -8,6 +8,9 @@
     "strict": true,   
     "skipLibCheck": true, 
     "emitDecoratorMetadata": true,
+    "sourceMap": true,  
+    "declarationMap": true,
+    "declaration": true,
     "experimentalDecorators": true,
     "paths": {
       "*": ["./*"]
