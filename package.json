@@ -1,0 +1,39 @@
+{
+  "name": "bedrockclient",
+  "version": "2.0.0",
+  "description": "Get started by customizing your environment (defined in the .idx/dev.nix file) with the tools and IDE extensions you'll need for your project!",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "test": "node ./dist/tools/test.js",
+    "dev": "node ./src/tools/build.js && npm run test",
+    "build": "tsc --build tsconfig.json"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@swc/core": "^1.7.11",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/semver": "^7.5.8",
+    "@types/uuid-1345": "^0.99.25",
+    "chalk": "^5.3.0",
+    "chokidar": "^3.6.0",
+    "lodash.debounce": "^4.0.8",
+    "ora": "^8.0.1",
+    "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "@sanctumterra/raknet": "^1.0.16",
+    "@serenityjs/binarystream": "^2.6.6",
+    "@serenityjs/protocol": "^0.4.2",
+    "@serenityjs/raknet": "^0.4.2",
+    "@swc/helpers": "^0.5.12",
+    "@types/node": "^22.3.0",
+    "jose": "^5.6.3",
+    "jsonwebtoken": "^9.0.2",
+    "prismarine-auth": "github:AnyBananaGAME/prismarine-auth",
+    "semver": "^7.6.3",
+    "uuid-1345": "^1.0.2"
+  }
+}
