@@ -5,7 +5,7 @@ import { Logger } from "../vendor/Logger";
 const client = new Client({
     host: "127.0.0.1",
     offline: false,
-    username: "ImoHigh",
+    username: "SanctumTerra", // Use Your own Username
     version: "1.21.20"
 })   
 client.connect();
