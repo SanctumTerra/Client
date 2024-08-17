@@ -7,6 +7,9 @@ class Logger {
     static error(...data: any[]) {
         this.log('§7<§l§cERROR§7>§r', ...data);
     }
+    static chat(...data: any[]): void {
+        this.log('§7<§l§aCHAT§7>§r', ...data);
+    }
 
     static date(): string {
         const date = new Date();
