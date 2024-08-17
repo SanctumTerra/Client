@@ -37,8 +37,10 @@ import {
 import { EventEmitter } from "events";
 
 class Listener extends EventEmitter {
-    emit<K extends keyof ListenerEvents>(eventName: K, ...args: Parameters<ListenerEvents[K]>): boolean {
-        return super.emit(eventName, ...args);
+    emit<K extends keyof ListenerEvents>(eventName: K, ...args: Parameters<ListenerEvents[K]>): boolean;
+    emit(eventName: string | symbol, ...args: any[]): boolean;
+    emit(eventName: any, ...args: any[]): boolean {
+      return super.emit(eventName, ...args);
     }
   
     on(eventName: string | symbol, listener: (...args: any[]) => void): this;
