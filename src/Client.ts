@@ -8,6 +8,7 @@ import { PacketSorter } from "./vendor/PacketSorter";
 import { PacketEncryptor } from "./vendor/PacketEncryptor";
 import { DataPacket, RequestNetworkSettingsPacket, TextPacket, TextPacketType } from "@serenityjs/protocol";
 import { Priority } from "@serenityjs/raknet";
+import { PluginLoader } from "./vendor/PluginLoader";
 
 class Client extends Listener {
     public readonly raknet: RakNetClient;
@@ -15,6 +16,7 @@ class Client extends Listener {
     public readonly protocol: ProtocolList;
     public readonly data: ClientData;
     public readonly packetSorter: PacketSorter;
+    public pluginLoader: PluginLoader;
 
     public runtimeEntityId!: bigint;
     public username!: string;
@@ -29,6 +31,7 @@ class Client extends Listener {
         this.raknet = new RakNetClient(this.options.host, this.options.port);
         this.data = new ClientData(this);
         this.packetSorter = new PacketSorter(this);
+        this.pluginLoader = new PluginLoader(this);
         this.prepare();
     }
 
@@ -37,7 +40,7 @@ class Client extends Listener {
         console.time('Protocol Validation');
         await protocolValidator.validateAndInstall();
         console.timeEnd('Protocol Validation');
-
+        await this.pluginLoader.init();
         this.initializeSession();
     }
 
