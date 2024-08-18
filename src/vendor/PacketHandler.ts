@@ -1,5 +1,5 @@
 import { 
-    LoginPacket, LoginTokens, NetworkSettingsPacket, PlayStatus, PlayStatusPacket,
+    LoginPacket, LoginTokens, MovePlayerPacket, NetworkSettingsPacket, PlayStatus, PlayStatusPacket,
     RequestChunkRadiusPacket,
     ResourcePackClientResponsePacket, ResourcePackResponse, ResourcePackStackPacket,
     ResourcePacksInfoPacket, ServerToClientHandshakePacket, SetLocalPlayerAsInitializedPacket, 
@@ -80,11 +80,17 @@ export class PacketHandler {
     }
 
     public onStartGame(instance: StartGamePacket): void {
+        this.client.position = instance.playerPosition;
+        this.client.runtimeEntityId = instance.runtimeEntityId;
+
         const radius = new RequestChunkRadiusPacket();
         radius.radius = this.client.options.viewDistance;
         radius.maxRadius = this.client.options.viewDistance;;
-        this.client.runtimeEntityId = instance.runtimeEntityId;
         this.client.sendPacket(radius, Priority.Immediate);
+    }
+
+    public onMovePlayer(instance: MovePlayerPacket): void {
+        this.client.position = instance.position;
     }
 
     onResourcePack(instance: ResourcePacksInfoPacket | ResourcePackStackPacket): void {

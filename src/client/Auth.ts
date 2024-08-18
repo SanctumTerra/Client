@@ -2,6 +2,8 @@ import { Authflow, Titles } from "prismarine-auth";
 import { Client } from "../Client";
 import { v3 } from "uuid-1345";
 import { Logger } from "../vendor/Logger";
+import { ClientboundCloseFormPacket } from "@serenityjs/protocol";
+const { RealmAPI } = require('prismarine-realms')
 
 interface Profile {
     name: string;
@@ -50,6 +52,21 @@ async function authenticate(client: Client): Promise<void> {
     }
 }
 
+async function realmAuthenticate (client: Client) {
+    console.log(".")
+    if(!client.options.realmOptions || client.options.realmOptions == null) {
+        new Error("An error has slipped by, please create an Issue on Github.");
+        return;
+    }
+    const api = RealmAPI.from(createAuthflow(client), 'bedrock')
+    const realm = await api.getRealmFromInvite(client.options.realmOptions.realmInvite)
+    if (!realm) throw Error("No realm found with that invite.\nPlease join one first.")
+    Logger.info("Successfully joined realm")
+    const { host, port } = await realm.getAddress()
+    client.options.host = host
+    client.options.port = port
+}  
+
 function createAuthflow(client: Client): Authflow {
     return new Authflow(
         client.options.username,
@@ -97,4 +114,4 @@ function setupClientChains(client: Client): void {
     client.data.loginData.clientUserChain = client.data.createClientUserChain(client.data.loginData.ecdhKeyPair.privateKey);
 }
 
-export { authenticate, createOfflineSession };
+export { authenticate, createOfflineSession, realmAuthenticate };

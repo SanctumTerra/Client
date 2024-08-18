@@ -1,4 +1,4 @@
-import { SetTimePacket, TextPacket } from "@serenityjs/protocol";
+import { PlayerAuthInputData, PlayerAuthInputPacket, SetTimePacket, TextPacket } from "@serenityjs/protocol";
 import { Client } from "../Client";
 import { Logger } from "../vendor/Logger";
 
@@ -9,12 +9,20 @@ const client = new Client({
     version: "1.21.20"
 })   
 client.connect();
+console.time("SpawnTime");
 
-client.on(SetTimePacket.name, () => {
+client.on("spawn", () => {
+    console.timeEnd("SpawnTime");
+    setInterval(async () => {
+        Logger.info(`§l§a`, client.position.x, client.position.y, client.position.z)
+    }, 2500)
+});
+
+client.on("SetTimePacket", () => {
     client.sendMessage("hey")
-})
+});
 
-client.on(TextPacket.name, (packet: TextPacket): void => {
+client.on("TextPacket", (packet: TextPacket): void => {
     if(packet.parameters){
         if(packet.message.includes("chat.type.text")) return Logger.chat(`§f<${packet.parameters[0]}> ${packet.parameters[1]}`)
         if(packet.message.includes("multiplayer.player.joined")) return Logger.chat(`§e${packet.parameters[0]} §ejoined the game`)
@@ -26,3 +34,4 @@ client.on(TextPacket.name, (packet: TextPacket): void => {
 
 Logger.info("§l§bINFO?§6!");
 Logger.error("§l§cERROR§6!")
+

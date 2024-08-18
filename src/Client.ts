@@ -6,7 +6,7 @@ import { Listener } from "./client/Listener";
 import { ProtocolValidator } from "./vendor/ProtocolValidator";
 import { PacketSorter } from "./vendor/PacketSorter";
 import { PacketEncryptor } from "./vendor/PacketEncryptor";
-import { DataPacket, RequestNetworkSettingsPacket, TextPacket, TextPacketType } from "@serenityjs/protocol";
+import { DataPacket, RequestNetworkSettingsPacket, TextPacket, TextPacketType, Vector3f } from "@serenityjs/protocol";
 import { Priority } from "@serenityjs/raknet";
 import { PluginLoader } from "./vendor/PluginLoader";
 
@@ -20,6 +20,8 @@ class Client extends Listener {
 
     public runtimeEntityId!: bigint;
     public username!: string;
+    public position!: Vector3f;
+
     public playStatus!: number;
     public _encryption: boolean = false;
     public _encryptor!: PacketEncryptor;
@@ -37,9 +39,9 @@ class Client extends Listener {
 
     public async connect(): Promise<void> {
         const protocolValidator = new ProtocolValidator(this);
-        console.time('Protocol Validation');
+        //console.time('Protocol Validation');
         await protocolValidator.validateAndInstall();
-        console.timeEnd('Protocol Validation');
+        //console.timeEnd('Protocol Validation');
         await this.pluginLoader.init();
         this.initializeSession();
     }

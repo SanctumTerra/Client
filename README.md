@@ -30,7 +30,7 @@ const client = new Client({
 client.connect();
 
 // 📥 Handle incoming TextPacket events
-client.on(TextPacket.name, (packet: TextPacket): void => {
+client.on("TextPacket", (packet: TextPacket): void => {
     if (packet.parameters) {
         // 🗨️ Handle standard chat messages
         if (packet.message.includes("chat.type.text")) {

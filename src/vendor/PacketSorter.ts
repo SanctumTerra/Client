@@ -10,6 +10,7 @@ import {
     PlayStatusPacket,
     ResourcePacksInfoPacket,
     ServerToClientHandshakePacket,
+    SetScorePacket,
     StartGamePacket,
     getPacketId
 } from "@serenityjs/protocol";
@@ -120,6 +121,8 @@ export class PacketSorter {
     private processFrames(frames: Buffer[]): void {
         for (const frame of frames) {
             const id = getPacketId(frame);
+            if (id === SetScorePacket.id) continue;
+            /** @ts-ignore */
             const PacketClass = Packets[id];
             if (!PacketClass) {
                 Logger.warn(`Packet with ID ${id} not found`);
@@ -136,10 +139,11 @@ export class PacketSorter {
     }
 
     private setupDefaultHandlers(): void {
-        this.client.on(NetworkSettingsPacket.name, this.packetHandler.onNetworkSettings.bind(this.packetHandler));
-        this.client.on(ServerToClientHandshakePacket.name, this.packetHandler.onServerToClientHandshake.bind(this.packetHandler));
-        this.client.on(PlayStatusPacket.name, this.packetHandler.onPlayStatus.bind(this.packetHandler));
-        this.client.on(ResourcePacksInfoPacket.name, this.packetHandler.onResourcePack.bind(this.packetHandler));
-        this.client.on(StartGamePacket.name, this.packetHandler.onStartGame.bind(this.packetHandler))
+        this.client.on("NetworkSettingsPacket", this.packetHandler.onNetworkSettings.bind(this.packetHandler));
+        this.client.on("ServerToClientHandshakePacket", this.packetHandler.onServerToClientHandshake.bind(this.packetHandler));
+        this.client.on("PlayStatusPacket", this.packetHandler.onPlayStatus.bind(this.packetHandler));
+        this.client.on("ResourcePacksInfoPacket", this.packetHandler.onResourcePack.bind(this.packetHandler));
+        this.client.on("StartGamePacket", this.packetHandler.onStartGame.bind(this.packetHandler));
+        this.client.on("MovePlayerPacket", this.packetHandler.onMovePlayer.bind(this.packetHandler));
     }
 }

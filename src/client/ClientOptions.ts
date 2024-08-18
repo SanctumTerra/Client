@@ -6,6 +6,9 @@ enum ProtocolList {
     "1.21.20" = 712
 }
 
+type RealmOptions = {
+    realmInvite: string;
+}
 
 type ClientOptions = {
     version: (typeof Versions)[number];
@@ -17,9 +20,11 @@ type ClientOptions = {
     debug: boolean;
     tokensFolder: string;
     viewDistance: number;
+    //realm: boolean;
+    //realmOptions: RealmOptions | null;
 }
 
-const defaultOptions: Required<ClientOptions> = {
+const defaultOptions: ClientOptions = {
     version: "1.21.20",
     offline: false,
     username: "defaultUser",
@@ -28,11 +33,14 @@ const defaultOptions: Required<ClientOptions> = {
     skinData: null,
     debug: false,
     tokensFolder: process.cwd() + "/tokens",
-    viewDistance: 10
+    viewDistance: 10,
+    //realm: false,
+    //realmOptions: null
 };
 
 export { 
     ClientOptions,
+    RealmOptions,
     defaultOptions,
     ProtocolList
 }
