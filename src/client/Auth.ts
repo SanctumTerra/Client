@@ -54,6 +54,7 @@ async function authenticate(client: Client): Promise<void> {
 
 async function realmAuthenticate (client: Client) {
     console.log(".")
+    /*
     if(!client.options.realmOptions || client.options.realmOptions == null) {
         new Error("An error has slipped by, please create an Issue on Github.");
         return;
@@ -65,6 +66,7 @@ async function realmAuthenticate (client: Client) {
     const { host, port } = await realm.getAddress()
     client.options.host = host
     client.options.port = port
+    */
 }  
 
 function createAuthflow(client: Client): Authflow {
