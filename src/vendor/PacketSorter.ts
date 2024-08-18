@@ -131,6 +131,7 @@ export class PacketSorter {
 
             try {
                 const instance = new PacketClass(frame).deserialize();
+                // @ts-ignore why tsc.... why!
                 this.client.emit(PacketClass.name, instance);
             } catch (error) {
                 Logger.warn(`Error processing packet ${id}: ${error instanceof Error ? error.message : String(error)}`);
