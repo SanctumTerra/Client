@@ -7,3 +7,6 @@ dev/
 .idx/
 U2NyZWV0/
 plugins/
+db/
+src/tools/level
+src/history/
