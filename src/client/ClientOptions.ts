@@ -20,6 +20,8 @@ type ClientOptions = {
     debug: boolean;
     tokensFolder: string;
     viewDistance: number;
+    validateProtocol: boolean;
+    loadPlugins: boolean;
     //realm: boolean;
     //realmOptions: RealmOptions | null;
 }
@@ -34,6 +36,8 @@ const defaultOptions: ClientOptions = {
     debug: false,
     tokensFolder: process.cwd() + "/tokens",
     viewDistance: 10,
+    validateProtocol: true,
+    loadPlugins: true
     //realm: false,
     //realmOptions: null
 };

@@ -1,10 +1,12 @@
 import { Client } from "src/Client";
 import { join } from "path";
-import { access, mkdir, readFile, writeFile } from "fs/promises";
-import { readdirSync, statSync } from "fs";
+import { mkdir, readFile, writeFile } from "fs/promises";
+import { readdirSync, statSync, readFileSync, existsSync } from "fs";
 import { Logger } from "./Logger";
 import { exec } from "child_process";
 import { promisify } from "util";
+import { promises as fs } from 'fs';
+import { access } from "fs/promises";
 
 interface PluginInfo {
     name: string;
@@ -34,17 +36,28 @@ export class PluginLoader {
         }
     }
 
-    private async getPluginFolders(): Promise<string[]> {
+    private getPluginFolders(): string[] {
         const items = readdirSync(this.path);
-        return items.filter(async (item) => {
+        return items.filter((item) => {
             const itemPath = join(this.path, item);
             if (!statSync(itemPath).isDirectory()) return false;
+            
+            const packageJsonPath = join(itemPath, 'package.json');
+            if (!existsSync(packageJsonPath)) {
+                Logger.info(`§cMissing package.json in ${item}`);
+                return false;
+            }
+
             try {
-                const packageJson = JSON.parse(await readFile(join(itemPath, 'package.json'), 'utf-8'));
+                const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
                 const { plugin } = packageJson;
-                return plugin && plugin.name && plugin.main && plugin.author && plugin.description && plugin.version;
-            } catch {
+                if (plugin && plugin.name && plugin.main && plugin.author && plugin.description && plugin.version) {
+                    return true;
+                }
                 Logger.info(`§cInvalid plugin configuration in ${item}/package.json`);
+                return false;
+            } catch {
+                Logger.info(`§cError parsing package.json in ${item}`);
                 return false;
             }
         });
@@ -68,7 +81,10 @@ export class PluginLoader {
         }
 
         const nodeModulesPath = join(pluginPath, 'node_modules');
-        if (await access(nodeModulesPath).catch(() => true)) {
+        try {
+            await fs.access(nodeModulesPath);
+            Logger.info(`§aDependencies already installed for plugin in ${pluginPath}`);
+        } catch {
             Logger.info(`§3Installing dependencies for plugin in ${pluginPath}...`);
             try {
                 await promisify(exec)('npm install', { cwd: pluginPath });
@@ -77,13 +93,11 @@ export class PluginLoader {
                 Logger.info(`§cFailed to install dependencies for plugin in ${pluginPath}: ${(error as Error).message}`);
                 throw error;
             }
-        } else {
-            Logger.info(`§aDependencies already installed for plugin in ${pluginPath}`);
         }
     }
 
     public async loadPlugins(): Promise<void> {
-        const pluginFolders = await this.getPluginFolders();
+        const pluginFolders = this.getPluginFolders();
         Logger.info("§3Loading Plugins!");
         
         if (pluginFolders.length === 0) {
@@ -91,10 +105,10 @@ export class PluginLoader {
             return;
         }
 
-        for (const pluginFolder of pluginFolders) {
+        const loadPromises = pluginFolders.map(async (pluginFolder) => {
             const pluginPath = join(this.path, pluginFolder);
             try {
-                const packageJson = JSON.parse(await readFile(join(pluginPath, 'package.json'), 'utf-8'));
+                const packageJson = JSON.parse(await fs.readFile(join(pluginPath, 'package.json'), 'utf-8'));
                 const pluginInfo: PluginInfo = packageJson.plugin;
 
                 await this.installDependencies(pluginPath);
@@ -113,6 +127,8 @@ export class PluginLoader {
                     Logger.info(`§3Make sure all dependencies are correctly listed in ${pluginFolder}/package.json`);
                 }
             }
-        }
+        });
+
+        await Promise.all(loadPromises);
     }
 }

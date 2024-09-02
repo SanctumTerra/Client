@@ -22,6 +22,8 @@ type ListenerEvents = {
 } & {
     'session': () => void;
     'spawn': () => void;
+    'tick': (tick: number) => void;
+    'PrePlayerAuthInputPacket': (packet: Protocol.PlayerAuthInputPacket, cancel: boolean) => void;
 };
 
 export { Listener };

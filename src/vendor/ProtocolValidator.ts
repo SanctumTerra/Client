@@ -1,57 +1,56 @@
 import { Client } from "../Client";
-import semver from 'semver';
-import { exec } from 'child_process';
-import { promisify } from 'util';
-
-const execAsync = promisify(exec);
+import fs from 'fs/promises';
+import path from 'path';
+import { Logger } from '../vendor/Logger';
 
 class ProtocolValidator {
     private client: Client;
     private readonly VERSIONS: Record<string, string> = {
-        "1.21.20": "0.4.2",
+        "1.21.20": "0.4.4",
     };
 
     constructor(client: Client) {
         this.client = client;
     }
 
-    async validateAndInstall(): Promise<void> {
+    async validateAndCheck(): Promise<void> {
+        Logger.info("Validating protocol version...");
         const currentVersion = await this.getCurrentProtocolVersion();
         const requiredVersion = this.getRequiredProtocolVersion();
 
         if (!requiredVersion) {
-            throw new Error(`Unsupported Minecraft version: ${this.client.options.version}`);
+            Logger.error(`Unsupported Minecraft version: ${this.client.options.version}`);
+            process.exit(1);
         }
 
-        if (!currentVersion || !semver.satisfies(currentVersion, requiredVersion)) {
-            await this.installProtocol(requiredVersion);
+        if (currentVersion !== requiredVersion) {
+            Logger.error(`Protocol version mismatch. Required: ${requiredVersion}, Current: ${currentVersion}`);
+            process.exit(1);
         }
+
+        Logger.info(`Protocol version check passed. Version: ${currentVersion}`);
     }
 
     private async getCurrentProtocolVersion(): Promise<string | null> {
+        return this.getVersionFromPackageJson();
+    }
+
+    private async getVersionFromPackageJson(): Promise<string | null> {
         try {
-            const { stdout } = await execAsync('npm list @serenityjs/protocol --json');
-            const packageInfo = JSON.parse(stdout);
-            return packageInfo.dependencies['@serenityjs/protocol'].version;
+            const packageJsonPath = path.join(process.cwd(), 'package.json');
+            const packageJsonContent = await fs.readFile(packageJsonPath, 'utf-8');
+            const packageJson = JSON.parse(packageJsonContent);
+            return packageJson.dependencies['@serenityjs/protocol'] || 
+                   packageJson.devDependencies['@serenityjs/protocol'] || 
+                   null;
         } catch (error) {
-            console.error('Error getting current @serenityjs/protocol version:', error);
+            Logger.error('Package not found in package.json');
             return null;
         }
     }
 
     private getRequiredProtocolVersion(): string | undefined {
         return this.VERSIONS[this.client.options.version];
-    }
-
-    private async installProtocol(version: string): Promise<void> {
-        try {
-            console.log(`Installing @serenityjs/protocol@${version}...`);
-            await execAsync(`npm install @serenityjs/protocol@${version}`);
-            console.log('Installation complete.');
-        } catch (error) {
-            console.error('Error installing @serenityjs/protocol:', error);
-            throw new Error('Failed to install required @serenityjs/protocol version');
-        }
     }
 }
 
