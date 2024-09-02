@@ -3,14 +3,13 @@ import {
     RequestChunkRadiusPacket,
     ResourcePackClientResponsePacket, ResourcePackResponse, ResourcePackStackPacket,
     ResourcePacksInfoPacket, ServerToClientHandshakePacket, SetLocalPlayerAsInitializedPacket, 
-    StartGamePacket
+    StartGamePacket, ClientToServerHandshakePacket
 } from "@serenityjs/protocol";
 import { Client } from "../Client";
 import { Logger } from "@sanctumterra/raknet";
 import { Priority } from "@serenityjs/raknet";
 import { createECDH, createHash, createPublicKey, KeyObject } from "crypto";
 import { PacketEncryptor } from "./PacketEncryptor";
-import { ClientToServerHandshakePacket } from "./packets/ClientToServerHandshakePacket";
 
 export class PacketHandler {
     constructor(private readonly client: Client) {}
