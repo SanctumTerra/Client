@@ -28,7 +28,7 @@
     }
   ],
   "dependencies": {
-    "@sanctumterra/raknet": "file:../Raknet",
+    "@sanctumterra/raknet": "^1.0.19",
     "@serenityjs/binarystream": "^2.6.6",
     "@serenityjs/block": "^0.4.4",
     "@serenityjs/network": "^0.4.4",
