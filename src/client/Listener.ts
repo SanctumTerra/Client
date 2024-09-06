@@ -10,6 +10,10 @@ class Listener extends EventEmitter {
     on<K extends keyof ListenerEvents>(eventName: K, listener: ListenerEvents[K]): this {
         return super.on(eventName, listener);
     }
+
+    once<K extends keyof ListenerEvents>(eventName: K, listener: ListenerEvents[K]): this {
+        return super.once(eventName, listener);
+    }
 }
 
 type PacketNames = {
@@ -26,4 +30,4 @@ type ListenerEvents = {
     'PrePlayerAuthInputPacket': (packet: Protocol.PlayerAuthInputPacket, cancel: boolean) => void;
 };
 
-export { Listener };
+export { Listener, ListenerEvents };

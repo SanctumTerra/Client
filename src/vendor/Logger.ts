@@ -10,7 +10,13 @@ class Logger {
     static chat(...data: any[]): void {
         this.log('§7<§l§aCHAT§7>§r', ...data);
     }
-
+    static debug(...data: any[]) {
+        this.log('§7<§l§dDEBUG§7>§r', ...data);
+    }
+    static warn(...data: any[]) {
+        this.log('§7<§l§eWARN§7>§r', ...data);
+    }
+    
     static date(): string {
         const date = new Date();
         return this.colorize(`§7<§f${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}§7>§r:`)[0];

@@ -1,18 +1,13 @@
 import { Frame, Priority, Reliability } from "@serenityjs/raknet";
 import { Client } from "../Client";
-import { Logger } from "@sanctumterra/raknet";
+import { Logger } from "../vendor/Logger";
 import {
     CompressionMethod,
     DataPacket,
     Framer,
-    NetworkSettingsPacket,
+    getPacketId,
     Packets,
-    PlayStatusPacket,
-    ResourcePacksInfoPacket,
-    ServerToClientHandshakePacket,
     SetScorePacket,
-    StartGamePacket,
-    getPacketId
 } from "@serenityjs/protocol";
 import { deflateRawSync, inflateRawSync } from "zlib";
 import { PacketHandler } from "./PacketHandler";
@@ -48,7 +43,7 @@ export class PacketSorter {
         frame.reliability = Reliability.ReliableOrdered;
         frame.orderChannel = 0;
         frame.payload = payload;
-        this.client.raknet.queue.sendFrame(frame, priority);
+        this.client.raknet.sender.sendFrame(frame, priority);
     }
 
     private preparePayload(framed: Buffer): Buffer {
