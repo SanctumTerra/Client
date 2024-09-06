@@ -27,8 +27,9 @@ async function createOfflineSession(client: Client): Promise<void> {
         uuid: generateUUID(client.options.username),
         xuid: 0
     };
-
     setupClientProfile(client, profile, []);
+    setupClientChains(client, true);
+    client.emit("session");
 }
 
 async function authenticate(client: Client): Promise<void> {
@@ -111,8 +112,8 @@ function setupClientProfile(client: Client, profile: Profile, accessToken: strin
     client.username = profile.name;
 }
 
-function setupClientChains(client: Client): void {
-    client.data.loginData.clientIdentityChain = client.data.createClientChain(null, false);
+function setupClientChains(client: Client, offline: boolean): void {
+    client.data.loginData.clientIdentityChain = client.data.createClientChain(null, offline);
     client.data.loginData.clientUserChain = client.data.createClientUserChain(client.data.loginData.ecdhKeyPair.privateKey);
 }
 

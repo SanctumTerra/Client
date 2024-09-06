@@ -1,6 +1,6 @@
 {
   "name": "@sanctumterra/client",
-  "version": "2.0.8",
+  "version": "2.0.9",
   "description": "We'll be singing Baraye.",
   "main": "./dist/index.js",
   "type": "commonjs",

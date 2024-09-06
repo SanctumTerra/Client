@@ -20,7 +20,7 @@ class Client extends Listener {
     public readonly data: ClientData;
     public readonly packetSorter: PacketSorter;
     public pluginLoader: PluginLoader;
-
+    private ticker!: NodeJS.Timeout;
     public runtimeEntityId!: bigint;
     public username!: string;
     public position!: Vector3f;
@@ -53,7 +53,7 @@ class Client extends Listener {
         this.pluginLoader = new PluginLoader(this);
         this.prepare();
         this.inventory = new Inventory(this);
-        setInterval(() => { this.emit("tick", this.tick++) }, 50)
+        this.ticker = setInterval(() => { this.emit("tick", this.tick++) }, 50)
         this.once("spawn", this.handleAuthInput.bind(this))
     }
 
@@ -66,6 +66,14 @@ class Client extends Listener {
             await this.pluginLoader.init();
         }
         this.initializeSession();
+    }
+    public disconnect() { 
+        Logger.info("Disconnecting...");
+        this.raknet.close();
+        clearInterval(this.ticker);
+        setTimeout(() => {
+            process.exit(0);
+        }, 1000)
     }
 
     public async sneak() { 
