@@ -6,10 +6,10 @@ import {
     StartGamePacket, ClientToServerHandshakePacket
 } from "@serenityjs/protocol";
 import { Client } from "../Client";
-import { Logger } from "@sanctumterra/raknet";
 import { Priority } from "@serenityjs/raknet";
 import { createECDH, createHash, createPublicKey, KeyObject } from "crypto";
 import { PacketEncryptor } from "./PacketEncryptor";
+import { Logger } from "./Logger";
 
 export class PacketHandler {
     constructor(private readonly client: Client) {}
