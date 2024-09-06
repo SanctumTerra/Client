@@ -44,7 +44,7 @@ async function authenticate(client: Client): Promise<void> {
         if(client.options.debug) Logger.info(`Authentication with Xbox took ${(endTime - startTime) / 1000}s.`);
 
         setupClientProfile(client, profile, chains);
-        setupClientChains(client);
+        setupClientChains(client, false);
 
         client.emit("session");
     } catch (error) {

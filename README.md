@@ -1,9 +1,12 @@
 # 🛠️ Minecraft Bedrock Edition Client Library
 
-## 📌 Supported Version
-- **1.21.20**
+![Version](https://img.shields.io/badge/Supported%20Version-1.21.20-brightgreen)
+![npm](https://img.shields.io/npm/v/@sanctumterra/client)
+![License](https://img.shields.io/badge/License-MIT-blue)
 
-## ⚙️ Installation
+A powerful and easy-to-use client library for Minecraft Bedrock Edition.
+
+## 📦 Installation
 
 Install the library via npm:
 
@@ -30,7 +33,7 @@ const client = new Client({
 client.connect();
 
 // 📥 Handle incoming TextPacket events
-client.on("TextPacket", (packet: TextPacket): void => {
+client.on(TextPacket.name, (packet: TextPacket): void => {
     if (packet.parameters) {
         // 🗨️ Handle standard chat messages
         if (packet.message.includes("chat.type.text")) {
@@ -87,3 +90,6 @@ client.on("TextPacket", (packet: TextPacket): void => {
 | **PrismarineJS**| Provides the framework needed for authentication.           | [GitHub Repository](https://github.com/PrismarineJS) |
 
 ---
+
+
+<p align="center">Made with ❤️ by SanctumTerra</p>
