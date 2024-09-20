@@ -17,25 +17,29 @@ npm i @sanctumterra/client
 ## 🚀 Usage Example
 
 ```typescript
-import { Client, Logger } from "@sanctumterra/client";
-import { TextPacket } from "@serenityjs/protocol"; // Import packet types
+// Import the Client, logger from the @sanctumterra/client package
+const { Client, Logger } = require("@sanctumterra/client");
 
-// 🎮 Create a new client instance with the necessary configurations
+// Create a new instance of the Client with the specified options
 const client = new Client({
-    host: "127.0.0.1",        // 🖥️ Server IP address
-    port: 19132,              // 🌐 Server port
-    offline: false,           // 🔒 Set to true if the server is offline
-    username: "SanctumTerra", // 🧑‍💻 Your Minecraft username
-    version: "1.21.20"        // 📦 The Minecraft Bedrock version
+    host: "127.0.0.1", // The IP address of the server
+    port: 19133, // The port of the server
+    offline: true, // Whether the client is offline or not
+    username: "SanctumTerra", // The username of the client
+    tokensFolder: "./cache/tokens", // The folder where the tokens are stored
+    version: "1.21.20", // The version of the game
+    validateProtocol: false, // Whether to validate the protocol or not
+    loadPlugins: false // Whether to load plugins or not
 });
 
-// 🌐 Connect to the server
+// Connect to the server
 client.connect();
 
-// 📥 Handle incoming TextPacket events
-client.on(TextPacket.name, (packet: TextPacket): void => {
+// Text Packet Event 
+client.on("TextPacket", (packet) => {
+    console.log(packet.message);
     if (packet.parameters) {
-        // 🗨️ Handle standard chat messages
+       // 🗨️ Handle standard chat messages
         if (packet.message.includes("chat.type.text")) {
             return Logger.chat(`§f<${packet.parameters[0]}> ${packet.parameters[1]}`);
         }
@@ -47,13 +51,20 @@ client.on(TextPacket.name, (packet: TextPacket): void => {
         if (packet.message.includes("multiplayer.player.left")) {
             return Logger.chat(`§e${packet.parameters[0]} left the game`);
         }
-
-        // 📝 Log any other message types
-        console.log(packet.message);
+        if(packet.message.includes("%chat.type.announcement")) {
+            return Logger.chat(`§d<${packet.parameters[0]}> ${packet.parameters[1]}`);
+        }
     }
     // 📜 Default log for any packet message
     Logger.chat(packet.message);
 });
+
+// Emitted when the client spawns.
+client.on("spawn", () => {
+    // You may use any type of logger you want ;)
+    Logger.info("Spawned!");
+});
+
 ```
 
 ---

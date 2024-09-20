@@ -1,373 +1,520 @@
-import { RakNetClient, Advertisement } from "@sanctumterra/raknet";
+import { RakNetClient, type Advertisement } from "@sanctumterra/raknet";
 import { authenticate, createOfflineSession } from "./client/Auth";
 import { ClientData } from "./client/ClientData";
-import { ProtocolList, defaultOptions, ClientOptions } from "./client/ClientOptions";
-import { Listener, ListenerEvents } from "./client/Listener";
+import {
+	ProtocolList,
+	defaultOptions,
+	type ClientOptions,
+} from "./client/ClientOptions";
+import { Listener, type ListenerEvents } from "./client/Listener";
 import { ProtocolValidator } from "./vendor/ProtocolValidator";
 import { PacketSorter } from "./vendor/PacketSorter";
-import { PacketEncryptor } from "./vendor/PacketEncryptor";
-import { ActionIds, BlockAction, DataPacket, InputDataFlags, InputMode, InputTransaction, InteractionMode, ItemUseInventoryTransaction, ItemUseInventoryTransactionType, LegacyTransaction, NetworkItemStackDescriptor, Packets, PlayerAuthInputData, PlayerAuthInputPacket, PlayMode, RequestNetworkSettingsPacket, TextPacket, TextPacketType, TriggerType, Vector2f, Vector3f } from "@serenityjs/protocol";
+import type { PacketEncryptor } from "./vendor/PacketEncryptor";
+import {
+	ActionIds,
+	BlockAction,
+	BlockCoordinates,
+	BlockFace,
+	ComplexInventoryTransaction,
+	DataPacket,
+	InputDataFlags,
+	InputMode,
+	InputTransaction,
+	InteractionMode,
+	InventoryTransaction,
+	InventoryTransactionPacket,
+	ItemReleaseInventoryTransaction,
+	ItemUseInventoryTransaction,
+	ItemUseInventoryTransactionType,
+	LegacyTransaction,
+	NetworkItemStackDescriptor,
+	NetworkSettingsPacket,
+	Packets,
+	PlayerActionPacket,
+	PlayerAuthInputData,
+	PlayerAuthInputPacket,
+	PlayMode,
+	RequestNetworkSettingsPacket,
+	TextPacket,
+	TextPacketType,
+	TriggerType,
+	Vector2f,
+	Vector3f,
+} from "@serenityjs/protocol";
 import { Priority } from "@serenityjs/raknet";
 import { PluginLoader } from "./vendor/PluginLoader";
 import { Inventory } from "./client/inventory/Inventory";
 import { Logger } from "./vendor/Logger";
 import { Queue } from "./vendor/Queue";
+import { PlayerAction } from "@serenityjs/serenity";
 
 class Client extends Listener {
-    public readonly raknet: RakNetClient;
-    public readonly options: ClientOptions;
-    public readonly protocol: ProtocolList;
-    public readonly data: ClientData;
-    public readonly packetSorter: PacketSorter;
-    public pluginLoader: PluginLoader;
-    private ticker!: NodeJS.Timeout;
-    public runtimeEntityId!: bigint;
-    public username!: string;
-    public position!: Vector3f;
-    public tick: number = 0;
+	public readonly raknet: RakNetClient;
+	public readonly options: ClientOptions;
+	public readonly protocol: ProtocolList;
+	public readonly data: ClientData;
+	public readonly packetSorter: PacketSorter;
+	public pluginLoader: PluginLoader;
+	private ticker!: NodeJS.Timeout;
+	public runtimeEntityId!: bigint;
+	public username!: string;
+	public position!: Vector3f;
+	public tick = 0;
 
-    public playStatus!: number;
-    public _encryption: boolean = false;
-    public _encryptor!: PacketEncryptor;
+	public playStatus!: number;
+	public _encryption = false;
+	public _encryptor!: PacketEncryptor;
 
-    private sneaking: boolean = false;
-    private firstSneak: boolean = false;
+	private sneaking = false;
+	private firstSneak = false;
 
-    private headYaw: number = 0;
-    private pitch: number = 0;
-    private yaw: number = 0;
-    private velocity: Vector3f = new Vector3f(0, 0, 0);
+	private headYaw = 0;
+	private pitch = 0;
+	private yaw = 0;
+	private velocity: Vector3f = new Vector3f(0, 0, 0);
 
-    public inventory: Inventory;
-    
-    private breakQueue: Queue<Vector3f> = new Queue();
-    private isBreaking: boolean = false;
-    
-    constructor(options: Partial<ClientOptions> = {}) {
-        super();
-        this.options = { ...defaultOptions, ...options };
-        this.protocol = ProtocolList[this.options.version];
-        this.raknet = new RakNetClient();
-        this.data = new ClientData(this);
-        this.packetSorter = new PacketSorter(this);
-        this.pluginLoader = new PluginLoader(this);
-        this.prepare();
-        this.inventory = new Inventory(this);
-        this.ticker = setInterval(() => { this.emit("tick", this.tick++) }, 50)
-        this.once("spawn", this.handleAuthInput.bind(this))
-    }
+	public inventory: Inventory;
 
-    public async connect(): Promise<void> {
-        const protocolValidator = new ProtocolValidator(this);
-        if(this.options.validateProtocol) {
-            await protocolValidator.validateAndCheck();
-        }
-        if(this.options.loadPlugins) {
-            await this.pluginLoader.init();
-        }
-        this.initializeSession();
-    }
-    public disconnect() { 
-        Logger.info("Disconnecting...");
-        this.raknet.close();
-        clearInterval(this.ticker);
-        setTimeout(() => {
-            process.exit(0);
-        }, 1000)
-    }
+	private breakQueue: Queue<Vector3f> = new Queue();
+	private isBreaking = false;
 
-    public async sneak() { 
-        this.firstSneak = true;
-        this.sneaking = true;
-    } 
+	constructor(options: Partial<ClientOptions> = {}) {
+		super();
+		this.options = { ...defaultOptions, ...options };
+		this.protocol = ProtocolList[this.options.version];
+		this.raknet = new RakNetClient();
+		this.data = new ClientData(this);
+		this.packetSorter = new PacketSorter(this);
+		this.pluginLoader = new PluginLoader(this);
+		this.prepare();
+		this.inventory = new Inventory(this);
+		this.ticker = setInterval(() => {
+			this.emit("tick", this.tick++);
+		}, 50);
+		this.once("spawn", this.handleAuthInput.bind(this));
+	}
 
-    private initializeSession(): void {
-        this.on("session", this.handleSessionStart.bind(this));
-        this.options.offline ? createOfflineSession(this) : authenticate(this);
-    }
+	public async connect(): Promise<void> {
+		const protocolValidator = new ProtocolValidator(this);
+		if (this.options.validateProtocol) {
+			await protocolValidator.validateAndCheck();
+		}
+		if (this.options.loadPlugins) {
+			await this.pluginLoader.init();
+		}
+		this.initializeSession();
+	}
 
-    private handleSessionStart(): void {
-        this.raknet.connect(this.options.host, this.options.port);
-    }
+	public disconnect() {
+		Logger.info("Disconnecting...");
+		this.raknet.close();
+		clearInterval(this.ticker);
+		setTimeout(() => {
+			process.exit(0);
+		}, 1000);
+	}
 
-    private handleServerAdvertisement(ping: Advertisement): void {
-        this.data.serverAdvertisement = ping;
-    }
+	public async sneak() {
+		this.firstSneak = true;
+		this.sneaking = true;
+	}
 
-    private prepare(): void {
-        this.raknet.once("connect", this.handleConnect.bind(this));
-    }
+	private initializeSession(): void {
+		this.on("session", this.handleSessionStart.bind(this));
+		this.options.offline ? createOfflineSession(this) : authenticate(this);
+	}
 
-    private handleConnect(): void {
-        const networkSettingsPacket = new RequestNetworkSettingsPacket();
-        networkSettingsPacket.protocol = this.protocol;
-        this.sendPacket(networkSettingsPacket);
-    }
+	private async handleSessionStart(): Promise<void> {
+		await this.raknet.connect(this.options.host, this.options.port);
+	}
 
-    public sendPacket(packet: DataPacket, priority: Priority = Priority.Normal): void {
-        const packetId = packet.getId();
-        const hexId = packetId.toString(16).padStart(2, '0');
-        if(this.options.debug) Logger.debug(`Sending Game PACKET --> ${packetId} | 0x${hexId} ${new Date().toISOString()}`);
+	private handleServerAdvertisement(ping: Advertisement): void {
+		this.data.serverAdvertisement = ping;
+	}
 
-        try {
-            this.packetSorter.sendPacket(packet, priority);
-        } catch (error) {
-            Logger.error(`Error sending packet: ${error instanceof Error ? error.message : String(error)}`);
-        }
-    }
+	private prepare(): void {
+		/// 111ms
+		this.raknet.once("connect", this.handleConnect.bind(this));
+	}
 
-    private handleAuthInput(): void {
-        setInterval(() => {
-            const inputData = new PlayerAuthInputData();
-            inputData.setFlag(InputDataFlags.BlockBreakingDelayEnabled, true);
-            if(this.sneaking) {
-                if(this.firstSneak) {
-                    this.firstSneak = false;
-                    inputData.setFlag(InputDataFlags.StartSneaking, true);
-                    inputData.setFlag(InputDataFlags.SneakDown, true);
-                }
-                inputData.setFlag(InputDataFlags.Sneaking, true);
-            }
+	private handleConnect(): void {
+		const networkSettingsPacket = new RequestNetworkSettingsPacket();
+		networkSettingsPacket.protocol = this.protocol;
+		this.sendPacket(networkSettingsPacket);
+	}
 
-            let packet = new PlayerAuthInputPacket();
-            packet.analogueMoveVector = new Vector2f(this.velocity.x, this.velocity.z);
-            packet.blockActions = [];
-            packet.gazeDirection = undefined;
-            packet.headYaw = this.headYaw;
-            packet.inputData = inputData;
-            packet.inputMode = InputMode.Mouse;
-            packet.itemStackRequest = undefined;
-            packet.motion = new Vector2f(this.velocity.x, this.velocity.z);
-            packet.pitch = this.pitch;
-            packet.playMode = PlayMode.Screen;
-            packet.interactionMode = InteractionMode.Touch;;
-            packet.position = this.position;
-            packet.positionDelta = new Vector3f( 
-                0,0,0
-            );
-            packet.tick = BigInt(this.tick);
-            packet.transaction = undefined;
-            packet.yaw = this.yaw;
+	public sendPacket(
+		packet: DataPacket,
+		priority: Priority = Priority.Normal,
+	): void {
+		const packetId = packet.getId();
+		const hexId = packetId.toString(16).padStart(2, "0");
+		if (this.options.debug)
+			Logger.debug(
+				`Sending Game PACKET --> ${packetId} | 0x${hexId} ${new Date().toISOString()}`,
+			);
 
-            let cancel = false;
-            this.emit("PrePlayerAuthInputPacket", packet, cancel);
-            if(!cancel) {
-                this.sendPacket(packet, Priority.Immediate);
-            }
-        }, 100)
-    }
+		try {
+			this.packetSorter.sendPacket(packet, priority);
+		} catch (error) {
+			Logger.error(
+				`Error sending packet: ${error instanceof Error ? error.message : String(error)}`,
+			);
+		}
+	}
 
-    public sendMessage(text: string): void {
-        const textPacket = new TextPacket();
-        textPacket.filtered = '';
-        textPacket.message = text.replace(/^\s+/, '');
-        textPacket.needsTranslation = false;
-        textPacket.parameters = [];
-        textPacket.platformChatId = "";
-        textPacket.source = this.data.profile.name;
-        textPacket.type = TextPacketType.Chat;
-        textPacket.xuid = "";
-        this.sendPacket(textPacket, Priority.Normal);
-    }
+	private handleAuthInput(): void {
+		setInterval(() => {
+			const inputData = new PlayerAuthInputData();
+			inputData.setFlag(InputDataFlags.BlockBreakingDelayEnabled, true);
+			if (this.sneaking) {
+				if (this.firstSneak) {
+					this.firstSneak = false;
+					inputData.setFlag(InputDataFlags.StartSneaking, true);
+					inputData.setFlag(InputDataFlags.SneakDown, true);
+				}
+				inputData.setFlag(InputDataFlags.Sneaking, true);
+			}
 
-    /**
-     * Look at a specific position in the world
-     * @param x The x coordinate of the target position
-     * @param y The y coordinate of the target position
-     * @param z The z coordinate of the target position
-     * @param aimWithHead Whether to adjust the pitch (true) or only yaw (false)
-     */
-    public lookAt(x: number, y: number, z: number, aimWithHead: boolean = true): void {
-        const view = {
-            x: x - this.position.x,
-            y: y - this.position.y,
-            z: z - this.position.z
-        };
+			const packet = new PlayerAuthInputPacket();
+			packet.analogueMoveVector = new Vector2f(
+				this.velocity.x,
+				this.velocity.z,
+			);
+			packet.blockActions = [];
+			packet.gazeDirection = undefined;
+			packet.headYaw = this.headYaw;
+			packet.inputData = inputData;
+			packet.inputMode = InputMode.Mouse;
+			packet.itemStackRequest = undefined;
+			packet.motion = new Vector2f(this.velocity.x, this.velocity.z);
+			packet.pitch = this.pitch;
+			packet.playMode = PlayMode.Screen;
+			packet.interactionMode = InteractionMode.Touch;
+			packet.position = this.position;
+			packet.positionDelta = new Vector3f(0, 0, 0);
+			packet.tick = BigInt(this.tick);
+			packet.transaction = undefined;
+			packet.yaw = this.yaw;
 
-        const dz = view.z;
-        const dx = view.x;
+			const cancel = false;
+			this.emit("PrePlayerAuthInputPacket", packet, cancel);
+			if (!cancel) {
+				this.sendPacket(packet, Priority.Immediate);
+			}
+		}, 100);
+	}
 
-        const tanOutput = 90 - (Math.atan(dx / dz) * (180 / Math.PI));
-        let thetaOffset = 270;
+	public sendMessage(text: string): void {
+		const textPacket = new TextPacket();
+		textPacket.filtered = "";
+		textPacket.message = text.replace(/^\s+/, "");
+		textPacket.needsTranslation = false;
+		textPacket.parameters = [];
+		textPacket.platformChatId = "";
+		textPacket.source = this.data.profile.name;
+		textPacket.type = TextPacketType.Chat;
+		textPacket.xuid = "";
+		this.sendPacket(textPacket, Priority.Normal);
+	}
 
-        if (dz < 0) {
-            thetaOffset = 90;
-        }
+	/**
+	 * Look at a specific position in the world
+	 * @param x The x coordinate of the target position
+	 * @param y The y coordinate of the target position
+	 * @param z The z coordinate of the target position
+	 * @param aimWithHead Whether to adjust the pitch (true) or only yaw (false)
+	 */
+	public lookAt(
+		x: number,
+		y: number,
+		z: number,
+		aimWithHead = true,
+	): void {
+		const view = {
+			x: x - this.position.x,
+			y: y - this.position.y,
+			z: z - this.position.z,
+		};
 
-        const yaw = thetaOffset + tanOutput;
+		const dz = view.z;
+		const dx = view.x;
 
-        if (aimWithHead) {
-            const bDiff = Math.sqrt(dx * dx + dz * dz);
-            const dy = (this.position.y) - y; 
-            this.pitch = Math.atan(dy / bDiff) * (180 / Math.PI);
-        }
+		const tanOutput = 90 - Math.atan(dx / dz) * (180 / Math.PI);
+		let thetaOffset = 270;
 
-        this.yaw = yaw;
-        this.headYaw = yaw;
-    }
+		if (dz < 0) {
+			thetaOffset = 90;
+		}
 
-    /**
-     * @deprecated
-     */
-    public async waitForEvent<K extends keyof ListenerEvents>(eventName: K, modifier?: (data: DataPacket) => void): Promise<Parameters<ListenerEvents[K]>[0]> {
-        return new Promise((resolve) => {
-            const listener: ListenerEvents[K] = ((...args: Parameters<ListenerEvents[K]>) => {
-                let data = args[0];
-                if (modifier && data instanceof DataPacket) {
-                    modifier(data);
-                }
-                this.removeListener(eventName, listener);
-                resolve(data);
-            }) as ListenerEvents[K];
+		const yaw = thetaOffset + tanOutput;
 
-            this.once(eventName, listener);
-        });
-    }
+		if (aimWithHead) {
+			const bDiff = Math.sqrt(dx * dx + dz * dz);
+			const dy = this.position.y - y;
+			this.pitch = Math.atan(dy / bDiff) * (180 / Math.PI);
+		}
 
-    /**
-     * Calculate the face of a block
-     * @param blockPosition The position of the block
-     * @returns The face of the block
-     */
-    private calculateFace(blockPosition: Vector3f): number {
-        const dx = blockPosition.x - this.position.x;
-        const dy = blockPosition.y - this.position.y;
-        const dz = blockPosition.z - this.position.z;
+		this.yaw = yaw;
+		this.headYaw = yaw;
+	}
 
-        const absDx = Math.abs(dx);
-        const absDy = Math.abs(dy);
-        const absDz = Math.abs(dz);
+	/**
+	 * @deprecated
+	 */
+	public async waitForEvent<K extends keyof ListenerEvents>(
+		eventName: K,
+		modifier?: (data: DataPacket) => void,
+	): Promise<Parameters<ListenerEvents[K]>[0]> {
+		return new Promise((resolve) => {
+			const listener: ListenerEvents[K] = ((
+				...args: Parameters<ListenerEvents[K]>
+			) => {
+				const data = args[0];
+				if (modifier && data instanceof DataPacket) {
+					modifier(data);
+				}
+				this.removeListener(eventName, listener);
+				resolve(data);
+			}) as ListenerEvents[K];
 
-        if (absDx > absDy && absDx > absDz) {
-            return dx > 0 ? 5 : 4; // EAST : WEST
-        } else if (absDy > absDx && absDy > absDz) {
-            return dy > 0 ? 1 : 0; // UP : DOWN
-        } else {
-            return dz > 0 ? 3 : 2; // SOUTH : North
-        }
-    }
+			this.once(eventName, listener);
+		});
+	}
 
-    /**
-     * Queue a block to be broken
-     * @param position The position of the block
-     */
-    public queueBreak(position: Vector3f): void {
-        this.breakQueue.enqueue(position);
-        this.processBreakQueue();
-    }
+	/**
+	 * Calculate the face of a block
+	 * @param blockPosition The position of the block
+	 * @returns The face of the block
+	 */
+	private calculateFace(blockPosition: Vector3f): number {
+		const dx = blockPosition.x - this.position.x;
+		const dy = blockPosition.y - this.position.y;
+		const dz = blockPosition.z - this.position.z;
 
-    /**
-     * Process the break queue
-     */
-    private async processBreakQueue(): Promise<void> {
-        if (this.isBreaking || this.breakQueue.isEmpty()) {
-            return;
-        }
+		const absDx = Math.abs(dx);
+		const absDy = Math.abs(dy);
+		const absDz = Math.abs(dz);
 
-        this.isBreaking = true;
+		if (absDx > absDy && absDx > absDz) {
+			return dx > 0 ? BlockFace.East : BlockFace.West;
+		}
+		if (absDy > absDx && absDy > absDz) {
+			return dy > 0 ? BlockFace.Top : BlockFace.Bottom;
+		}
+		return dz > 0 ? BlockFace.South : BlockFace.North;
+	}
 
-        while (!this.breakQueue.isEmpty()) {
-            const position = this.breakQueue.dequeue();
-            if (position) {
-                await this.breakBlock(position);
-            }
-        }
+	/**
+	 * Queue a block to be broken
+	 * @param position The position of the block
+	 */
+	public queueBreak(position: Vector3f): void {
+		this.breakQueue.enqueue(position);
+		this.processBreakQueue();
+	}
 
-        this.isBreaking = false;
-    }
+	/**
+	 * Process the break queue
+	 */
+	private async processBreakQueue(): Promise<void> {
+		if (this.isBreaking || this.breakQueue.isEmpty()) {
+			return;
+		}
 
-    /**
-     * Break a block
-     * @param position The position of the block
-     * @param ticks The number of ticks to break the block
-     */
-    private async breakBlock(position: Vector3f, ticks: number = 5): Promise<void> {
-        const MAX_DISTANCE = 5;
-        const TICK_INTERVAL = 100;
+		this.isBreaking = true;
 
-        const isBlockTooFar = (playerPosition: Vector3f, blockPosition: Vector3f): boolean => {
-            return Math.abs(blockPosition.x - playerPosition.x) > MAX_DISTANCE ||
-                   Math.abs(blockPosition.z - playerPosition.z) > MAX_DISTANCE;
-        };
+		while (!this.breakQueue.isEmpty()) {
+			const position = this.breakQueue.dequeue();
+			if (position) {
+				await this.breakBlock(position);
+			}
+		}
 
-        const modifyNextPacket = (modifier: (packet: PlayerAuthInputPacket) => void): Promise<void> => {
-            return new Promise((resolve) => {
-                this.once('PrePlayerAuthInputPacket', (packet: PlayerAuthInputPacket) => {
-                    modifier(packet);
-                    resolve();
-                });
-            });
-        };
+		this.isBreaking = false;
+	}
 
-        const sleep = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms));
+	/**
+	 * Break a block
+	 * @param position The position of the block
+	 * @param ticks The number of ticks to break the block
+	 */
+	private async breakBlock(
+		position: Vector3f,
+		ticks = 5,
+	): Promise<void> {
+		const MAX_DISTANCE = 5;
+		const TICK_INTERVAL = 100;
 
-        if (isBlockTooFar(this.position, position)) {
-            Logger.warn(`The block is too far from the player. Max distance is ${MAX_DISTANCE} blocks.`);
-            return;
-        }
+		const isBlockTooFar = (
+			playerPosition: Vector3f,
+			blockPosition: Vector3f,
+		): boolean => {
+			return (
+				Math.abs(blockPosition.x - playerPosition.x) > MAX_DISTANCE ||
+				Math.abs(blockPosition.y - playerPosition.y) > MAX_DISTANCE ||
+				Math.abs(blockPosition.z - playerPosition.z) > MAX_DISTANCE
+			);
+		};
 
-        const startTick = Number(this.tick);
-        const endTick = startTick + ticks;
+		const modifyNextPacket = (
+			modifier: (packet: PlayerAuthInputPacket) => void,
+		): Promise<void> => {
+			return new Promise((resolve) => {
+				this.once(
+					"PrePlayerAuthInputPacket",
+					(packet: PlayerAuthInputPacket) => {
+						modifier(packet);
+						resolve();
+					},
+				);
+			});
+		};
 
-        this.lookAt(position.x, position.y, position.z);
+		const sleep = (ms: number): Promise<void> =>
+			new Promise((resolve) => setTimeout(resolve, ms));
 
-        const face = this.calculateFace(position);
-        // Start Break
-        await modifyNextPacket((packet: PlayerAuthInputPacket) => {
-            this.lookAt(position.x, position.y, position.z);
-            packet.blockActions.push(
-                new BlockAction(ActionIds.StartBreak, position, face),
-                new BlockAction(ActionIds.CrackBreak, position, face)
-            );
-            packet.inputData.setFlag(InputDataFlags.BlockAction, true);
-        });
+		if (isBlockTooFar(this.position, position)) {
+			Logger.warn(
+				`The block is too far from the player. Max distance is ${MAX_DISTANCE} blocks.`,
+			);
+			return;
+		}
 
-        // Crack Break
-        for (let tick = startTick + 1; tick < endTick; tick++) {
-            await modifyNextPacket((packet: PlayerAuthInputPacket) => {
-                this.lookAt(position.x, position.y, position.z);
-                packet.blockActions.push(new BlockAction(ActionIds.CrackBreak, position, face));
-                packet.inputData.setFlag(InputDataFlags.BlockAction, true);
-            });
-            await sleep(TICK_INTERVAL);
-        }
+		const startTick = Number(this.tick);
+		const endTick = startTick + ticks;
 
-        // Stop Break
-        await modifyNextPacket((packet: PlayerAuthInputPacket) => {
-            packet.inputData.setFlag(InputDataFlags.BlockAction, true);
-            packet.inputData.setFlag(InputDataFlags.ItemInteract, true);
-            this.lookAt(position.x, position.y, position.z);
+		this.lookAt(position.x, position.y, position.z);
 
-            packet.blockActions.push(
-                new BlockAction(ActionIds.StopBreak),
-                new BlockAction(ActionIds.CrackBreak, position, face)
-            );
+		const face = this.calculateFace(position);
+		// Start Break
+		await modifyNextPacket((packet: PlayerAuthInputPacket) => {
+			this.lookAt(position.x, position.y, position.z);
+			packet.blockActions.push(
+				new BlockAction(ActionIds.StartBreak, position, face),
+				new BlockAction(ActionIds.CrackBreak, position, face),
+			);
+			packet.inputData.setFlag(InputDataFlags.BlockAction, true);
+		});
 
-            packet.transaction = new InputTransaction(
-                new LegacyTransaction(0, []),
-                [],
-                new ItemUseInventoryTransaction(
-                    ItemUseInventoryTransactionType.Destroy,
-                    TriggerType.Unknown,
-                    position, 1, 0,
-                    new NetworkItemStackDescriptor(0),
-                    this.position,
-                    new Vector3f(0, 0, 0), 0,
-                    false
-                )
-            );
-        });
+		// Crack Break
+		for (let tick = startTick + 1; tick < endTick; tick++) {
+			await modifyNextPacket((packet: PlayerAuthInputPacket) => {
+				this.lookAt(position.x, position.y, position.z);
+				packet.blockActions.push(
+					new BlockAction(ActionIds.CrackBreak, position, face),
+				);
+				packet.inputData.setFlag(InputDataFlags.BlockAction, true);
+			});
+			await sleep(TICK_INTERVAL);
+		}
 
-        await sleep(TICK_INTERVAL);
-    }
+		// Stop Break
+		await modifyNextPacket((packet: PlayerAuthInputPacket) => {
+			packet.inputData.setFlag(InputDataFlags.BlockAction, true);
+			packet.inputData.setFlag(InputDataFlags.ItemInteract, true);
+			this.lookAt(position.x, position.y, position.z);
 
-    /**
-     * Break a block
-     * @param {Vector3f} position The position of the block
-     */
-    public break(position: Vector3f): void {
-        this.queueBreak(position);
-    }
+			packet.blockActions.push(
+				new BlockAction(ActionIds.StopBreak),
+				new BlockAction(ActionIds.CrackBreak, position, face),
+			);
+
+			packet.transaction = new InputTransaction(
+				new LegacyTransaction(0, []),
+				[],
+				new ItemUseInventoryTransaction(
+					ItemUseInventoryTransactionType.Destroy,
+					TriggerType.Unknown,
+					position,
+					this.calculateFace(position),
+					0,
+					new NetworkItemStackDescriptor(0),
+					this.position,
+					new Vector3f(0, 0, 0),
+					0,
+					false,
+				),
+			);
+		});
+		await sleep(TICK_INTERVAL);
+	}
+
+	/**
+	 * Break a block
+	 * @param {Vector3f} position The position of the block
+	 */
+	public break(position: Vector3f): void {
+		this.queueBreak(position);
+	}
+
+	/**
+	 * DO NOT USE AS THIS IS NOT FINISHED!
+	 * @todo Finish this
+	 */
+	public place(position: Vector3f): void {
+		this.lookAt(position.x, position.y, position.z);
+
+		const action1 = new PlayerActionPacket();
+		action1.entityRuntimeId = this.runtimeEntityId;
+		action1.action = ActionIds.StartItemUseOn;
+		action1.blockPosition = position.subtract(new Vector3f(0, 1, 0));
+		action1.face = this.calculateFace(position);
+		action1.resultPosition = position;
+
+		this.sendPacket(action1, Priority.Normal);
+
+		const transaction1 = new InventoryTransactionPacket();
+		transaction1.legacy = new LegacyTransaction(0);
+		transaction1.transaction = new InventoryTransaction(
+			ComplexInventoryTransaction.ItemUseTransaction,
+			[],
+			new ItemUseInventoryTransaction(
+				ItemUseInventoryTransactionType.Place,
+				TriggerType.PlayerInput,
+				new BlockCoordinates(position.x, position.y - 1, position.z),
+				this.calculateFace(position),
+				0,
+				this.inventory.getItem(0),
+				this.position,
+				new Vector3f(0, 0, 0),
+				this.inventory.getItem(0).networkBlockId ?? 0,
+				true,
+			),
+		);
+
+		this.sendPacket(transaction1);
+
+		const transaction2 = new InventoryTransactionPacket();
+
+		transaction2.legacy = new LegacyTransaction(0);
+		transaction2.transaction = new InventoryTransaction(
+			ComplexInventoryTransaction.ItemUseTransaction,
+			[],
+			new ItemUseInventoryTransaction(
+				ItemUseInventoryTransactionType.Use,
+				TriggerType.Unknown,
+				new BlockCoordinates(position.x, position.y - 1, position.z),
+				this.calculateFace(position),
+				0,
+				this.inventory.getItem(0),
+				this.position,
+				new Vector3f(0, 0, 0),
+				this.inventory.getItem(0).networkBlockId ?? 0,
+				false,
+			),
+		);
+		this.sendPacket(transaction2);
+
+		const action2 = new PlayerActionPacket();
+		action2.entityRuntimeId = this.runtimeEntityId;
+		action2.action = ActionIds.StopItemUseOn;
+		action2.blockPosition = position;
+		action2.face = this.calculateFace(position);
+		action2.resultPosition = new Vector3f(0, 0, 0);
+
+		this.sendPacket(action2);
+	}
 }
 
 export { Client };

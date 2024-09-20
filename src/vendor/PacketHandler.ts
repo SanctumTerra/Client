@@ -1,144 +1,188 @@
-import { 
-    LoginPacket, LoginTokens, MovePlayerPacket, NetworkSettingsPacket, PlayStatus, PlayStatusPacket,
-    RequestChunkRadiusPacket,
-    ResourcePackClientResponsePacket, ResourcePackResponse, ResourcePackStackPacket,
-    ResourcePacksInfoPacket, ServerToClientHandshakePacket, SetLocalPlayerAsInitializedPacket, 
-    StartGamePacket, ClientToServerHandshakePacket
+import {
+	LoginPacket,
+	LoginTokens,
+	type MovePlayerPacket,
+	type NetworkSettingsPacket,
+	PlayStatus,
+	type PlayStatusPacket,
+	RequestChunkRadiusPacket,
+	ResourcePackClientResponsePacket,
+	ResourcePackResponse,
+	type ResourcePackStackPacket,
+	type ResourcePacksInfoPacket,
+	type ServerToClientHandshakePacket,
+	SetLocalPlayerAsInitializedPacket,
+	type StartGamePacket,
+	ClientToServerHandshakePacket,
 } from "@serenityjs/protocol";
-import { Client } from "../Client";
+import type { Client } from "../Client";
 import { Priority } from "@serenityjs/raknet";
-import { createECDH, createHash, createPublicKey, KeyObject } from "crypto";
+import { createECDH, createHash, createPublicKey, KeyObject } from "node:crypto";
 import { PacketEncryptor } from "./PacketEncryptor";
 import { Logger } from "./Logger";
 
 export class PacketHandler {
-    constructor(private readonly client: Client) {}
+	constructor(private readonly client: Client) {}
 
-    onNetworkSettings(instance: NetworkSettingsPacket): void {
-        if (this.client.options.debug) Logger.debug("S -> C NetworkSettingsPacket");
-        this.client.data.sendDeflated = true;
-        this.client.data.compressionThreshold = instance.compressionThreshold;
-        this.sendLoginPacket();
-    }
+	onNetworkSettings(instance: NetworkSettingsPacket): void {
+		if (this.client.options.debug) Logger.debug("S -> C NetworkSettingsPacket");
+		this.client.data.sendDeflated = true;
+		this.client.data.compressionThreshold = instance.compressionThreshold;
+		this.sendLoginPacket();
+	}
 
-    private sendLoginPacket(): void {
-        const chain = [this.client.data.loginData.clientIdentityChain, ...this.client.data.accessToken];
-        const userChain = this.client.data.loginData.clientUserChain;
-        const encodedChain = JSON.stringify({ chain });
+	private sendLoginPacket(): void {
+		const chain = [
+			this.client.data.loginData.clientIdentityChain,
+			...this.client.data.accessToken,
+		];
+		const userChain = this.client.data.loginData.clientUserChain;
+		const encodedChain = JSON.stringify({ chain });
 
-        const login = new LoginPacket();
-        login.protocol = this.client.protocol;
-        login.tokens = new LoginTokens(userChain, encodedChain);
-        this.client.sendPacket(login, Priority.Immediate);
-    }
+		const login = new LoginPacket();
+		login.protocol = this.client.protocol;
+		login.tokens = new LoginTokens(userChain, encodedChain);
+		this.client.sendPacket(login, Priority.Immediate);
+	}
 
-    onServerToClientHandshake(instance: ServerToClientHandshakePacket): void {
-        const [header, payload] = instance.token.split('.').map(k => Buffer.from(k, 'base64'));
-        const { x5u } = JSON.parse(header.toString());
-        const { salt } = JSON.parse(payload.toString());
+	onServerToClientHandshake(instance: ServerToClientHandshakePacket): void {
+		const [header, payload] = instance.token
+			.split(".")
+			.map((k) => Buffer.from(k, "base64"));
+		const { x5u } = JSON.parse(header.toString());
+		const { salt } = JSON.parse(payload.toString());
 
-        const pubKeyDer = createPublicKey({ key: Buffer.from(x5u, 'base64'), type: "spki", format: "der" });
-        this.client.data.sharedSecret = this.createSharedSecret(this.client.data.loginData.ecdhKeyPair.privateKey, pubKeyDer);
+		const pubKeyDer = createPublicKey({
+			key: Buffer.from(x5u, "base64"),
+			type: "spki",
+			format: "der",
+		});
+		this.client.data.sharedSecret = this.createSharedSecret(
+			this.client.data.loginData.ecdhKeyPair.privateKey,
+			pubKeyDer,
+		);
 
-        this.setupEncryption(salt);
-        this.sendClientToServerHandshake();
-    }
+		this.setupEncryption(salt);
+		this.sendClientToServerHandshake();
+	}
 
-    private setupEncryption(salt: string): void {
-        const secretHash = createHash('sha256')
-            .update(Buffer.from(salt, 'base64'))
-            .update(this.client.data.sharedSecret)
-            .digest();
+	private setupEncryption(salt: string): void {
+		const secretHash = createHash("sha256")
+			.update(Buffer.from(salt, "base64"))
+			.update(this.client.data.sharedSecret)
+			.digest();
 
-        this.client.data.secretKeyBytes = secretHash;
-        this.client.data.iv = secretHash.slice(0, 16);
-        
-        if (!this.client._encryptor) {
-            this.client._encryptor = new PacketEncryptor(this.client, this.client.data.secretKeyBytes);
-        }
-        this.client._encryption = true;
-    }
+		this.client.data.secretKeyBytes = secretHash;
+		this.client.data.iv = secretHash.slice(0, 16);
 
-    private sendClientToServerHandshake(): void {
-        const handshake = new ClientToServerHandshakePacket();
-        this.client.sendPacket(handshake, Priority.Immediate);
-    }
+		if (!this.client._encryptor) {
+			this.client._encryptor = new PacketEncryptor(
+				this.client,
+				this.client.data.secretKeyBytes,
+			);
+		}
+		this.client._encryption = true;
+	}
 
-    onPlayStatus(instance: PlayStatusPacket): void {
-        this.client.playStatus = instance.status;
-        if (instance.status === PlayStatus.PlayerSpawn) {
-            this.handlePlayerSpawn();
-        }
-    }
+	private sendClientToServerHandshake(): void {
+		const handshake = new ClientToServerHandshakePacket();
+		this.client.sendPacket(handshake, Priority.Immediate);
+	}
 
-    private handlePlayerSpawn(): void {
-        const init = new SetLocalPlayerAsInitializedPacket();
-        init.runtimeEntityId = this.client.runtimeEntityId;
-        this.client.sendPacket(init, Priority.Immediate);
-        this.client.emit("spawn");
-    }
+	onPlayStatus(instance: PlayStatusPacket): void {
+		this.client.playStatus = instance.status;
+		if (instance.status === PlayStatus.PlayerSpawn) {
+			this.handlePlayerSpawn();
+		}
+	}
 
-    public onStartGame(instance: StartGamePacket): void {
-        this.client.position = instance.playerPosition;
-        this.client.runtimeEntityId = instance.runtimeEntityId;
+	private handlePlayerSpawn(): void {
+		const init = new SetLocalPlayerAsInitializedPacket();
+		init.runtimeEntityId = this.client.runtimeEntityId;
+		this.client.sendPacket(init, Priority.Immediate);
+		this.client.emit("spawn");
+	}
 
-        const radius = new RequestChunkRadiusPacket();
-        radius.radius = this.client.options.viewDistance;
-        radius.maxRadius = this.client.options.viewDistance;;
-        this.client.sendPacket(radius, Priority.Immediate);
-    }
+	public onStartGame(instance: StartGamePacket): void {
+		this.client.position = instance.playerPosition;
+		this.client.runtimeEntityId = instance.runtimeEntityId;
 
-    public onMovePlayer(instance: MovePlayerPacket): void {
-        this.client.position = instance.position;
-    }
+		const radius = new RequestChunkRadiusPacket();
+		radius.radius = this.client.options.viewDistance;
+		radius.maxRadius = this.client.options.viewDistance;
+		this.client.sendPacket(radius, Priority.Immediate);
+	}
 
-    onResourcePack(instance: ResourcePacksInfoPacket | ResourcePackStackPacket): void {
-        if (instance.texturePacks.length !== 0) {
-            Logger.debug("Texture Pack Length is not 0!");
-        }
-        this.sendResourcePackResponse();
-    }
+	public onMovePlayer(instance: MovePlayerPacket): void {
+		this.client.position = instance.position;
+	}
 
-    private sendResourcePackResponse(): void {
-        const response = new ResourcePackClientResponsePacket();
-        response.response = ResourcePackResponse.Completed;
-        response.packs = [];
-        this.client.sendPacket(response, Priority.Immediate);
-    }
+	onResourcePack(
+		instance: ResourcePacksInfoPacket | ResourcePackStackPacket,
+	): void {
+		if (instance.texturePacks.length !== 0) {
+			Logger.debug("Texture Pack Length is not 0!");
+		}
+		this.sendResourcePackResponse();
+	}
 
-    private createSharedSecret(privateKey: KeyObject, publicKey: KeyObject): Buffer {
-        this.validateKeys(privateKey, publicKey);
+	private sendResourcePackResponse(): void {
+		const response = new ResourcePackClientResponsePacket();
+		response.response = ResourcePackResponse.Completed;
+		response.packs = [];
+		this.client.sendPacket(response, Priority.Immediate);
+	}
 
-        const curve = privateKey.asymmetricKeyDetails?.namedCurve;
-        if (!curve) {
-            throw new Error('Invalid private key format. Expected JWK with named curve.');
-        }
+	private createSharedSecret(
+		privateKey: KeyObject,
+		publicKey: KeyObject,
+	): Buffer {
+		this.validateKeys(privateKey, publicKey);
 
-        const ecdh = createECDH(curve);
-        const privateKeyJwk = privateKey.export({ format: 'jwk' }) as { d?: string };
-        const publicKeyJwk = publicKey.export({ format: 'jwk' }) as { x?: string, y?: string };
+		const curve = privateKey.asymmetricKeyDetails?.namedCurve;
+		if (!curve) {
+			throw new Error(
+				"Invalid private key format. Expected JWK with named curve.",
+			);
+		}
 
-        if (!privateKeyJwk.d || !publicKeyJwk.x || !publicKeyJwk.y) {
-            throw new Error("Invalid key format");
-        }
+		const ecdh = createECDH(curve);
+		const privateKeyJwk = privateKey.export({ format: "jwk" }) as {
+			d?: string;
+		};
+		const publicKeyJwk = publicKey.export({ format: "jwk" }) as {
+			x?: string;
+			y?: string;
+		};
 
-        const privateKeyHex = Buffer.from(privateKeyJwk.d, 'base64').toString('hex');
-        ecdh.setPrivateKey(privateKeyHex, 'hex');
+		if (!privateKeyJwk.d || !publicKeyJwk.x || !publicKeyJwk.y) {
+			throw new Error("Invalid key format");
+		}
 
-        const publicKeyX = Buffer.from(publicKeyJwk.x, 'base64').toString('hex');
-        const publicKeyY = Buffer.from(publicKeyJwk.y, 'base64').toString('hex');
-        const publicKeyHex = '04' + publicKeyX + publicKeyY;
+		const privateKeyHex = Buffer.from(privateKeyJwk.d, "base64").toString(
+			"hex",
+		);
+		ecdh.setPrivateKey(privateKeyHex, "hex");
 
-        return ecdh.computeSecret(publicKeyHex, 'hex');
-    }
+		const publicKeyX = Buffer.from(publicKeyJwk.x, "base64").toString("hex");
+		const publicKeyY = Buffer.from(publicKeyJwk.y, "base64").toString("hex");
+		const publicKeyHex = `04${publicKeyX}${publicKeyY}`;
 
-    private validateKeys(privateKey: KeyObject, publicKey: KeyObject): void {
-        if (!(privateKey instanceof KeyObject) || !(publicKey instanceof KeyObject)) {
-            throw new Error('Both privateKey and publicKey must be crypto.KeyObject instances');
-        }
-        
-        if (privateKey.type !== 'private' || publicKey.type !== 'public') {
-            throw new Error('Invalid key types. Expected private and public keys.');
-        }
-    }
+		return ecdh.computeSecret(publicKeyHex, "hex");
+	}
+
+	private validateKeys(privateKey: KeyObject, publicKey: KeyObject): void {
+		if (
+			!(privateKey instanceof KeyObject) ||
+			!(publicKey instanceof KeyObject)
+		) {
+			throw new Error(
+				"Both privateKey and publicKey must be crypto.KeyObject instances",
+			);
+		}
+
+		if (privateKey.type !== "private" || publicKey.type !== "public") {
+			throw new Error("Invalid key types. Expected private and public keys.");
+		}
+	}
 }
