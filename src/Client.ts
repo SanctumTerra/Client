@@ -46,7 +46,6 @@ import { PluginLoader } from "./vendor/PluginLoader";
 import { Inventory } from "./client/inventory/Inventory";
 import { Logger } from "./vendor/Logger";
 import { Queue } from "./vendor/Queue";
-import { PlayerAction } from "@serenityjs/serenity";
 
 class Client extends Listener {
 	public readonly raknet: RakNetClient;
