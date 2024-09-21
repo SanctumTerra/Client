@@ -133,7 +133,6 @@ export class PacketSorter {
 			const id = getPacketId(frame);
 			if (id === SetScorePacket.id) continue;
 
-			/** @ts-ignore */
 			const PacketClass = Packets[id];
 
 			if (!PacketClass) {
@@ -142,7 +141,6 @@ export class PacketSorter {
 			}
 			try {
 				const instance = new PacketClass(frame).deserialize();
-				// @ts-ignore why tsc.... why!
 				this.client.emit(PacketClass.name, instance);
 			} catch (error) {
 				Logger.warn(

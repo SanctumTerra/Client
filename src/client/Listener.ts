@@ -6,21 +6,27 @@ class Listener extends EventEmitter {
 	emit<K extends keyof ListenerEvents>(
 		eventName: K,
 		...args: Parameters<ListenerEvents[K]>
-	): boolean {
+	): boolean;
+	emit(eventName: string, ...args: unknown[]): boolean;
+	emit(eventName: string, ...args: unknown[]): boolean {
 		return super.emit(eventName, ...args);
 	}
 
 	on<K extends keyof ListenerEvents>(
 		eventName: K,
-		listener: ListenerEvents[K],
-	): this {
+		listener: ListenerEvents[K]
+	): this;
+	on(eventName: string, listener: (...args: unknown[]) => void): this;
+	on(eventName: string, listener: (...args: unknown[]) => void): this {
 		return super.on(eventName, listener);
 	}
 
 	once<K extends keyof ListenerEvents>(
 		eventName: K,
-		listener: ListenerEvents[K],
-	): this {
+		listener: ListenerEvents[K]
+	): this;
+	once(eventName: string, listener: (...args: unknown[]) => void): this;
+	once(eventName: string, listener: (...args: unknown[]) => void): this {
 		return super.once(eventName, listener);
 	}
 }
@@ -30,7 +36,7 @@ type PacketNames = {
 }[keyof typeof Protocol];
 
 type ListenerEvents = {
-	// @ts-ignore rararara
+	// @ts-expect-error does not matter
 	[K in PacketNames]: (packet: InstanceType<(typeof Protocol)[K]>) => void;
 } & {
 	session: () => void;
