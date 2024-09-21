@@ -16,7 +16,9 @@ interface PluginInfo {
 }
 
 interface PluginConstructor {
-	new (client: Client): {
+	new (
+		client: Client,
+	): {
 		onLoad?: (client: Client) => Promise<void>;
 	};
 }

@@ -1,7 +1,8 @@
-const Versions = ["1.21.20"] as const;
+const Versions = ["1.21.20", "1.21.30"] as const;
 
 enum ProtocolList {
 	"1.21.20" = 712,
+	"1.21.30" = 729,
 }
 
 type RealmOptions = {
@@ -25,7 +26,7 @@ type ClientOptions = {
 };
 
 const defaultOptions: ClientOptions = {
-	version: "1.21.20",
+	version: "1.21.30",
 	offline: false,
 	username: "defaultUser",
 	host: "127.0.0.1",

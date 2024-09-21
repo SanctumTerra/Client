@@ -13,8 +13,8 @@ import type { PacketEncryptor } from "./vendor/PacketEncryptor";
 import {
 	ActionIds,
 	BlockAction,
-	BlockCoordinates,
 	BlockFace,
+	BlockPosition,
 	ComplexInventoryTransaction,
 	DataPacket,
 	InputDataFlags,
@@ -152,7 +152,6 @@ class Client extends Listener {
 			Logger.debug(
 				`Sending Game PACKET --> ${packetId} | 0x${hexId} ${new Date().toISOString()}`,
 			);
-
 		try {
 			this.packetSorter.sendPacket(packet, priority);
 		} catch (error) {
@@ -224,12 +223,7 @@ class Client extends Listener {
 	 * @param z The z coordinate of the target position
 	 * @param aimWithHead Whether to adjust the pitch (true) or only yaw (false)
 	 */
-	public lookAt(
-		x: number,
-		y: number,
-		z: number,
-		aimWithHead = true,
-	): void {
+	public lookAt(x: number, y: number, z: number, aimWithHead = true): void {
 		const view = {
 			x: x - this.position.x,
 			y: y - this.position.y,
@@ -338,10 +332,7 @@ class Client extends Listener {
 	 * @param position The position of the block
 	 * @param ticks The number of ticks to break the block
 	 */
-	private async breakBlock(
-		position: Vector3f,
-		ticks = 5,
-	): Promise<void> {
+	private async breakBlock(position: Vector3f, ticks = 5): Promise<void> {
 		const MAX_DISTANCE = 5;
 		const TICK_INTERVAL = 100;
 
@@ -471,7 +462,7 @@ class Client extends Listener {
 			new ItemUseInventoryTransaction(
 				ItemUseInventoryTransactionType.Place,
 				TriggerType.PlayerInput,
-				new BlockCoordinates(position.x, position.y - 1, position.z),
+				new BlockPosition(position.x, position.y - 1, position.z),
 				this.calculateFace(position),
 				0,
 				this.inventory.getItem(0),
@@ -493,7 +484,7 @@ class Client extends Listener {
 			new ItemUseInventoryTransaction(
 				ItemUseInventoryTransactionType.Use,
 				TriggerType.Unknown,
-				new BlockCoordinates(position.x, position.y - 1, position.z),
+				new BlockPosition(position.x, position.y - 1, position.z),
 				this.calculateFace(position),
 				0,
 				this.inventory.getItem(0),

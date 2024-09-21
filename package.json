@@ -1,6 +1,6 @@
 {
   "name": "@sanctumterra/client",
-  "version": "2.0.10",
+  "version": "2.0.11",
   "description": "We'll be singing Baraye.",
   "main": "./dist/index.js",
   "type": "commonjs",
@@ -32,10 +32,9 @@
   "dependencies": {
     "@sanctumterra/raknet": "^1.0.19",
     "@serenityjs/binarystream": "^2.6.6",
-    "@serenityjs/binarystream-linux-x64-gnu": "^2.6.6",
     "@serenityjs/block": "^0.4.4",
     "@serenityjs/network": "^0.4.4",
-    "@serenityjs/protocol": "0.4.4",
+    "@serenityjs/protocol": "^0.5.1-beta-20240921175107",
     "@serenityjs/raknet": "^0.4.4",
     "@serenityjs/world": "^0.4.4",
     "@types/node": "^22.5.1",

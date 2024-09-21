@@ -14,6 +14,21 @@ Install the library via npm:
 npm i @sanctumterra/client
 ```
 
+> [!IMPORTANT]  
+> Due to some features needing protocol support the versions can not be automatically switched, and will require a specific client version.
+
+
+
+## 📊 Supported Versions
+
+| Client Version | Protocol Version | Minecraft Version |
+|----------------|-------------------|-------------------|
+| 2.0.10         | 712               | 1.21.20           |
+| 2.0.11         | 729               | 1.21.30           |
+
+
+
+
 ## 🚀 Usage Example
 
 ```typescript

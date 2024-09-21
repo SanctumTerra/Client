@@ -1,4 +1,8 @@
-import { type TextPacket, type UpdateBlockPacket, Vector3f } from "@serenityjs/protocol";
+import {
+	type TextPacket,
+	type UpdateBlockPacket,
+	Vector3f,
+} from "@serenityjs/protocol";
 import { Client, Logger } from "../index";
 
 function sleep(ms: number) {
@@ -9,10 +13,15 @@ const client = new Client({
 	host: "127.0.0.1",
 	offline: true,
 	username: "SanctumTerra",
-	version: "1.21.20",
-	port: 19133,
+	version: "1.21.30",
+	port: 19132,
 	loadPlugins: false,
 	validateProtocol: false,
+	tokensFolder: "./tokens",
+});
+
+client.raknet.socket.on("error", (error) => {
+	Logger.error(error);
 });
 
 Logger.info("Connecting to server...");
@@ -40,6 +49,7 @@ client.on("TextPacket", async (packet: TextPacket): Promise<void> => {
 client.on("spawn", async () => {
 	console.timeEnd("SpawnTime");
 	await sleep(1000);
+	client.sendMessage("§aHello, world!");
 	client.place(new Vector3f(323, 143, 294));
 });
 

@@ -8,7 +8,7 @@ import {
 	RequestChunkRadiusPacket,
 	ResourcePackClientResponsePacket,
 	ResourcePackResponse,
-	type ResourcePackStackPacket,
+	ResourcePackStackPacket,
 	type ResourcePacksInfoPacket,
 	type ServerToClientHandshakePacket,
 	SetLocalPlayerAsInitializedPacket,
@@ -17,7 +17,12 @@ import {
 } from "@serenityjs/protocol";
 import type { Client } from "../Client";
 import { Priority } from "@serenityjs/raknet";
-import { createECDH, createHash, createPublicKey, KeyObject } from "node:crypto";
+import {
+	createECDH,
+	createHash,
+	createPublicKey,
+	KeyObject,
+} from "node:crypto";
 import { PacketEncryptor } from "./PacketEncryptor";
 import { Logger } from "./Logger";
 
@@ -120,8 +125,14 @@ export class PacketHandler {
 	onResourcePack(
 		instance: ResourcePacksInfoPacket | ResourcePackStackPacket,
 	): void {
-		if (instance.texturePacks.length !== 0) {
-			Logger.debug("Texture Pack Length is not 0!");
+		if (instance instanceof ResourcePackStackPacket) {
+			if (instance.texturePacks.length !== 0) {
+				Logger.debug("Texture Pack Length is not 0!");
+			}
+		} else {
+			if (instance.packs.length !== 0) {
+				Logger.debug("Texture Pack Length is not 0!");
+			}
 		}
 		this.sendResourcePackResponse();
 	}

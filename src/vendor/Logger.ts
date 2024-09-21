@@ -45,7 +45,7 @@ const Logger = {
 	date(): string {
 		const date = new Date();
 		return this.colorize(
-			`§7<§f${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}§7>§r:`
+			`§7<§f${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}§7>§r:`,
 		)[0] as string;
 	},
 
@@ -63,7 +63,7 @@ const Logger = {
 				return color || match;
 			});
 		});
-	}
+	},
 };
 
 export { Logger };

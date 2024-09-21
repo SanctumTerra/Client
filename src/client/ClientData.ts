@@ -8,7 +8,11 @@ import { type SignOptions, sign } from "jsonwebtoken";
 import * as UUID from "uuid-1345";
 import * as skin from "./skin/Skin.json";
 import type { Client } from "../Client";
-import type { AnimatedImageData, PersonaPieces, PieceTintColors } from "./skin/Skin";
+import type {
+	AnimatedImageData,
+	PersonaPieces,
+	PieceTintColors,
+} from "./skin/Skin";
 import type { Advertisement } from "@sanctumterra/raknet";
 
 type LoginData = {

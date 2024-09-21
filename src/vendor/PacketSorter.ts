@@ -132,13 +132,14 @@ export class PacketSorter {
 		for (const frame of frames) {
 			const id = getPacketId(frame);
 			if (id === SetScorePacket.id) continue;
+
 			/** @ts-ignore */
 			const PacketClass = Packets[id];
+
 			if (!PacketClass) {
 				Logger.warn(`Packet with ID ${id} not found`);
 				continue;
 			}
-
 			try {
 				const instance = new PacketClass(frame).deserialize();
 				// @ts-ignore why tsc.... why!
@@ -146,6 +147,7 @@ export class PacketSorter {
 			} catch (error) {
 				Logger.warn(
 					`Error processing packet ${id}: ${error instanceof Error ? error.message : String(error)}`,
+					(error as Error).stack,
 				);
 			}
 		}
