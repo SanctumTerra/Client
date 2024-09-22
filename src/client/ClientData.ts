@@ -14,6 +14,7 @@ import type {
 	PieceTintColors,
 } from "./skin/Skin";
 import type { Advertisement } from "@sanctumterra/raknet";
+import type { Connection } from "../Connection";
 
 type LoginData = {
 	ecdhKeyPair: KeyPairKeyObjectResult;
@@ -87,7 +88,7 @@ const der: KeyExportOptions<"der"> = { format: "der", type: "spki" };
 
 class ClientData {
 	public loginData: LoginData;
-	private client: Client;
+	private client: Connection;
 	public iv: Buffer = Buffer.alloc(0);
 	public encryption: Encryptions;
 	public serverAdvertisement!: Advertisement;
@@ -98,7 +99,7 @@ class ClientData {
 	public sharedSecret!: Buffer;
 	public secretKeyBytes!: Buffer;
 
-	constructor(client: Client) {
+	constructor(client: Connection) {
 		this.client = client;
 		this.loginData = this.prepareLoginData();
 		this.encryption = {

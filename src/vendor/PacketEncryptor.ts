@@ -2,7 +2,7 @@ import { CompressionMethod } from "@serenityjs/protocol";
 import { Frame, Reliability } from "@serenityjs/raknet";
 import * as crypto from "node:crypto";
 import * as Zlib from "node:zlib";
-import type { Client } from "../Client";
+import type { Connection } from "src/Connection";
 
 class PacketEncryptor {
 	public secretKeyBytes: Buffer;
@@ -12,7 +12,7 @@ class PacketEncryptor {
 	public cipher: crypto.Cipher | null;
 	public decipher: crypto.Decipher | null;
 
-	constructor(client: Client, secretKey: Buffer, compressionThreshold = 1) {
+	constructor(client: Connection, secretKey: Buffer, compressionThreshold = 1) {
 		this.secretKeyBytes = Buffer.from(secretKey);
 		this.compressionThreshold = compressionThreshold;
 		this.sendCounter = 0n;

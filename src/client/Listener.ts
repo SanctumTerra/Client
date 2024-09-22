@@ -14,7 +14,7 @@ class Listener extends EventEmitter {
 
 	on<K extends keyof ListenerEvents>(
 		eventName: K,
-		listener: ListenerEvents[K]
+		listener: ListenerEvents[K],
 	): this;
 	on(eventName: string, listener: (...args: unknown[]) => void): this;
 	on(eventName: string, listener: (...args: unknown[]) => void): this {
@@ -23,7 +23,7 @@ class Listener extends EventEmitter {
 
 	once<K extends keyof ListenerEvents>(
 		eventName: K,
-		listener: ListenerEvents[K]
+		listener: ListenerEvents[K],
 	): this;
 	once(eventName: string, listener: (...args: unknown[]) => void): this;
 	once(eventName: string, listener: (...args: unknown[]) => void): this {

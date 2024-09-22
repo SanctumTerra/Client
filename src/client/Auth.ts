@@ -2,8 +2,7 @@ import { Authflow, Titles } from "prismarine-auth";
 import type { Client } from "../Client";
 import { v3 } from "uuid-1345";
 import { Logger } from "../vendor/Logger";
-import { ClientboundCloseFormPacket } from "@serenityjs/protocol";
-const { RealmAPI } = require("prismarine-realms");
+import type { Connection } from "../Connection";
 
 interface Profile {
 	name: string;
@@ -17,7 +16,7 @@ function generateUUID(username: string): string {
 	return v3({ namespace: UUID_NAMESPACE, name: username });
 }
 
-async function createOfflineSession(client: Client): Promise<void> {
+async function createOfflineSession(client: Connection): Promise<void> {
 	if (!client.options.username) {
 		throw new Error("Must specify a valid username for offline session");
 	}
@@ -32,7 +31,7 @@ async function createOfflineSession(client: Client): Promise<void> {
 	client.emit("session");
 }
 
-async function authenticate(client: Client): Promise<void> {
+async function authenticate(client: Connection): Promise<void> {
 	const startTime = Date.now();
 
 	try {
@@ -57,7 +56,7 @@ async function authenticate(client: Client): Promise<void> {
 	}
 }
 
-async function realmAuthenticate(client: Client) {
+async function realmAuthenticate(client: Connection) {
 	console.log(".");
 	/*
     if(!client.options.realmOptions || client.options.realmOptions == null) {
@@ -74,7 +73,7 @@ async function realmAuthenticate(client: Client) {
     */
 }
 
-function createAuthflow(client: Client): Authflow {
+function createAuthflow(client: Connection): Authflow {
 	return new Authflow(
 		client.options.username,
 		client.options.tokensFolder,
@@ -91,7 +90,7 @@ function createAuthflow(client: Client): Authflow {
 
 async function getMinecraftBedrockToken(
 	authflow: Authflow,
-	client: Client,
+	client: Connection,
 ): Promise<string[]> {
 	try {
 		// @ts-expect-error Wrong param type in Authflow definition
@@ -121,7 +120,7 @@ function extractProfile(jwt: string): Profile {
 }
 
 function setupClientProfile(
-	client: Client,
+	client: Connection,
 	profile: Profile,
 	accessToken: string[],
 ): void {
@@ -131,7 +130,7 @@ function setupClientProfile(
 }
 
 async function setupClientChains(
-	client: Client,
+	client: Connection,
 	offline = false,
 ): Promise<void> {
 	client.data.loginData.clientIdentityChain =
