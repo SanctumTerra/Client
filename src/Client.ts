@@ -1,68 +1,34 @@
-import { RakNetClient, type Advertisement } from "@sanctumterra/raknet";
-import { authenticate, createOfflineSession } from "./client/Auth";
-import { ClientData } from "./client/ClientData";
-import {
-	ProtocolList,
-	defaultOptions,
-	type ClientOptions,
-} from "./client/ClientOptions";
-import { Listener, type ListenerEvents } from "./client/Listener";
-import { ProtocolValidator } from "./vendor/ProtocolValidator";
-import { PacketSorter } from "./vendor/PacketSorter";
-import type { PacketEncryptor } from "./vendor/PacketEncryptor";
 import {
 	ActionIds,
 	BlockAction,
 	BlockFace,
 	BlockPosition,
-	ComplexInventoryTransaction,
-	DataPacket,
-	InputDataFlags,
+	ComplexInventoryTransaction, InputDataFlags,
 	InputMode,
 	InputTransaction,
 	InteractionMode,
 	InventoryTransaction,
-	InventoryTransactionPacket,
-	ItemReleaseInventoryTransaction,
-	ItemUseInventoryTransaction,
+	InventoryTransactionPacket, ItemUseInventoryTransaction,
 	ItemUseInventoryTransactionType,
 	LegacyTransaction,
-	NetworkItemStackDescriptor,
-	NetworkSettingsPacket,
-	Packets,
-	PlayerActionPacket,
+	type MovePlayerPacket,
+	NetworkItemStackDescriptor, PlayerActionPacket,
 	PlayerAuthInputData,
 	PlayerAuthInputPacket,
-	PlayMode,
-	RequestNetworkSettingsPacket,
-	TextPacket,
+	PlayMode, TextPacket,
 	TextPacketType,
 	TriggerType,
 	Vector2f,
-	Vector3f,
+	Vector3f
 } from "@serenityjs/protocol";
 import { Priority } from "@serenityjs/raknet";
-import { PluginLoader } from "./vendor/PluginLoader";
+import type { ClientOptions } from "./client/ClientOptions";
 import { Inventory } from "./client/inventory/Inventory";
+import { Connection } from "./Connection";
 import { Logger } from "./vendor/Logger";
 import { Queue } from "./vendor/Queue";
 
-class Client extends Listener {
-	public readonly raknet: RakNetClient;
-	public readonly options: ClientOptions;
-	public readonly protocol: ProtocolList;
-	public readonly data: ClientData;
-	public readonly packetSorter: PacketSorter;
-	public pluginLoader: PluginLoader;
-	private ticker!: NodeJS.Timeout;
-	public runtimeEntityId!: bigint;
-	public username!: string;
-	public position!: Vector3f;
-	public tick = 0;
-
-	public playStatus!: number;
-	public _encryption = false;
-	public _encryptor!: PacketEncryptor;
+class Client extends Connection {
 
 	private sneaking = false;
 	private firstSneak = false;
@@ -78,39 +44,11 @@ class Client extends Listener {
 	private isBreaking = false;
 
 	constructor(options: Partial<ClientOptions> = {}) {
-		super();
-		this.options = { ...defaultOptions, ...options };
-		this.protocol = ProtocolList[this.options.version];
-		this.raknet = new RakNetClient();
-		this.data = new ClientData(this);
-		this.packetSorter = new PacketSorter(this);
-		this.pluginLoader = new PluginLoader(this);
-		this.prepare();
+		super(options);
+		
 		this.inventory = new Inventory(this);
-		this.ticker = setInterval(() => {
-			this.emit("tick", this.tick++);
-		}, 50);
-		this.once("spawn", this.handleAuthInput.bind(this));
-	}
-
-	public async connect(): Promise<void> {
-		const protocolValidator = new ProtocolValidator(this);
-		if (this.options.validateProtocol) {
-			await protocolValidator.validateAndCheck();
-		}
-		if (this.options.loadPlugins) {
-			await this.pluginLoader.init();
-		}
-		this.initializeSession();
-	}
-
-	public disconnect() {
-		Logger.info("Disconnecting...");
-		this.raknet.close();
-		clearInterval(this.ticker);
-		setTimeout(() => {
-			process.exit(0);
-		}, 1000);
+		this.on("spawn", this.handleAuthInput.bind(this));
+		this.on("MovePlayerPacket", this.onMovePlayer.bind(this));
 	}
 
 	public async sneak() {
@@ -118,47 +56,10 @@ class Client extends Listener {
 		this.sneaking = true;
 	}
 
-	private initializeSession(): void {
-		this.on("session", this.handleSessionStart.bind(this));
-		this.options.offline ? createOfflineSession(this) : authenticate(this);
-	}
 
-	private async handleSessionStart(): Promise<void> {
-		await this.raknet.connect(this.options.host, this.options.port);
-	}
 
-	private handleServerAdvertisement(ping: Advertisement): void {
-		this.data.serverAdvertisement = ping;
-	}
-
-	private prepare(): void {
-		/// 111ms
-		this.raknet.once("connect", this.handleConnect.bind(this));
-	}
-
-	private handleConnect(): void {
-		const networkSettingsPacket = new RequestNetworkSettingsPacket();
-		networkSettingsPacket.protocol = this.protocol;
-		this.sendPacket(networkSettingsPacket);
-	}
-
-	public sendPacket(
-		packet: DataPacket,
-		priority: Priority = Priority.Normal,
-	): void {
-		const packetId = packet.getId();
-		const hexId = packetId.toString(16).padStart(2, "0");
-		if (this.options.debug)
-			Logger.debug(
-				`Sending Game PACKET --> ${packetId} | 0x${hexId} ${new Date().toISOString()}`,
-			);
-		try {
-			this.packetSorter.sendPacket(packet, priority);
-		} catch (error) {
-			Logger.error(
-				`Error sending packet: ${error instanceof Error ? error.message : String(error)}`,
-			);
-		}
+	private onMovePlayer(instance: MovePlayerPacket): void {
+		this.position = instance.position;
 	}
 
 	private handleAuthInput(): void {
@@ -252,29 +153,7 @@ class Client extends Listener {
 		this.headYaw = yaw;
 	}
 
-	/**
-	 * @deprecated
-	 */
-	public async waitForEvent<K extends keyof ListenerEvents>(
-		eventName: K,
-		modifier?: (data: DataPacket) => void,
-	): Promise<Parameters<ListenerEvents[K]>[0]> {
-		return new Promise((resolve) => {
-			const listener: ListenerEvents[K] = ((
-				...args: Parameters<ListenerEvents[K]>
-			) => {
-				const data = args[0];
-				if (modifier && data instanceof DataPacket) {
-					modifier(data);
-				}
-				this.removeListener(eventName, listener);
-				resolve(data);
-			}) as ListenerEvents[K];
-
-			this.once(eventName, listener);
-		});
-	}
-
+	
 	/**
 	 * Calculate the face of a block
 	 * @param blockPosition The position of the block
