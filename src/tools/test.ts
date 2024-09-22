@@ -15,8 +15,8 @@ const client = new Client({
 	host: "127.0.0.1",
 	offline: false,
 	username: "SanctumTerra",
-	version: "1.21.20",
-	port: 19133,
+	version: "1.21.30",
+	port: 19132,
 	loadPlugins: false,
 	validateProtocol: false,
 });

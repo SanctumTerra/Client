@@ -1,31 +1,21 @@
-import {
-	type TextPacket,
-	type UpdateBlockPacket,
-	Vector3f,
-} from "@serenityjs/protocol";
+import { Vector3f, type TextPacket, type UpdateBlockPacket } from "@serenityjs/protocol";
 import { Client, Logger } from "../index";
 
-function sleep(ms: number) {
-	return new Promise((resolve) => setTimeout(resolve, ms));
-}
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const client = new Client({
 	host: "127.0.0.1",
-	offline: true,
+	port: 19132,
 	username: "SanctumTerra",
 	version: "1.21.30",
-	port: 19132,
+	offline: true,
 	loadPlugins: false,
 	validateProtocol: false,
-	tokensFolder: "./tokens",
 });
 
-client.raknet.socket.on("error", (error) => {
-	Logger.error(error);
-});
+client.raknet.socket.on("error", (error) => Logger.error(error));
 
 Logger.info("Connecting to server...");
-
 try {
 	client.connect();
 	console.time("SpawnTime");
@@ -33,31 +23,40 @@ try {
 	Logger.error(error as Error);
 }
 
-client.on("TextPacket", async (packet: TextPacket): Promise<void> => {
+client.on("TextPacket", handleTextPacket);
+client.on("spawn", handleSpawn);
+client.on("UpdateBlockPacket", handleUpdateBlockPacket);
+
+async function handleTextPacket(packet: TextPacket): Promise<void> {
 	if (!packet.parameters) return Logger.chat(packet.message);
 
 	const [param1, param2] = packet.parameters;
-	if (packet.message.includes("chat.type.text"))
-		Logger.chat(`§f<${param1}> ${param2}`);
-	else if (packet.message.includes("multiplayer.player.joined"))
-		Logger.chat(`§e${param1} §ejoined the game`);
-	else if (packet.message.includes("multiplayer.player.left"))
-		Logger.chat(`§f${param1} §7left the game`);
-	else console.log(packet.message);
-});
+	const messageTypes = {
+		"chat.type.text": () => Logger.chat(`§f<${param1}> ${param2}`),
+		"multiplayer.player.joined": () => Logger.chat(`§e${param1} §ejoined the game`),
+		"multiplayer.player.left": () => Logger.chat(`§f${param1} §7left the game`),
+		"chat.type.announcement": () => Logger.chat(`§d[${param1}] ${param2}`),
+	};
 
-client.on("spawn", async () => {
+	const handler = Object.entries(messageTypes).find(([key]) => packet.message.includes(key));
+	handler ? handler[1]() : console.log(packet.message);
+}
+
+async function handleSpawn(): Promise<void> {
 	console.timeEnd("SpawnTime");
 	await sleep(1000);
 	client.sendMessage("§aHello, world!");
 	client.place(new Vector3f(323, 143, 294));
-});
+}
 
-client.on("UpdateBlockPacket", (packet: UpdateBlockPacket) => {
-	// const block = BlockPermutation.resolve(BlockIdentifier.Air);
-	//console.log(inspect(block, true, 999, true))
+function handleUpdateBlockPacket(packet: UpdateBlockPacket): void {
 	if (packet.networkBlockId === 11844 || packet.networkBlockId === 6118) return;
-	client.break(
-		new Vector3f(packet.position.x, packet.position.y, packet.position.z),
-	);
-});
+
+	const distance = Math.abs(packet.position.x - client.position.x) +
+	                   Math.abs(packet.position.y - client.position.y) +
+	                   Math.abs(packet.position.z - client.position.z);
+
+	if (distance <= 5) {
+		client.break(new Vector3f(packet.position.x, packet.position.y, packet.position.z));
+	}
+}
