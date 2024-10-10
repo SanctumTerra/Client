@@ -57,7 +57,7 @@ export class PacketSorter {
             } else if (header === 21) {
                 this.handleDisconnect(frame.payload);
             } else {
-                Logger.debug(`Unknown header ${header}`);
+                if (globalThis.__DEBUG) Logger.debug(`Unknown header ${header}`);
             }
         } catch (error) {
             Logger.warn(

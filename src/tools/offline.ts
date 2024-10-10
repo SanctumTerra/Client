@@ -5,12 +5,13 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const client = new Client({
 	host: "127.0.0.1",
-	port: 19132,
+	port: 19133,
 	username: "SanctumTerra",
 	version: "1.21.30",
 	offline: true,
 	loadPlugins: false,
 	validateProtocol: false,
+	debug: false
 });
 
 client.raknet.socket.on("error", (error) => Logger.error(error));

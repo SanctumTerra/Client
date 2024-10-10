@@ -1,4 +1,4 @@
-import { RakNetClient } from "@sanctumterra/raknet";
+import { Client as RakNetClient } from "@sanctumterra/raknet";
 import { type ClientOptions, defaultOptions, ProtocolList } from "./client/ClientOptions";
 import { Listener } from "./client/Listener";
 import { ClientData } from "./client/ClientData";
@@ -9,6 +9,24 @@ import { PacketSorter } from "./vendor/PacketSorter";
 import { PacketEncryptor } from "./vendor/PacketEncryptor";
 import { authenticate, createOfflineSession } from "./client/Auth";
 import { createECDH, createHash, createPublicKey, KeyObject } from "node:crypto";
+import { performance } from 'node:perf_hooks';
+
+export function measureExecutionTime(target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
+    const originalMethod = descriptor.value;
+    descriptor.value = function (...args: unknown[]) {
+        const start = performance.now();
+        const result = originalMethod.apply(this, args);
+        const end = performance.now();
+        const duration = end - start;
+        if (globalThis.__DEBUG) Logger.debug(`${propertyKey} execution time: ${duration.toFixed(2)}ms`);
+        return result;
+    };
+    return descriptor;
+}
+
+declare global {
+    var __DEBUG: boolean;
+}
 
 class Connection extends Listener {
     private ticker!: NodeJS.Timeout;
@@ -30,12 +48,12 @@ class Connection extends Listener {
 	constructor(options: Partial<ClientOptions> = {}) {
         super();
         this.options = { ...defaultOptions, ...options };
+		globalThis.__DEBUG = options.debug ?? false;
         this.protocol = ProtocolList[this.options.version];
-        this.raknet = new RakNetClient();
+		this.raknet = new RakNetClient({ host: this.options.host, port: this.options.port, debug: this.options.debug });
         this.data = new ClientData(this);
 		this.packetSorter = new PacketSorter(this);
         this.prepare();
-
     }
 
     public async connect(): Promise<void> {
@@ -94,15 +112,17 @@ class Connection extends Listener {
         this.sendPacket(networkSettingsPacket);
     }
 
+	@measureExecutionTime
     private initializeSession(): void {
 		this.on("session", this.handleSessionStart.bind(this));
 		this.options.offline ? createOfflineSession(this) : authenticate(this);
 	}
     
     private async handleSessionStart(): Promise<void> {
-		await this.raknet.connect(this.options.host, this.options.port);
+		await this.raknet.connect();
 	}
 
+    @measureExecutionTime
     private onNetworkSettings(instance: NetworkSettingsPacket): void {
         if (this.options.debug) Logger.debug("S -> C NetworkSettingsPacket");
 		this.data.sendDeflated = true;
@@ -110,6 +130,7 @@ class Connection extends Listener {
 		this.sendLoginPacket();
     }
 
+    @measureExecutionTime
     private onStartGame(instance: StartGamePacket): void {
 		this.position = instance.playerPosition;
 		this.runtimeEntityId = instance.runtimeEntityId;
@@ -120,6 +141,7 @@ class Connection extends Listener {
 		this.sendPacket(radius, Priority.Immediate);
 	}
 
+    @measureExecutionTime
     onServerToClientHandshake(instance: ServerToClientHandshakePacket): void {
 		const [header, payload] = instance.token
 			.split(".")
@@ -141,6 +163,7 @@ class Connection extends Listener {
 		this.sendClientToServerHandshake();
 	}
 
+    @measureExecutionTime
     private onPlayStatus(instance: PlayStatusPacket): void {
 		this.playStatus = instance.status;
 		if (instance.status === PlayStatus.PlayerSpawn) {
@@ -151,6 +174,7 @@ class Connection extends Listener {
 		}
 	}
 
+    @measureExecutionTime
     private onResourcePack(
 		instance: ResourcePacksInfoPacket | ResourcePackStackPacket,
 	): void {
@@ -168,7 +192,7 @@ class Connection extends Listener {
 		response.packs = []; 
 		this.sendPacket(response, Priority.Immediate);
     }
-
+	@measureExecutionTime
     private sendLoginPacket(): void {
 		const chain = [
 			this.data.loginData.clientIdentityChain,
@@ -183,6 +207,7 @@ class Connection extends Listener {
 		this.sendPacket(login, Priority.Immediate);
 	}
 
+    @measureExecutionTime
     private createSharedSecret(
 		privateKey: KeyObject,
 		publicKey: KeyObject,
@@ -215,7 +240,7 @@ class Connection extends Listener {
 		return ecdh.computeSecret(publicKeyHex, "hex");
 	}
 
-    
+    @measureExecutionTime
 	private setupEncryption(salt: string): void {
 		const secretHash = createHash("sha256")
 			.update(Buffer.from(salt, "base64"))
@@ -233,12 +258,14 @@ class Connection extends Listener {
 		}
 		this._encryption = true;
 	}
-    
+
+    @measureExecutionTime
     private sendClientToServerHandshake(): void {
 		const handshake = new ClientToServerHandshakePacket();
 		this.sendPacket(handshake, Priority.Immediate);
 	}
 
+    @measureExecutionTime
 	private validateKeys(privateKey: KeyObject, publicKey: KeyObject): void {
 		if (
 			!(privateKey instanceof KeyObject) ||

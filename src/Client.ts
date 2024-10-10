@@ -45,7 +45,6 @@ class Client extends Connection {
 
 	constructor(options: Partial<ClientOptions> = {}) {
 		super(options);
-		
 		this.inventory = new Inventory(this);
 		this.on("spawn", this.handleAuthInput.bind(this));
 		this.on("MovePlayerPacket", this.onMovePlayer.bind(this));
