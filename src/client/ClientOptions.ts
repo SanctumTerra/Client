@@ -1,4 +1,4 @@
-const Versions = ["1.21.20", "1.21.30"] as const;
+const Versions = [ "1.21.20", "1.21.30" ] as const;
 
 enum ProtocolList {
 	"1.21.20" = 712,
@@ -21,8 +21,6 @@ type ClientOptions = {
 	viewDistance: number;
 	validateProtocol: boolean;
 	loadPlugins: boolean;
-	//realm: boolean;
-	//realmOptions: RealmOptions | null;
 };
 
 const defaultOptions: ClientOptions = {
@@ -36,9 +34,7 @@ const defaultOptions: ClientOptions = {
 	tokensFolder: `${process.cwd()}/tokens`,
 	viewDistance: 10,
 	validateProtocol: true,
-	loadPlugins: true,
-	//realm: false,
-	//realmOptions: null
+	loadPlugins: true
 };
 
 export { type ClientOptions, type RealmOptions, defaultOptions, ProtocolList };

@@ -8,7 +8,7 @@ const colors: { [key: string]: string } = {
 	"4": "\u001B[31m", // Dark Red
 	"5": "\u001B[35m", // Dark Purple
 	"6": "\u001B[33m", // Gold
-	"7": "\u001B[30m", // Gray
+	"7": "\u001B[37m", // Light Gray
 	"8": "\u001B[90m", // Dark Gray
 	"9": "\u001B[94m", // Blue
 	a: "\u001B[92m", // Green

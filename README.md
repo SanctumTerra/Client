@@ -19,10 +19,11 @@ npm i @sanctumterra/client
 
 ## 📊 Supported Versions
 
-| Client Version | Protocol Version | Minecraft Version |
+| Client Version | Protocol Version  | Minecraft Version |
 |----------------|-------------------|-------------------|
-| 2.1.0          | 729               | 1.21.30           |
 | 2.0.10         | 712               | 1.21.20           |
+| 2.1.2          | 729               | 1.21.30           |
+
 
 ## 🚀 Usage Example
 

@@ -1,6 +1,6 @@
 {
   "name": "@sanctumterra/client",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "We'll be singing Baraye.",
   "main": "./dist/index.js",
   "type": "commonjs",
@@ -14,6 +14,12 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "maintainers": [
+    {
+      "name": "SanctumTerra",
+      "url": "https://github.com/TerraOfficial"
+    }
+  ],
   "devDependencies": {
     "@biomejs/biome": "1.9.2",
     "@types/jsonwebtoken": "^9.0.7",
@@ -24,14 +30,8 @@
     "typescript": "^5.6.3",
     "why-is-node-running": "^3.2.0"
   },
-  "maintainers": [
-    {
-      "name": "SanctumTerra",
-      "url": "https://github.com/TerraOfficial"
-    }
-  ],
   "dependencies": {
-    "@sanctumterra/raknet": "^1.1.2",
+    "@sanctumterra/raknet": "^1.1.3",
     "@serenityjs/binarystream": "^2.6.6",
     "@serenityjs/block": "^0.4.4",
     "@serenityjs/network": "^0.4.4",
@@ -39,7 +39,6 @@
     "@serenityjs/raknet": "^0.4.4",
     "@serenityjs/world": "^0.4.4",
     "@types/node": "^22.7.5",
-    "jose": "^5.9.3",
     "prismarine-auth": "github:AnyBananaGAME/prismarine-auth",
     "prismarine-realms": "^1.3.2",
     "uuid-1345": "^1.0.2"

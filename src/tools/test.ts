@@ -16,9 +16,9 @@ const client = new Client({
 	offline: false,
 	username: "SanctumTerra",
 	version: "1.21.30",
-	port: 19132,
+	port: 19133,
 	loadPlugins: false,
-	validateProtocol: false,
+	validateProtocol: false
 });
 
 try {
@@ -34,10 +34,12 @@ try {
 client.on("spawn", () => {
 	console.timeEnd("SpawnTime");
 	client.sneak();
+	/*
 	setInterval(() => {
 		const [x, y, z] = Math.random() < 0.5 ? [258, 74, 257] : [251, 72, 257];
-		// client.lookAt(x, y, z);
+		client.lookAt(x, y, z);
 	}, 1000);
+	*/
 
 	setInterval(async () => {
 		const item = client.inventory.items.find((item) => item.network > 0);
@@ -60,11 +62,11 @@ client.on("TextPacket", async (packet: TextPacket): Promise<void> => {
 
 	const [param1, param2] = packet.parameters;
 	if (packet.message.includes("chat.type.text"))
-		Logger.chat(`§f<${param1}> ${param2}`);
+		Logger.chat(`§f<${param1}> ${param2}§r`);
 	else if (packet.message.includes("multiplayer.player.joined"))
-		Logger.chat(`§e${param1} §ejoined the game`);
+		Logger.chat(`§e${param1} §ejoined the game§r`);
 	else if (packet.message.includes("multiplayer.player.left"))
-		Logger.chat(`§f${param1} §7left the game`);
+		Logger.chat(`§f${param1} §7left the game§r`);
 	else console.log(packet.message);
 
 	if (packet.message.includes("chat.type.text") && param2.includes("rat")) {

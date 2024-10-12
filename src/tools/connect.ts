@@ -5,7 +5,7 @@ const client = new Client({
 	offline: true,
 	username: "SanctumTerra",
 	version: "1.21.30",
-	port: 19132,
+	port: 19133,
 	loadPlugins: false,
 	validateProtocol: false,
 });

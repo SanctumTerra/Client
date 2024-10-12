@@ -2,7 +2,7 @@ import { Client as RakNetClient } from "@sanctumterra/raknet";
 import { type ClientOptions, defaultOptions, ProtocolList } from "./client/ClientOptions";
 import { Listener } from "./client/Listener";
 import { ClientData } from "./client/ClientData";
-import { ClientToServerHandshakePacket, type DataPacket, DisconnectPacket, LoginPacket, LoginTokens, type NetworkSettingsPacket, PlayStatus, type PlayStatusPacket, RequestChunkRadiusPacket, RequestNetworkSettingsPacket, ResourcePackClientResponsePacket, ResourcePackResponse, type ResourcePacksInfoPacket, ResourcePackStackPacket, type ServerToClientHandshakePacket, SetLocalPlayerAsInitializedPacket, type StartGamePacket, type Vector3f } from "@serenityjs/protocol";
+import { ClientToServerHandshakePacket, type DataPacket, DisconnectMessage, DisconnectPacket, DisconnectReason, LoginPacket, LoginTokens, type NetworkSettingsPacket, PlayStatus, type PlayStatusPacket, RequestChunkRadiusPacket, RequestNetworkSettingsPacket, ResourcePackClientResponsePacket, ResourcePackResponse, type ResourcePacksInfoPacket, ResourcePackStackPacket, type ServerToClientHandshakePacket, SetLocalPlayerAsInitializedPacket, type StartGamePacket, type Vector3f } from "@serenityjs/protocol";
 import { Logger } from "./vendor/Logger";
 import { Priority } from "@serenityjs/raknet";
 import { PacketSorter } from "./vendor/PacketSorter";
@@ -65,18 +65,22 @@ class Connection extends Listener {
 		Logger.info(`Disconnecting: ${reason}`);
 		if (clientSide) {
 			const disconnectPacket = new DisconnectPacket();
+			disconnectPacket.reason = DisconnectReason.Disconnected;
+			disconnectPacket.message = new DisconnectMessage();
+			disconnectPacket.hideDisconnectScreen = true;
 			this.sendPacket(disconnectPacket, Priority.Immediate);
+			this.raknet.disconnect();
+		} else {
+			this.raknet.close();
 		}
 		clearInterval(this.ticker);
 		this.removeAllListeners();
-		this.raknet.close();
-		process.exit(0);
 	}
 
 
     public sendPacket(
         packet: DataPacket,
-        priority: Priority = Priority.Normal,
+        priority: Priority = Priority.Normal
     ): void {
         const packetId = packet.getId();
         const hexId = packetId.toString(16).padStart(2, "0");
