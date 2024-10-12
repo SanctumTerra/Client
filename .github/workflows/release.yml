@@ -8,6 +8,8 @@ on:
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v3
 
@@ -30,14 +32,11 @@ jobs:
 
       - name: Create Release
         if: success()
-        uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ steps.package-info.outputs.version }}
-          release_name: Release v${{ steps.package-info.outputs.version }} for Minecraft ${{ steps.package-info.outputs.minecraft }}
-          body: |
-            Release for @sanctumterra/client v${{ steps.package-info.outputs.version }}
-            Compatible with Minecraft ${{ steps.package-info.outputs.minecraft }}
-          draft: false
-          prerelease: false
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create v${{ steps.package-info.outputs.version }} \
+            --title "Release v${{ steps.package-info.outputs.version }} for Minecraft ${{ steps.package-info.outputs.minecraft }}" \
+            --notes "Release for @sanctumterra/client v${{ steps.package-info.outputs.version }}
+            Compatible with Minecraft ${{ steps.package-info.outputs.minecraft }}" \
+            --target ${{ github.sha }}
