@@ -1,174 +1,170 @@
 import {
-    Disconnect,
-    Frame,
-    type Priority,
-    Reliability,
+	Disconnect,
+	Frame,
+	type Priority,
+	Reliability,
 } from "@serenityjs/raknet";
 import { Logger } from "../vendor/Logger";
 import {
-    CompressionMethod,
-    type DataPacket,
-    DisconnectPacket,
-    Framer,
-    getPacketId,
-    Packets,
-    SetScorePacket,
+	CompressionMethod,
+	type DataPacket,
+	DisconnectPacket,
+	Framer,
+	getPacketId,
+	Packets,
+	SetScorePacket,
 } from "@serenityjs/protocol";
 import { deflateRawSync, inflateRawSync } from "node:zlib";
 import { CraftingDataPacket } from "./packets/CraftingDataPacket";
 import type { Connection } from "../Connection";
 
 export class PacketSorter {
+	constructor(private readonly connection: Connection) {
+		this.initializeListeners();
+	}
 
-    constructor(private readonly connection: Connection) {
-        this.initializeListeners();
-    }
+	public sendPacket(packet: DataPacket, priority: Priority): void {
+		const serialized = packet.serialize();
+		const framed = Framer.frame(serialized);
+		const payload = this.preparePayload(framed);
 
+		const frame = new Frame();
+		frame.reliability = Reliability.ReliableOrdered;
+		frame.orderChannel = 0;
+		frame.payload = payload;
+		this.connection.raknet.sender.sendFrame(frame, priority);
+	}
 
-    public sendPacket(packet: DataPacket, priority: Priority): void {
-        const serialized = packet.serialize();
-        const framed = Framer.frame(serialized);
-        const payload = this.preparePayload(framed);
+	public handleDisconnect(payload: Buffer): void {
+		this.connection.emit("close");
+	}
 
-        const frame = new Frame();
-        frame.reliability = Reliability.ReliableOrdered;
-        frame.orderChannel = 0;
-        frame.payload = payload;
-        this.connection.raknet.sender.sendFrame(frame, priority);
-    }
+	private initializeListeners(): void {
+		this.connection.raknet.on(
+			"encapsulated",
+			this.handleEncapsulatedPacket.bind(this),
+		);
+	}
 
-    public handleDisconnect(payload: Buffer): void {
-        this.connection.emit("close");
-    }
+	private handleEncapsulatedPacket(frame: Frame): void {
+		const header = frame.payload[0] as number;
+		try {
+			if (header === 254) {
+				this.handleGamePacket(frame.payload);
+			} else if (header === 21) {
+				this.handleDisconnect(frame.payload);
+			} else {
+				if (globalThis.__DEBUG) Logger.debug(`Unknown header ${header}`);
+			}
+		} catch (error) {
+			Logger.warn(
+				`Error processing encapsulated packet: ${error instanceof Error ? error.message : String(error)}`,
+			);
+		}
+	}
 
+	private preparePayload(framed: Buffer): Buffer {
+		if (this.connection._encryption) {
+			return this.connection._encryptor.encryptPacket(framed).payload;
+		}
 
-    private initializeListeners(): void {
-        this.connection.raknet.on(
-            "encapsulated",
-            this.handleEncapsulatedPacket.bind(this),
-        );
-    }
+		if (!this.connection.data.sendDeflated) {
+			return Buffer.concat([Buffer.from([254]), framed]);
+		}
 
-    private handleEncapsulatedPacket(frame: Frame): void {
-        const header = frame.payload[0] as number;
-        try {
-            if (header === 254) {
-                this.handleGamePacket(frame.payload);
-            } else if (header === 21) {
-                this.handleDisconnect(frame.payload);
-            } else {
-                if (globalThis.__DEBUG) Logger.debug(`Unknown header ${header}`);
-            }
-        } catch (error) {
-            Logger.warn(
-                `Error processing encapsulated packet: ${error instanceof Error ? error.message : String(error)}`,
-            );
-        }
-    }
+		const deflated =
+			framed.byteLength > 256
+				? Buffer.from([CompressionMethod.Zlib, ...deflateRawSync(framed)])
+				: Buffer.from([CompressionMethod.None, ...framed]);
+		return Buffer.concat([Buffer.from([254]), deflated]);
+	}
 
-    private preparePayload(framed: Buffer): Buffer {
-        if (this.connection._encryption) {
-            return this.connection._encryptor.encryptPacket(framed).payload;
-        }
+	private handleGamePacket(payload: Buffer): void {
+		let decrypted = this.decryptPayload(payload.subarray(1));
+		if (!decrypted) return;
 
-        if (!this.connection.data.sendDeflated) {
-            return Buffer.concat([Buffer.from([254]), framed]);
-        }
+		const algorithm = this.getCompressionAlgorithm(decrypted);
+		if (algorithm !== CompressionMethod.NotPresent) {
+			decrypted = decrypted.subarray(1);
+		}
 
-        const deflated =
-            framed.byteLength > 256
-                ? Buffer.from([CompressionMethod.Zlib, ...deflateRawSync(framed)])
-                : Buffer.from([CompressionMethod.None, ...framed]);
-        return Buffer.concat([Buffer.from([254]), deflated]);
-    }
+		const inflated = this.inflatePacket(decrypted, algorithm);
+		if (!inflated) return;
 
-    private handleGamePacket(payload: Buffer): void {
-        let decrypted = this.decryptPayload(payload.subarray(1));
-        if (!decrypted) return;
+		this.processInflatedPacket(inflated);
+	}
 
-        const algorithm = this.getCompressionAlgorithm(decrypted);
-        if (algorithm !== CompressionMethod.NotPresent) {
-            decrypted = decrypted.subarray(1);
-        }
+	private decryptPayload(payload: Buffer): Buffer | null {
+		if (!this.connection._encryption) return payload;
 
-        const inflated = this.inflatePacket(decrypted, algorithm);
-        if (!inflated) return;
+		try {
+			return this.connection._encryptor.decryptPacket(payload);
+		} catch (error) {
+			Logger.error(
+				`Decryption error: ${error instanceof Error ? error.message : String(error)}`,
+			);
+			return null;
+		}
+	}
 
-        this.processInflatedPacket(inflated);
-    }
+	private getCompressionAlgorithm(buffer: Buffer): CompressionMethod {
+		return buffer[0] in CompressionMethod
+			? (buffer.readUint8() as CompressionMethod)
+			: CompressionMethod.NotPresent;
+	}
 
-    private decryptPayload(payload: Buffer): Buffer | null {
-        if (!this.connection._encryption) return payload;
+	private inflatePacket(
+		buffer: Buffer,
+		algorithm: CompressionMethod,
+	): Buffer | null {
+		switch (algorithm) {
+			case CompressionMethod.Zlib:
+				return inflateRawSync(buffer);
+			case CompressionMethod.None:
+			case CompressionMethod.NotPresent:
+				return buffer;
+			default:
+				Logger.error(
+					`Invalid compression algorithm: ${CompressionMethod[algorithm]}`,
+				);
+				return null;
+		}
+	}
 
-        try {
-            return this.connection._encryptor.decryptPacket(payload);
-        } catch (error) {
-            Logger.error(
-                `Decryption error: ${error instanceof Error ? error.message : String(error)}`,
-            );
-            return null;
-        }
-    }
+	private processInflatedPacket(inflated: Buffer): void {
+		try {
+			const frames = Framer.unframe(inflated);
+			this.processFrames(frames);
+		} catch (error) {
+			Logger.warn(
+				`Could not unframe packet: ${error instanceof Error ? error.message : String(error)}`,
+			);
+		}
+	}
 
-    private getCompressionAlgorithm(buffer: Buffer): CompressionMethod {
-        return buffer[0] in CompressionMethod
-            ? (buffer.readUint8() as CompressionMethod)
-            : CompressionMethod.NotPresent;
-    }
+	private processFrames(frames: Buffer[]): void {
+		for (const frame of frames) {
+			const id = getPacketId(frame);
+			if (id === SetScorePacket.id) continue;
 
-    private inflatePacket(
-        buffer: Buffer,
-        algorithm: CompressionMethod,
-    ): Buffer | null {
-        switch (algorithm) {
-            case CompressionMethod.Zlib:
-                return inflateRawSync(buffer);
-            case CompressionMethod.None:
-            case CompressionMethod.NotPresent:
-                return buffer;
-            default:
-                Logger.error(
-                    `Invalid compression algorithm: ${CompressionMethod[algorithm]}`,
-                );
-                return null;
-        }
-    }
+			let PacketClass = Packets[id];
+			if (id === 52) {
+				PacketClass = CraftingDataPacket;
+			}
 
-    private processInflatedPacket(inflated: Buffer): void {
-        try {
-            const frames = Framer.unframe(inflated);
-            this.processFrames(frames);
-        } catch (error) {
-            Logger.warn(
-                `Could not unframe packet: ${error instanceof Error ? error.message : String(error)}`,
-            );
-        }
-    }
-
-    private processFrames(frames: Buffer[]): void {
-        for (const frame of frames) {
-            const id = getPacketId(frame);
-            if (id === SetScorePacket.id) continue;
-
-            let PacketClass = Packets[id];
-            if (id === 52) {
-                PacketClass = CraftingDataPacket;
-            }
-
-            if (!PacketClass) {
-                Logger.warn(`Packet with ID ${id} not found`);
-                continue;
-            }
-            try {
-                const instance = new PacketClass(frame).deserialize();
-                this.connection.emit(PacketClass.name, instance);
-            } catch (error) {
-                Logger.warn(
-                    `Error processing packet ${id}: ${error instanceof Error ? error.message : String(error)}`,
-                    (error as Error).stack,
-                );
-            }
-        }
-    }
-
+			if (!PacketClass) {
+				Logger.warn(`Packet with ID ${id} not found`);
+				continue;
+			}
+			try {
+				const instance = new PacketClass(frame).deserialize();
+				this.connection.emit(PacketClass.name, instance);
+			} catch (error) {
+				Logger.warn(
+					`Error processing packet ${id}: ${error instanceof Error ? error.message : String(error)}`,
+					(error as Error).stack,
+				);
+			}
+		}
+	}
 }

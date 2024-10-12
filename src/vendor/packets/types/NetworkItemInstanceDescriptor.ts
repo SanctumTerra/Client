@@ -35,7 +35,7 @@ class ItemInstanceUserData extends DataType {
 		nbt: CompoundTag | null,
 		canPlaceOn: Array<string>,
 		canDestroy: Array<string>,
-		ticking?: bigint | null
+		ticking?: bigint | null,
 	) {
 		super();
 		this.nbt = nbt;
@@ -47,7 +47,7 @@ class ItemInstanceUserData extends DataType {
 	public static read(
 		stream: BinaryStream,
 		_endian: Endianness,
-		id: number
+		id: number,
 	): ItemInstanceUserData {
 		// Read the data marker.
 		const marker = stream.readUint16(Endianness.Little);
@@ -110,7 +110,8 @@ class ItemInstanceUserData extends DataType {
 		}
 
 		// Check if the item is a shield.
-		const ticking = id === globalThis.shieldID ? stream.readInt64(Endianness.Little) : null;
+		const ticking =
+			id === globalThis.shieldID ? stream.readInt64(Endianness.Little) : null;
 		// Return the instance.
 		return new ItemInstanceUserData(nbt, canPlaceOn, canDestroy, ticking);
 	}
@@ -119,7 +120,7 @@ class ItemInstanceUserData extends DataType {
 		stream: BinaryStream,
 		value: ItemInstanceUserData,
 		_endian: Endianness,
-		id: number
+		id: number,
 	): void {
 		// Check if the nbt is null.
 		if (value.nbt) {

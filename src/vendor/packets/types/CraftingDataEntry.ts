@@ -146,7 +146,7 @@ class CraftingDataEntry extends DataType {
 				smithingTransform,
 				smithingTrim,
 			);
-			
+
 			entries.push(entry);
 		}
 		// Return the entries.

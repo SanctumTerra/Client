@@ -1,4 +1,8 @@
-import { Vector3f, type TextPacket, type UpdateBlockPacket } from "@serenityjs/protocol";
+import {
+	Vector3f,
+	type TextPacket,
+	type UpdateBlockPacket,
+} from "@serenityjs/protocol";
 import { Client, Logger } from "../index";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -11,7 +15,7 @@ const client = new Client({
 	offline: true,
 	loadPlugins: false,
 	validateProtocol: false,
-	debug: false
+	debug: false,
 });
 
 client.raknet.socket.on("error", (error) => Logger.error(error));
@@ -40,12 +44,16 @@ async function handleTextPacket(packet: TextPacket): Promise<void> {
 	const [param1, param2] = packet.parameters;
 	const messageTypes = {
 		"chat.type.text": () => Logger.chat(`§f<${param1}> ${param2}§r`),
-		"multiplayer.player.joined": () => Logger.chat(`§e${param1} §ejoined the game§r`),
-		"multiplayer.player.left": () => Logger.chat(`§f${param1} §7left the game§r`),
+		"multiplayer.player.joined": () =>
+			Logger.chat(`§e${param1} §ejoined the game§r`),
+		"multiplayer.player.left": () =>
+			Logger.chat(`§f${param1} §7left the game§r`),
 		"chat.type.announcement": () => Logger.chat(`§d[${param1}] ${param2}§r`),
 	};
 
-	const handler = Object.entries(messageTypes).find(([key]) => packet.message.includes(key));
+	const handler = Object.entries(messageTypes).find(([key]) =>
+		packet.message.includes(key),
+	);
 	handler ? handler[1]() : console.log(packet.message);
 }
 
@@ -59,11 +67,14 @@ async function handleSpawn(): Promise<void> {
 function handleUpdateBlockPacket(packet: UpdateBlockPacket): void {
 	if (packet.networkBlockId === 11844 || packet.networkBlockId === 6118) return;
 
-	const distance = Math.abs(packet.position.x - client.position.x) +
-	                   Math.abs(packet.position.y - client.position.y) +
-	                   Math.abs(packet.position.z - client.position.z);
+	const distance =
+		Math.abs(packet.position.x - client.position.x) +
+		Math.abs(packet.position.y - client.position.y) +
+		Math.abs(packet.position.z - client.position.z);
 
 	if (distance <= 5) {
-		client.break(new Vector3f(packet.position.x, packet.position.y, packet.position.z));
+		client.break(
+			new Vector3f(packet.position.x, packet.position.y, packet.position.z),
+		);
 	}
 }

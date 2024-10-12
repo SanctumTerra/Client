@@ -82,17 +82,22 @@ client.on("spawn", () => {
 
 ## 📜 Changelog
 
+### 2.1.2
+- Added a couple examples in /examples/ (readline, skinStealer).
+- debug logs n options.
+- Allow safe disconnection.
+
 ### 2.1.0
-- Separated Client into Connection and Client classes
-- Fixed CraftingDataPacket for Shields
-- Improved packet handling for pre-spawn packets
-- Enhanced Listener Events for "secret" / "hidden" events
+- Separated Client into Connection and Client classes.
+- Fixed CraftingDataPacket for Shields.
+- Improved packet handling for pre-spawn packets.
+- Enhanced Listener Events for "secret" / "hidden" events.
 
 ### 2.0.11
-- Added support for Minecraft 1.21.30
+- Added support for Minecraft 1.21.30.
 
 ### 2.0.0
-- Initial Release of V2
+- Initial Release of V2.
 
 ## ❤️ Credits
 

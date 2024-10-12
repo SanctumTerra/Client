@@ -3,23 +3,27 @@ import {
 	BlockAction,
 	BlockFace,
 	BlockPosition,
-	ComplexInventoryTransaction, InputDataFlags,
+	ComplexInventoryTransaction,
+	InputDataFlags,
 	InputMode,
 	InputTransaction,
 	InteractionMode,
 	InventoryTransaction,
-	InventoryTransactionPacket, ItemUseInventoryTransaction,
+	InventoryTransactionPacket,
+	ItemUseInventoryTransaction,
 	ItemUseInventoryTransactionType,
 	LegacyTransaction,
 	type MovePlayerPacket,
-	NetworkItemStackDescriptor, PlayerActionPacket,
+	NetworkItemStackDescriptor,
+	PlayerActionPacket,
 	PlayerAuthInputData,
 	PlayerAuthInputPacket,
-	PlayMode, TextPacket,
+	PlayMode,
+	TextPacket,
 	TextPacketType,
 	TriggerType,
 	Vector2f,
-	Vector3f
+	Vector3f,
 } from "@serenityjs/protocol";
 import { Priority } from "@serenityjs/raknet";
 import type { ClientOptions } from "./client/ClientOptions";
@@ -29,7 +33,6 @@ import { Logger } from "./vendor/Logger";
 import { Queue } from "./vendor/Queue";
 
 class Client extends Connection {
-
 	private sneaking = false;
 	private firstSneak = false;
 
@@ -54,8 +57,6 @@ class Client extends Connection {
 		this.firstSneak = true;
 		this.sneaking = true;
 	}
-
-
 
 	private onMovePlayer(instance: MovePlayerPacket): void {
 		this.position = instance.position;
@@ -152,7 +153,6 @@ class Client extends Connection {
 		this.headYaw = yaw;
 	}
 
-	
 	/**
 	 * Calculate the face of a block
 	 * @param blockPosition The position of the block

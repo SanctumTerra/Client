@@ -18,7 +18,7 @@ const client = new Client({
 	version: "1.21.30",
 	port: 19133,
 	loadPlugins: false,
-	validateProtocol: false
+	validateProtocol: false,
 });
 
 try {
