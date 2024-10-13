@@ -20,7 +20,7 @@ npm install @sanctumterra/client
 
 ```ts
 import Jimp from "jimp";
-import { Client } from "../src";
+import { Client, Logger } from "@sanctumterra/client";
 import fs from "node:fs";
 
 const client = new Client({

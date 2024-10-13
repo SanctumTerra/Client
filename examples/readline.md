@@ -13,7 +13,7 @@ This example demonstrates how to use the readline module to send messages to the
 
 ```ts
 import { Vector3f } from "@serenityjs/protocol";
-import { Client, Logger } from "../src";
+import { Client, Logger } from "@sanctumterra/client";
 import { createInterface } from "node:readline";
 
 // Create a new client instance
