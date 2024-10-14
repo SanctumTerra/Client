@@ -37,7 +37,6 @@ const client = new Client({
     username: "SanctumTerra",
     tokensFolder: "./cache/tokens",
     version: "1.21.30",
-    validateProtocol: false,
     loadPlugins: false
 });
 
@@ -81,6 +80,11 @@ client.on("spawn", () => {
 - Easier to use and understand
 
 ## 📜 Changelog
+
+### 2.1.3
+- Removed Protocol Validation
+- Added more debug logs
+- Improved performance
 
 ### 2.1.2
 - Added a couple examples in /examples/ (readline, skinStealer).
