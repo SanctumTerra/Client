@@ -15,7 +15,7 @@ const client = new Client({
 	offline: true,
 	loadPlugins: false,
 	validateProtocol: false,
-	debug: false,
+	debug: false
 });
 
 client.raknet.socket.on("error", (error) => Logger.error(error));

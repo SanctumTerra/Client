@@ -95,6 +95,7 @@ class Connection extends Listener {
 		this.prepare();
 	}
 
+	@measureExecutionTime
 	public async connect(): Promise<void> {
 		this.initializeSession();
 	}
@@ -116,6 +117,7 @@ class Connection extends Listener {
 		this.removeAllListeners();
 	}
 
+	@measureExecutionTime
 	public sendPacket(
 		packet: DataPacket,
 		priority: Priority = Priority.Normal,
@@ -167,6 +169,7 @@ class Connection extends Listener {
 		this.options.offline ? createOfflineSession(this) : authenticate(this);
 	}
 
+	@measureExecutionTime
 	private async handleSessionStart(): Promise<void> {
 		await this.raknet.connect();
 	}
@@ -261,15 +264,16 @@ class Connection extends Listener {
 	@measureExecutionTime
 	private createSharedSecret(
 		privateKey: KeyObject,
-		publicKey: KeyObject,
+		publicKey: KeyObject
 	): Buffer {
 		this.validateKeys(privateKey, publicKey);
 		const curve = privateKey.asymmetricKeyDetails?.namedCurve;
 		if (!curve) {
 			throw new Error(
-				"Invalid private key format. Expected JWK with named curve.",
+				"Invalid private key format. Expected JWK with named curve."
 			);
 		}
+		
 		const ecdh = createECDH(curve);
 		const privateKeyJwk = privateKey.export({ format: "jwk" }) as {
 			d?: string;
@@ -278,17 +282,19 @@ class Connection extends Listener {
 			x?: string;
 			y?: string;
 		};
+		
 		if (!privateKeyJwk.d || !publicKeyJwk.x || !publicKeyJwk.y) {
 			throw new Error("Invalid key format");
 		}
-		const privateKeyHex = Buffer.from(privateKeyJwk.d, "base64").toString(
-			"hex",
-		);
-		ecdh.setPrivateKey(privateKeyHex, "hex");
-		const publicKeyX = Buffer.from(publicKeyJwk.x, "base64").toString("hex");
-		const publicKeyY = Buffer.from(publicKeyJwk.y, "base64").toString("hex");
-		const publicKeyHex = `04${publicKeyX}${publicKeyY}`;
-		return ecdh.computeSecret(publicKeyHex, "hex");
+		
+		ecdh.setPrivateKey(Buffer.from(privateKeyJwk.d, "base64"));
+		const publicKeyBuffer = Buffer.concat([
+			Buffer.from([0x04]), // Uncompressed point format
+			Buffer.from(publicKeyJwk.x, "base64"),
+			Buffer.from(publicKeyJwk.y, "base64")
+		]);
+		
+		return ecdh.computeSecret(publicKeyBuffer);
 	}
 
 	@measureExecutionTime
