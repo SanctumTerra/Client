@@ -14,7 +14,6 @@ const client = new Client({
 	version: "1.21.30",
 	offline: true,
 	loadPlugins: false,
-	validateProtocol: false,
 	debug: false
 });
 
