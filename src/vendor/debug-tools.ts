@@ -18,11 +18,14 @@ export function measureExecutionTime(
 	return descriptor;
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-export function measureExecutionTimeForFunction<T extends (...args: any[]) => any>(
-	target: T
-): T {
-	return function (this: ThisParameterType<T>, ...args: Parameters<T>): ReturnType<T> {
+export function measureExecutionTimeForFunction<
+	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+	T extends (...args: any[]) => any,
+>(target: T): T {
+	return function (
+		this: ThisParameterType<T>,
+		...args: Parameters<T>
+	): ReturnType<T> {
 		const start = performance.now();
 		const result = target.apply(this, args);
 		const end = performance.now();

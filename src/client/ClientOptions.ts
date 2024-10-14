@@ -32,7 +32,7 @@ const defaultOptions: ClientOptions = {
 	debug: false,
 	tokensFolder: `${process.cwd()}/tokens`,
 	viewDistance: 10,
-	loadPlugins: false
+	loadPlugins: false,
 };
 
 export { type ClientOptions, type RealmOptions, defaultOptions, ProtocolList };

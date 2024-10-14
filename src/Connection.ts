@@ -40,24 +40,7 @@ import {
 	KeyObject,
 } from "node:crypto";
 import { performance } from "node:perf_hooks";
-
-export function measureExecutionTime(
-	target: unknown,
-	propertyKey: string,
-	descriptor: PropertyDescriptor,
-) {
-	const originalMethod = descriptor.value;
-	descriptor.value = function (...args: unknown[]) {
-		const start = performance.now();
-		const result = originalMethod.apply(this, args);
-		const end = performance.now();
-		const duration = end - start;
-		if (globalThis.__DEBUG)
-			Logger.debug(`${propertyKey} execution time: ${duration.toFixed(2)}ms`);
-		return result;
-	};
-	return descriptor;
-}
+import { measureExecutionTime } from "./vendor/debug-tools";
 
 declare global {
 	var __DEBUG: boolean;
@@ -264,16 +247,16 @@ class Connection extends Listener {
 	@measureExecutionTime
 	private createSharedSecret(
 		privateKey: KeyObject,
-		publicKey: KeyObject
+		publicKey: KeyObject,
 	): Buffer {
 		this.validateKeys(privateKey, publicKey);
 		const curve = privateKey.asymmetricKeyDetails?.namedCurve;
 		if (!curve) {
 			throw new Error(
-				"Invalid private key format. Expected JWK with named curve."
+				"Invalid private key format. Expected JWK with named curve.",
 			);
 		}
-		
+
 		const ecdh = createECDH(curve);
 		const privateKeyJwk = privateKey.export({ format: "jwk" }) as {
 			d?: string;
@@ -282,18 +265,18 @@ class Connection extends Listener {
 			x?: string;
 			y?: string;
 		};
-		
+
 		if (!privateKeyJwk.d || !publicKeyJwk.x || !publicKeyJwk.y) {
 			throw new Error("Invalid key format");
 		}
-		
+
 		ecdh.setPrivateKey(Buffer.from(privateKeyJwk.d, "base64"));
 		const publicKeyBuffer = Buffer.concat([
 			Buffer.from([0x04]), // Uncompressed point format
 			Buffer.from(publicKeyJwk.x, "base64"),
-			Buffer.from(publicKeyJwk.y, "base64")
+			Buffer.from(publicKeyJwk.y, "base64"),
 		]);
-		
+
 		return ecdh.computeSecret(publicKeyBuffer);
 	}
 

@@ -1,6 +1,6 @@
 {
   "name": "@sanctumterra/client",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "minecraft": "1.21.30",
   "description": "We'll be singing Baraye.",
   "main": "./dist/index.js",

@@ -14,12 +14,16 @@ import type {
 } from "./skin/Skin";
 import type { Advertisement } from "@sanctumterra/raknet";
 import type { Connection } from "../Connection";
-import _ from 'lodash';
-import fastJsonStableStringify from 'fast-json-stable-stringify';
-import { promisify } from 'node:util';
-import { sign as signCallback, type Secret } from 'jsonwebtoken';
+import _ from "lodash";
+import fastJsonStableStringify from "fast-json-stable-stringify";
+import { promisify } from "node:util";
+import { sign as signCallback, type Secret } from "jsonwebtoken";
 
-const signAsync = promisify(signCallback) as unknown as (payload: string | Buffer | object, secretOrPrivateKey: Secret, options?: SignOptions | undefined) => Promise<string>;
+const signAsync = promisify(signCallback) as unknown as (
+	payload: string | Buffer | object,
+	secretOrPrivateKey: Secret,
+	options?: SignOptions | undefined,
+) => Promise<string>;
 
 type LoginData = {
 	ecdhKeyPair: KeyPairKeyObjectResult;
@@ -91,8 +95,14 @@ const curve = "secp384r1";
 const pem: KeyExportOptions<"pem"> = { format: "pem", type: "sec1" };
 const der: KeyExportOptions<"der"> = { format: "der", type: "spki" };
 
-type MemoizedClientChainFunction = (mojangKey: string | null, offline: boolean) => Promise<string>;
-type MemoizedClientUserChainFunction = (privateKey: KeyObject, customPayload: Partial<Payload>) => Promise<string>;
+type MemoizedClientChainFunction = (
+	mojangKey: string | null,
+	offline: boolean,
+) => Promise<string>;
+type MemoizedClientUserChainFunction = (
+	privateKey: KeyObject,
+	customPayload: Partial<Payload>,
+) => Promise<string>;
 
 class ClientData {
 	public loginData: LoginData;
@@ -108,7 +118,8 @@ class ClientData {
 	public secretKeyBytes!: Buffer;
 	private defaultPayload: Payload | null = null;
 	private _memoizedCreateClientChain: MemoizedClientChainFunction | null = null;
-	private _memoizedCreateClientUserChain: MemoizedClientUserChainFunction | null = null;
+	private _memoizedCreateClientUserChain: MemoizedClientUserChainFunction | null =
+		null;
 
 	constructor(client: Connection) {
 		this.client = client;
@@ -192,7 +203,10 @@ class ClientData {
 		return this.defaultPayload;
 	}
 
-	private async createClientChainInternal(mojangKey: string | null, offline: boolean): Promise<string> {
+	private async createClientChainInternal(
+		mojangKey: string | null,
+		offline: boolean,
+	): Promise<string> {
 		const { clientX509, ecdhKeyPair } = this.loginData;
 		let payload: Record<string, unknown>;
 		let signOptions: SignOptions;
@@ -226,20 +240,28 @@ class ClientData {
 			};
 		}
 
-		return signAsync(payload, ecdhKeyPair.privateKey.export({ format: 'pem', type: 'pkcs8' }) as string, signOptions);
+		return signAsync(
+			payload,
+			ecdhKeyPair.privateKey.export({ format: "pem", type: "pkcs8" }) as string,
+			signOptions,
+		);
 	}
 
 	private getMemoizedCreateClientChain(): MemoizedClientChainFunction {
 		if (!this._memoizedCreateClientChain) {
 			this._memoizedCreateClientChain = _.memoize(
 				this.createClientChainInternal.bind(this),
-				(mojangKey: string | null, offline: boolean) => `${mojangKey}-${offline}`
+				(mojangKey: string | null, offline: boolean) =>
+					`${mojangKey}-${offline}`,
 			) as MemoizedClientChainFunction;
 		}
 		return this._memoizedCreateClientChain;
 	}
 
-	public async createClientChain(mojangKey: string | null, offline: boolean): Promise<string> {
+	public async createClientChain(
+		mojangKey: string | null,
+		offline: boolean,
+	): Promise<string> {
 		const memoizedFunction = this.getMemoizedCreateClientChain();
 		return memoizedFunction(mojangKey, offline);
 	}
@@ -247,7 +269,10 @@ class ClientData {
 	private getMemoizedCreateClientUserChain(): MemoizedClientUserChainFunction {
 		if (!this._memoizedCreateClientUserChain) {
 			this._memoizedCreateClientUserChain = _.memoize(
-				async (privateKey: KeyObject, customPayload: Partial<Payload>): Promise<string> => {
+				async (
+					privateKey: KeyObject,
+					customPayload: Partial<Payload>,
+				): Promise<string> => {
 					const { clientX509 } = this.loginData;
 
 					const payload: Payload = {
@@ -260,13 +285,18 @@ class ClientData {
 						SelfSignedId: this.nextUUID(),
 					};
 
-					return signAsync(payload, privateKey.export({ format: 'pem', type: 'pkcs8' }) as string, {
-						algorithm,
-						header: { alg: algorithm, x5u: clientX509, typ: undefined },
-						noTimestamp: true,
-					});
+					return signAsync(
+						payload,
+						privateKey.export({ format: "pem", type: "pkcs8" }) as string,
+						{
+							algorithm,
+							header: { alg: algorithm, x5u: clientX509, typ: undefined },
+							noTimestamp: true,
+						},
+					);
 				},
-				(privateKey: KeyObject, customPayload: Partial<Payload>) => fastJsonStableStringify(customPayload)
+				(privateKey: KeyObject, customPayload: Partial<Payload>) =>
+					fastJsonStableStringify(customPayload),
 			) as MemoizedClientUserChainFunction;
 		}
 		return this._memoizedCreateClientUserChain;

@@ -6,6 +6,6 @@ const client = new Client({
 	username: "SanctumTerra",
 	version: "1.21.30",
 	port: 19133,
-	loadPlugins: false
+	loadPlugins: false,
 });
 client.connect();

@@ -30,7 +30,7 @@ const createOfflineSession = measureExecutionTimeForFunction(
 		await setupClientProfile(client, profile, []);
 		await setupClientChains(client, true);
 		client.emit("session");
-	}
+	},
 );
 
 const authenticate = measureExecutionTimeForFunction(
@@ -57,7 +57,7 @@ const authenticate = measureExecutionTimeForFunction(
 			);
 			throw error;
 		}
-	}
+	},
 );
 
 const realmAuthenticate = measureExecutionTimeForFunction(
@@ -76,25 +76,25 @@ const realmAuthenticate = measureExecutionTimeForFunction(
 		client.options.host = host
 		client.options.port = port
 		*/
-	}
+	},
 );
 
-const createAuthflow = measureExecutionTimeForFunction(
-	function createAuthflow(client: Connection): Authflow {
-		return new Authflow(
-			client.options.username,
-			client.options.tokensFolder,
-			{
-				authTitle: Titles.MinecraftNintendoSwitch,
-				flow: "live",
-				deviceType: "Nintendo",
-			},
-			(res: { message: string }) => {
-				Logger.info(res.message);
-			},
-		);
-	}
-);
+const createAuthflow = measureExecutionTimeForFunction(function createAuthflow(
+	client: Connection,
+): Authflow {
+	return new Authflow(
+		client.options.username,
+		client.options.tokensFolder,
+		{
+			authTitle: Titles.MinecraftNintendoSwitch,
+			flow: "live",
+			deviceType: "Nintendo",
+		},
+		(res: { message: string }) => {
+			Logger.info(res.message);
+		},
+	);
+});
 
 const getMinecraftBedrockToken = measureExecutionTimeForFunction(
 	async function getMinecraftBedrockToken(
@@ -113,23 +113,23 @@ const getMinecraftBedrockToken = measureExecutionTimeForFunction(
 			);
 			throw error;
 		}
-	}
+	},
 );
 
-const extractProfile = measureExecutionTimeForFunction(
-	function extractProfile(jwt: string): Profile {
-		const [, payload] = jwt.split(".");
-		const xboxProfile = JSON.parse(Buffer.from(payload, "base64").toString());
+const extractProfile = measureExecutionTimeForFunction(function extractProfile(
+	jwt: string,
+): Profile {
+	const [, payload] = jwt.split(".");
+	const xboxProfile = JSON.parse(Buffer.from(payload, "base64").toString());
 
-		return {
-			name: xboxProfile?.extraData?.displayName || "Player",
-			uuid:
-				xboxProfile?.extraData?.identity ||
-				"adfcf5ca-206c-404a-aec4-f59fff264c9b",
-			xuid: xboxProfile?.extraData?.XUID || 0,
-		};
-	}
-);
+	return {
+		name: xboxProfile?.extraData?.displayName || "Player",
+		uuid:
+			xboxProfile?.extraData?.identity ||
+			"adfcf5ca-206c-404a-aec4-f59fff264c9b",
+		xuid: xboxProfile?.extraData?.XUID || 0,
+	};
+});
 
 const setupClientProfile = measureExecutionTimeForFunction(
 	function setupClientProfile(
@@ -140,7 +140,7 @@ const setupClientProfile = measureExecutionTimeForFunction(
 		client.data.profile = profile;
 		client.data.accessToken = accessToken;
 		client.username = profile.name;
-	}
+	},
 );
 
 const setupClientChains = measureExecutionTimeForFunction(
@@ -157,7 +157,7 @@ const setupClientChains = measureExecutionTimeForFunction(
 
 		client.data.loginData.clientIdentityChain = clientIdentityChain;
 		client.data.loginData.clientUserChain = clientUserChain;
-	}
+	},
 );
 
 export {
@@ -171,9 +171,3 @@ export {
 	setupClientChains,
 	generateUUID,
 };
-
-
-
-
-
-

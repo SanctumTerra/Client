@@ -6,7 +6,7 @@ const connection = new Connection({
 	username: "SanctumTerra",
 	version: "1.21.30",
 	offline: true,
-	loadPlugins: false
+	loadPlugins: false,
 });
 
 connection.connect();
