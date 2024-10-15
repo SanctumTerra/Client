@@ -22,7 +22,7 @@ npm i @sanctumterra/client
 | Client Version | Protocol Version  | Minecraft Version |
 |----------------|-------------------|-------------------|
 | 2.0.10         | 712               | 1.21.20           |
-| 2.1.2          | 729               | 1.21.30           |
+| 2.1.5          | 729               | 1.21.30           |
 
 
 ## 🚀 Usage Example
