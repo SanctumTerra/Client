@@ -69,7 +69,7 @@ client.on("spawn", () => {
 
 ### 🎛️ Client Configuration
 - **Required Parameters**: `host`, `port`
-- **Optional Parameters**: `offline`, `username`, `tokensFolder`, `version`, `validateProtocol`, `loadPlugins`
+- **Optional Parameters**: `offline`, `username`, `tokensFolder`, `version`, `deviceOS`
 
 ### 📡 Event Handling
 - Events allow you to listen to any implemented packet if it is not implemented you will receive a warning and it should not crash if there is a crash then make an issue on github.
