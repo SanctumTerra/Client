@@ -3,7 +3,7 @@ import {
 	type TextPacket,
 	type UpdateBlockPacket,
 } from "@serenityjs/protocol";
-import { Client, Logger } from "../index";
+import { Client, DeviceOS, Logger } from "../index";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -15,6 +15,7 @@ const client = new Client({
 	offline: true,
 	loadPlugins: false,
 	debug: false,
+	deviceOS: DeviceOS.Android,
 });
 
 client.raknet.socket.on("error", (error) => Logger.error(error));

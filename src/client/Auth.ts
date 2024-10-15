@@ -2,7 +2,7 @@ import { Authflow, Titles } from "prismarine-auth";
 import { v3 } from "uuid-1345";
 import { Logger } from "../vendor/Logger";
 import type { Connection } from "../Connection";
-import { measureExecutionTimeForFunction } from "src/vendor/debug-tools";
+import { measureExecutionTimeForFunction } from "../vendor/debug-tools";
 
 interface Profile {
 	name: string;

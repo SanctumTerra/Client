@@ -164,7 +164,7 @@ class ClientData {
 			DefaultInputMode: 1,
 			DeviceId: this.nextUUID(),
 			DeviceModel: "Helicopter",
-			DeviceOS: 7,
+			DeviceOS: this.client.options.deviceOS,
 			GameVersion: this.client.options.version,
 			GuiScale: 0,
 			IsEditorMode: false,
