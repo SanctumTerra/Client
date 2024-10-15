@@ -28,16 +28,16 @@ npm i @sanctumterra/client
 ## 🚀 Usage Example
 
 ```typescript
-const { Client, Logger } = require("@sanctumterra/client");
+const { Client, Logger, DeviceOS } = require("@sanctumterra/client");
 
 const client = new Client({
     host: "127.0.0.1",
-    port: 19133,
+    port: 19132,
     offline: true,
     username: "SanctumTerra",
     tokensFolder: "./cache/tokens",
     version: "1.21.30",
-    loadPlugins: false
+    deviceOS: DeviceOS.Android
 });
 
 client.connect();
@@ -80,6 +80,9 @@ client.on("spawn", () => {
 - Easier to use and understand
 
 ## 📜 Changelog
+
+### 2.1.5
+- Added DeviceOS to the Client.
 
 ### 2.1.3
 - Removed Protocol Validation
