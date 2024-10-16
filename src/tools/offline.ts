@@ -14,8 +14,8 @@ const client = new Client({
 	version: "1.21.30",
 	offline: true,
 	loadPlugins: false,
-	debug: true,
-	deviceOS: DeviceOS.Win10
+	debug: false,
+	deviceOS: DeviceOS.Win10,
 });
 
 client.raknet.socket.on("error", (error) => Logger.error(error));
