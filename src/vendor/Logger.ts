@@ -1,24 +1,40 @@
 type LogData = string | number | boolean | null | undefined | object;
 
 const colors: { [key: string]: string } = {
-	"0": "\u001B[30m", // Black
-	"1": "\u001B[34m", // Dark Blue
-	"2": "\u001B[32m", // Dark Green
-	"3": "\u001B[36m", // Dark Aqua
-	"4": "\u001B[31m", // Dark Red
-	"5": "\u001B[35m", // Dark Purple
-	"6": "\u001B[33m", // Gold
-	"7": "\u001B[37m", // Light Gray
-	"8": "\u001B[90m", // Dark Gray
-	"9": "\u001B[94m", // Blue
-	a: "\u001B[92m", // Green
-	b: "\u001B[96m", // Aqua
-	c: "\u001B[91m", // Red
-	d: "\u001B[95m", // Light Purple
-	e: "\u001B[93m", // Yellow
-	f: "\u001B[97m", // White
-	r: "\u001B[0m", // Reset
-	l: "\u001B[1m", // Bold
+	"0": "\u001B[30m",
+	"1": "\u001B[34m",
+	"2": "\u001B[32m",
+	"3": "\u001B[36m",
+	"4": "\u001B[31m",
+	"5": "\u001B[35m",
+	"6": "\u001B[33m",
+	"7": "\u001B[37m",
+	"8": "\u001B[90m",
+	"9": "\u001B[94m",
+	a: "\u001B[92m",
+	b: "\u001B[96m",
+	c: "\u001B[91m",
+	d: "\u001B[95m",
+	e: "\u001B[93m",
+	f: "\u001B[97m",
+	g: "\u001B[38;5;221m",
+	h: "\u001B[38;5;224m",
+	i: "\u001B[38;5;251m",
+	j: "\u001B[38;5;237m",
+	m: "\u001B[38;5;124m",
+	n: "\u001B[38;5;173m",
+	p: "\u001B[38;5;221m",
+	q: "\u001B[38;5;71m",
+	s: "\u001B[38;5;37m",
+	t: "\u001B[38;5;25m",
+	u: "\u001B[38;5;140m",
+	r: "\u001B[0m",
+};
+
+const specialFormatting: { [key: string]: string } = {
+	l: "\u001B[1m",
+	o: "\u001B[3m", 
+	k: "\u001B[5m", 
 };
 
 const Logger = {
@@ -54,14 +70,35 @@ const Logger = {
 	},
 
 	colorize(...args: LogData[]): (string | LogData)[] {
-		const regex = /§[\da-fklr]/g;
+		const regex = /§[0-9a-zA-Z]/g;
 
 		return args.map((arg) => {
 			if (typeof arg !== "string") return arg;
-			return arg.replace(regex, (match) => {
-				const color = colors[match[1]];
-				return color || match;
+			let result = "";
+			let lastIndex = 0;
+			let currentColor = "";
+			let currentFormat = "";
+
+			arg.replace(regex, (match, index) => {
+				const code = match[1].toLowerCase();
+				result += arg.slice(lastIndex, index) + (colors[code] || specialFormatting[code] || "");
+				
+				if (colors[code]) {
+					currentColor = colors[code];
+					currentFormat = "";
+				} else if (specialFormatting[code]) {
+					currentFormat += specialFormatting[code];
+				} else if (code === 'r') {
+					currentColor = "";
+					currentFormat = "";
+				}
+
+				lastIndex = index + 2;
+				return "";
 			});
+
+			result += arg.slice(lastIndex);
+			return result + colors.r; 
 		});
 	},
 };
