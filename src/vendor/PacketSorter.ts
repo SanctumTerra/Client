@@ -11,12 +11,31 @@ import {
 	DisconnectPacket,
 	Framer,
 	getPacketId,
+	Packet,
 	Packets,
-	SetScorePacket,
+	SetScorePacket
 } from "@serenityjs/protocol";
 import { deflateRawSync, inflateRawSync } from "node:zlib";
 import { CraftingDataPacket } from "./packets/CraftingDataPacket";
 import type { Connection } from "../Connection";
+import { LevelEventGenericPacket } from "./packets/LevelEventGenericPacket";
+import { identity } from "lodash";
+import { CurrectStructureFeaturePacket } from "./packets/current-structure-feature-packet";
+import { TrimDataPacket } from "./packets/trim-data-packet";
+import { PlayerFogPacket } from "./packets/player-fog-packet";
+import { GameRulesChangedPacket } from "./packets/game-rules-changed";
+import { SetDifficultyPacket } from "./packets/set-difficulty-packet";
+import { SetSpawnPositionPacket } from "./packets/set-spawn-position-packet";
+import { SetHealthPacket } from "./packets/set-health";
+import { UnlockedRecipesPacket } from "./packets/unlocked-recipes";
+import { SyncActorPropertyPacket } from "./packets/SyncActorPropertyPacket";
+import { MoveActorDeltaPacket } from "./packets/MoveActorDeltaPacket";
+import { ItemComponentPacket } from "./packets/ItemComponentPacket";
+import { SetActorDataPacket } from "./packets/SetActorDataPacket";
+import { AddEntityPacket } from "./packets/AddActorPacket";
+import { AddItemActorPacket } from "./packets/add-item-actor";
+import { LegacyTelemetryEventPacket } from "./packets/LegacyTelemetryEventPacket";
+import { UpdateSubChunkBlocksPacket } from "./packets/UpdateSubChunkBlocksPacket";
 
 export class PacketSorter {
 	constructor(private readonly connection: Connection) {
@@ -152,16 +171,85 @@ export class PacketSorter {
 				PacketClass = CraftingDataPacket;
 			}
 
+			if ((id as number) === 124) {
+				PacketClass = LevelEventGenericPacket;
+			}
+
+			if ((id as number) === 314) {
+				PacketClass = CurrectStructureFeaturePacket;
+			}
+
+			if ((id as number) === 302) {
+				PacketClass = TrimDataPacket;
+			}
+
+			if ((id as number) === 160) {
+				PacketClass = PlayerFogPacket;
+			}
+
+			if ((id as number) === 72) {
+				PacketClass = GameRulesChangedPacket;
+			}
+
+			if ((id as number) === 60) {
+				PacketClass = SetDifficultyPacket;
+			}
+
+			if ((id as number) === 43) {
+				PacketClass = SetSpawnPositionPacket;
+			}
+
+			if ((id as number) === 42) {
+				PacketClass = SetHealthPacket;
+			}
+
+			if ((id as number) === 199) {
+				PacketClass = UnlockedRecipesPacket;
+			}
+
+			if ((id as number) === 165) {
+				PacketClass = SyncActorPropertyPacket;
+			}
+
+			if ((id as number) === 111) {
+				PacketClass = MoveActorDeltaPacket;
+			}
+
+			if((id as number) === 162) {
+				PacketClass = ItemComponentPacket;
+			}
+
+			if((id as number) === 39) {
+				PacketClass = SetActorDataPacket;
+			}
+
+			if((id as number) === 13) {
+				PacketClass = AddEntityPacket;
+			}
+
+			if((id as number) === 15) {
+				PacketClass = AddItemActorPacket;
+			}
+
+			if((id as number) === 65) {
+				PacketClass = LegacyTelemetryEventPacket;
+			}
+
+			if((id as number) === 172) {
+				PacketClass = UpdateSubChunkBlocksPacket;
+			}
+
 			if (!PacketClass) {
 				Logger.warn(`Packet with ID ${id} not found`);
 				continue;
 			}
+
 			try {
 				const instance = new PacketClass(frame).deserialize();
 				this.connection.emit(PacketClass.name, instance);
 			} catch (error) {
 				Logger.warn(
-					`Error processing packet ${id}: ${error instanceof Error ? error.message : String(error)}`,
+					`Error processing packet ${id}: ${error instanceof Error ? error.message : String(error)}\n`,
 					(error as Error).stack,
 				);
 			}

@@ -1,4 +1,5 @@
-import { Client as RakNetClient } from "@sanctumterra/raknet";
+import { Client as RakNetClient, type Advertisement } from "@sanctumterra/raknet";
+
 import {
 	type ClientOptions,
 	defaultOptions,
@@ -39,7 +40,6 @@ import {
 	createPublicKey,
 	KeyObject,
 } from "node:crypto";
-import { performance } from "node:perf_hooks";
 import { measureExecutionTime } from "./vendor/debug-tools";
 
 declare global {
@@ -71,7 +71,7 @@ class Connection extends Listener {
 		this.raknet = new RakNetClient({
 			host: this.options.host,
 			port: this.options.port,
-			debug: this.options.debug,
+			debug: this.options.debug
 		});
 		this.data = new ClientData(this);
 		this.packetSorter = new PacketSorter(this);
@@ -79,8 +79,8 @@ class Connection extends Listener {
 	}
 
 	@measureExecutionTime
-	public async connect(): Promise<void> {
-		this.initializeSession();
+	public async connect(): Promise<Advertisement> {
+		return await this.initializeSession();
 	}
 
 	public disconnect(clientSide = true, packet: DisconnectPacket | null = null) {
@@ -92,7 +92,7 @@ class Connection extends Listener {
 			disconnectPacket.message = new DisconnectMessage();
 			disconnectPacket.hideDisconnectScreen = true;
 			this.sendPacket(disconnectPacket, Priority.Immediate);
-			this.raknet.disconnect();
+			this.raknet.close();
 		} else {
 			this.raknet.close();
 		}
@@ -147,14 +147,18 @@ class Connection extends Listener {
 	}
 
 	@measureExecutionTime
-	private initializeSession(): void {
-		this.on("session", this.handleSessionStart.bind(this));
-		this.options.offline ? createOfflineSession(this) : authenticate(this);
+	private initializeSession(): Promise<Advertisement> {
+		return new Promise((resolve, reject) => {
+			this.on("session", async () => {
+				resolve(await this.handleSessionStart());
+			});
+			this.options.offline ? createOfflineSession(this) : authenticate(this);
+		});
 	}
 
 	@measureExecutionTime
-	private async handleSessionStart(): Promise<void> {
-		await this.raknet.connect();
+	private async handleSessionStart(): Promise<Advertisement> {
+		return await this.raknet.connect();
 	}
 
 	@measureExecutionTime
