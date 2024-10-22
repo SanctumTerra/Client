@@ -5,7 +5,7 @@ import { MoveActorDeltaData } from "./types/MoveActorDeltaData";
 
 @Proto(111)
 class MoveActorDeltaPacket extends DataPacket {
-    @Serialize(MoveActorDeltaData) public actorData!: MoveActorDeltaData;
+	@Serialize(MoveActorDeltaData) public actorData!: MoveActorDeltaData;
 }
 
 export { MoveActorDeltaPacket };

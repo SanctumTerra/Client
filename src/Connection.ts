@@ -1,4 +1,7 @@
-import { Client as RakNetClient, type Advertisement } from "@sanctumterra/raknet";
+import {
+	Client as RakNetClient,
+	type Advertisement,
+} from "@sanctumterra/raknet";
 
 import {
 	type ClientOptions,
@@ -71,7 +74,7 @@ class Connection extends Listener {
 		this.raknet = new RakNetClient({
 			host: this.options.host,
 			port: this.options.port,
-			debug: this.options.debug
+			debug: this.options.debug,
 		});
 		this.data = new ClientData(this);
 		this.packetSorter = new PacketSorter(this);

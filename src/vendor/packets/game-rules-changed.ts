@@ -3,7 +3,7 @@ import { Proto, Serialize } from "@serenityjs/raknet";
 
 @Proto(72)
 class GameRulesChangedPacket extends DataPacket {
-    @Serialize(GameRules) public rules!: GameRules;
+	@Serialize(GameRules) public rules!: GameRules;
 }
 
 export { GameRulesChangedPacket };

@@ -1,7 +1,12 @@
 import { DataType } from "@serenityjs/raknet";
 import { type BinaryStream, Endianness } from "@serenityjs/binarystream";
 import { CompoundTag } from "@serenityjs/nbt";
-import { type ActorDataId, ActorDataType, BlockPosition, Vector3f } from "@serenityjs/protocol";
+import {
+	type ActorDataId,
+	ActorDataType,
+	BlockPosition,
+	Vector3f,
+} from "@serenityjs/protocol";
 
 class DataItem<T = unknown> extends DataType {
 	/**
@@ -107,7 +112,7 @@ class DataItem<T = unknown> extends DataType {
 
 	public static override write(
 		stream: BinaryStream,
-		data: Array<DataItem>
+		data: Array<DataItem>,
 	): void {
 		// Write the number of data items.
 		stream.writeVarInt(data.length);

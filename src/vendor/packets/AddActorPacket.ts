@@ -3,9 +3,16 @@ import {
 	Float32,
 	VarLong,
 	VarString,
-	ZigZong
+	ZigZong,
 } from "@serenityjs/binarystream";
-import { DataPacket, EntityAttributes, Links, Packet, PropertySyncData, Vector3f } from "@serenityjs/protocol";
+import {
+	DataPacket,
+	EntityAttributes,
+	Links,
+	Packet,
+	PropertySyncData,
+	Vector3f,
+} from "@serenityjs/protocol";
 import { Serialize, Proto } from "@serenityjs/raknet";
 import { DataItem } from "./types/data-item";
 

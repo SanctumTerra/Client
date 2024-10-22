@@ -6,7 +6,7 @@ import { VarInt } from "@serenityjs/binarystream";
 
 @Proto(165)
 class SyncActorPropertyPacket extends DataPacket {
-    @Serialize(CompoundTag, true) public properties!: CompoundTag;
+	@Serialize(CompoundTag, true) public properties!: CompoundTag;
 }
 
 export { SyncActorPropertyPacket };

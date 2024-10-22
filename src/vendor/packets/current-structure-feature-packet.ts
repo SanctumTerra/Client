@@ -4,7 +4,7 @@ import { Proto, Serialize } from "@serenityjs/raknet";
 
 @Proto(314)
 class CurrectStructureFeaturePacket extends DataPacket {
-    @Serialize(VarString) public featureId!: string;
+	@Serialize(VarString) public featureId!: string;
 }
 
 export { CurrectStructureFeaturePacket };

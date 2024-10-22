@@ -4,7 +4,7 @@ import { ComponentItem } from "./types/ComponentItem";
 
 @Proto(Packet.ItemComponent)
 class ItemComponentPacket extends DataPacket {
-    @Serialize(ComponentItem) public items!: Array<ComponentItem>;
+	@Serialize(ComponentItem) public items!: Array<ComponentItem>;
 }
 
 export { ItemComponentPacket };

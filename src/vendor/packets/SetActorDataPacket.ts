@@ -1,11 +1,18 @@
 import { VarLong } from "@serenityjs/binarystream";
-import { ActorDataId, ActorDataType, type ActorFlag, DataPacket, Packet, PropertySyncData } from "@serenityjs/protocol";
+import {
+	ActorDataId,
+	ActorDataType,
+	type ActorFlag,
+	DataPacket,
+	Packet,
+	PropertySyncData,
+} from "@serenityjs/protocol";
 import { Proto, Serialize } from "@serenityjs/raknet";
 import { DataItem } from "./types/data-item";
 
 @Proto(Packet.SetActorData)
 class SetActorDataPacket extends DataPacket {
-    @Serialize(VarLong) public runtimeEntityId!: bigint;
+	@Serialize(VarLong) public runtimeEntityId!: bigint;
 	@Serialize(DataItem) public data!: Array<DataItem>;
 	@Serialize(PropertySyncData) public properties!: PropertySyncData;
 	@Serialize(VarLong) public tick!: bigint;

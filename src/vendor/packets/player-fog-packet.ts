@@ -5,7 +5,7 @@ import { Fogs } from "./types/Fogs";
 
 @Proto(160)
 class PlayerFogPacket extends DataPacket {
-    @Serialize(Fogs) public stack!: Fogs;
+	@Serialize(Fogs) public stack!: Fogs;
 }
 
 export { PlayerFogPacket };

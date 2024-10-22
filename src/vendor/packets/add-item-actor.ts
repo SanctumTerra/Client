@@ -1,9 +1,12 @@
 import { Bool, VarLong, ZigZong } from "@serenityjs/binarystream";
-import { DataPacket, NetworkItemStackDescriptor, Packet, Vector3f } from "@serenityjs/protocol";
+import {
+	DataPacket,
+	NetworkItemStackDescriptor,
+	Packet,
+	Vector3f,
+} from "@serenityjs/protocol";
 import { Serialize, Proto } from "@serenityjs/raknet";
 import { DataItem } from "./types/data-item";
-
-
 
 @Proto(Packet.AddItemActor)
 class AddItemActorPacket extends DataPacket {

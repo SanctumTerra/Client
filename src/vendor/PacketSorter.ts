@@ -13,7 +13,7 @@ import {
 	getPacketId,
 	Packet,
 	Packets,
-	SetScorePacket
+	SetScorePacket,
 } from "@serenityjs/protocol";
 import { deflateRawSync, inflateRawSync } from "node:zlib";
 import { CraftingDataPacket } from "./packets/CraftingDataPacket";
@@ -215,27 +215,27 @@ export class PacketSorter {
 				PacketClass = MoveActorDeltaPacket;
 			}
 
-			if((id as number) === 162) {
+			if ((id as number) === 162) {
 				PacketClass = ItemComponentPacket;
 			}
 
-			if((id as number) === 39) {
+			if ((id as number) === 39) {
 				PacketClass = SetActorDataPacket;
 			}
 
-			if((id as number) === 13) {
+			if ((id as number) === 13) {
 				PacketClass = AddEntityPacket;
 			}
 
-			if((id as number) === 15) {
+			if ((id as number) === 15) {
 				PacketClass = AddItemActorPacket;
 			}
 
-			if((id as number) === 65) {
+			if ((id as number) === 65) {
 				PacketClass = LegacyTelemetryEventPacket;
 			}
 
-			if((id as number) === 172) {
+			if ((id as number) === 172) {
 				PacketClass = UpdateSubChunkBlocksPacket;
 			}
 

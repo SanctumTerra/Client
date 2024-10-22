@@ -6,8 +6,8 @@ import { CompoundTag } from "@serenityjs/nbt";
 
 @Proto(124)
 class LevelEventGenericPacket extends DataPacket {
-    @Serialize(VarInt) public eventId!: number;
-    @Serialize(NbtLoop) public nbtData!: NbtLoop;
+	@Serialize(VarInt) public eventId!: number;
+	@Serialize(NbtLoop) public nbtData!: NbtLoop;
 }
 
 export { LevelEventGenericPacket };

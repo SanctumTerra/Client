@@ -37,7 +37,11 @@ setTimeout(() => {
 client.on("TextPacket", handleTextPacket);
 client.on("spawn", handleSpawn);
 client.on("UpdateBlockPacket", handleUpdateBlockPacket);
-client.on("StartGamePacket", (packet) => { console.log(`Logged in with UniqueID ${packet.entityId} and runtimeID ${packet.runtimeEntityId}`)});
+client.on("StartGamePacket", (packet) => {
+	console.log(
+		`Logged in with UniqueID ${packet.entityId} and runtimeID ${packet.runtimeEntityId}`,
+	);
+});
 async function handleTextPacket(packet: TextPacket): Promise<void> {
 	if (!packet.parameters) return Logger.chat(packet.message);
 

@@ -33,8 +33,8 @@ const colors: { [key: string]: string } = {
 
 const specialFormatting: { [key: string]: string } = {
 	l: "\u001B[1m",
-	o: "\u001B[3m", 
-	k: "\u001B[5m", 
+	o: "\u001B[3m",
+	k: "\u001B[5m",
 };
 
 const Logger = {
@@ -81,14 +81,16 @@ const Logger = {
 
 			arg.replace(regex, (match, index) => {
 				const code = match[1].toLowerCase();
-				result += arg.slice(lastIndex, index) + (colors[code] || specialFormatting[code] || "");
-				
+				result +=
+					arg.slice(lastIndex, index) +
+					(colors[code] || specialFormatting[code] || "");
+
 				if (colors[code]) {
 					currentColor = colors[code];
 					currentFormat = "";
 				} else if (specialFormatting[code]) {
 					currentFormat += specialFormatting[code];
-				} else if (code === 'r') {
+				} else if (code === "r") {
 					currentColor = "";
 					currentFormat = "";
 				}
@@ -98,7 +100,7 @@ const Logger = {
 			});
 
 			result += arg.slice(lastIndex);
-			return result + colors.r; 
+			return result + colors.r;
 		});
 	},
 };
