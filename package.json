@@ -1,6 +1,6 @@
 {
   "name": "@sanctumterra/client",
-  "version": "2.1.8",
+  "version": "2.1.9",
   "minecraft": "1.21.30",
   "description": "We'll be singing Baraye.",
   "main": "./dist/index.js",
@@ -46,7 +46,6 @@
     "fast-json-stable-stringify": "^2.1.0",
     "lodash": "^4.17.21",
     "prismarine-auth": "github:AnyBananaGAME/prismarine-auth",
-    "raknet-native": "^1.2.3",
     "uuid-1345": "^1.0.2"
   }
 }
