@@ -1,9 +1,4 @@
 import {
-	Client as RakNetClient,
-	type Advertisement,
-} from "@sanctumterra/raknet";
-
-import {
 	type ClientOptions,
 	defaultOptions,
 	ProtocolList,
@@ -45,6 +40,9 @@ import {
 } from "node:crypto";
 import { measureExecutionTime } from "./vendor/debug-tools";
 
+import { Client as RakNetClient, type Advertisement } from "../../Raknet/src/";
+
+
 declare global {
 	var __DEBUG: boolean;
 }
@@ -72,9 +70,9 @@ class Connection extends Listener {
 		globalThis.__DEBUG = options.debug ?? false;
 		this.protocol = ProtocolList[this.options.version];
 		this.raknet = new RakNetClient({
-			host: this.options.host,
+			address: this.options.host,
 			port: this.options.port,
-			debug: this.options.debug,
+			debug: false, // this.options.debug,
 		});
 		this.data = new ClientData(this);
 		this.packetSorter = new PacketSorter(this);
@@ -95,9 +93,9 @@ class Connection extends Listener {
 			disconnectPacket.message = new DisconnectMessage();
 			disconnectPacket.hideDisconnectScreen = true;
 			this.sendPacket(disconnectPacket, Priority.Immediate);
-			this.raknet.close();
+			// this.raknet.close();
 		} else {
-			this.raknet.close();
+			// this.raknet.close();
 		}
 		clearInterval(this.ticker);
 		this.removeAllListeners();
@@ -117,8 +115,9 @@ class Connection extends Listener {
 		try {
 			this.packetSorter.sendPacket(packet, priority);
 		} catch (error) {
+			console.log(error)
 			Logger.error(
-				`Error sending packet: ${error instanceof Error ? error.message : String(error)}`,
+				"Error sending packet: ", (error as Error),
 			);
 		}
 	}
@@ -144,6 +143,7 @@ class Connection extends Listener {
 	}
 
 	private handleConnect(): void {
+		console.log("handle")
 		const networkSettingsPacket = new RequestNetworkSettingsPacket();
 		networkSettingsPacket.protocol = this.protocol;
 		this.sendPacket(networkSettingsPacket);
@@ -248,6 +248,7 @@ class Connection extends Listener {
 		const login = new LoginPacket();
 		login.protocol = this.protocol;
 		login.tokens = new LoginTokens(userChain, encodedChain);
+		console.log("test")
 		this.sendPacket(login, Priority.Immediate);
 	}
 

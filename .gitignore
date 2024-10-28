@@ -12,3 +12,4 @@ src/tools/level
 src/history/
 note.txt
 bun.lockb
+src/tools/z.ts

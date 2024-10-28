@@ -1,6 +1,5 @@
 import {
 	Disconnect,
-	Frame,
 	type Priority,
 	Reliability,
 } from "@serenityjs/raknet";
@@ -36,6 +35,7 @@ import { AddEntityPacket } from "./packets/AddActorPacket";
 import { AddItemActorPacket } from "./packets/add-item-actor";
 import { LegacyTelemetryEventPacket } from "./packets/LegacyTelemetryEventPacket";
 import { UpdateSubChunkBlocksPacket } from "./packets/UpdateSubChunkBlocksPacket";
+import { Frame } from "../../../Raknet/src/";
 
 export class PacketSorter {
 	constructor(private readonly connection: Connection) {
@@ -43,15 +43,21 @@ export class PacketSorter {
 	}
 
 	public sendPacket(packet: DataPacket, priority: Priority): void {
-		const serialized = packet.serialize();
-		const framed = Framer.frame(serialized);
-		const payload = this.preparePayload(framed);
-
-		const frame = new Frame();
-		frame.reliability = Reliability.ReliableOrdered;
-		frame.orderChannel = 0;
-		frame.payload = payload;
-		this.connection.raknet.sender.sendFrame(frame, priority);
+		try {
+			const serialized = packet.serialize();
+			const framed = Framer.frame(serialized);
+			const payload = this.preparePayload(framed);
+			const frame = new Frame();
+			frame.reliability = Reliability.ReliableOrdered;
+			frame.orderChannel = 0;
+			frame.splitFrameIndex = 0;
+			frame.payload = payload;
+			this.connection.raknet.framer.sendFrame(frame, priority);
+		} catch (error) {
+			Logger.error(
+				`Error sending packet:  ${(error as Error).message}`, (error as Error),
+			);
+		}
 	}
 
 	public handleDisconnect(payload: Buffer): void {
@@ -65,13 +71,13 @@ export class PacketSorter {
 		);
 	}
 
-	private handleEncapsulatedPacket(frame: Frame): void {
-		const header = frame.payload[0] as number;
+	private handleEncapsulatedPacket(payload: Buffer): void {
+		const header = payload[0] as number;
 		try {
 			if (header === 254) {
-				this.handleGamePacket(frame.payload);
+				this.handleGamePacket(payload);
 			} else if (header === 21) {
-				this.handleDisconnect(frame.payload);
+				this.handleDisconnect(payload);
 			} else {
 				if (globalThis.__DEBUG) Logger.debug(`Unknown header ${header}`);
 			}
