@@ -18,7 +18,7 @@ const client = new Client({
 	deviceOS: DeviceOS.Win10,
 });
 
-client.raknet.socket.on("error", (error) => Logger.error(error));
+client.raknet.socket.on("error", (error: Error) => Logger.error(error));
 
 Logger.info("Connecting to server...");
 try {

@@ -35,7 +35,7 @@ import { AddEntityPacket } from "./packets/AddActorPacket";
 import { AddItemActorPacket } from "./packets/add-item-actor";
 import { LegacyTelemetryEventPacket } from "./packets/LegacyTelemetryEventPacket";
 import { UpdateSubChunkBlocksPacket } from "./packets/UpdateSubChunkBlocksPacket";
-import { Frame } from "../../../Raknet/src/";
+import { Frame } from "@sanctumterra/raknet";
 
 export class PacketSorter {
 	constructor(private readonly connection: Connection) {

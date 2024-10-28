@@ -40,7 +40,7 @@ import {
 } from "node:crypto";
 import { measureExecutionTime } from "./vendor/debug-tools";
 
-import { Client as RakNetClient, type Advertisement } from "../../Raknet/src/";
+import { Client as RakNetClient, type Advertisement } from "@sanctumterra/raknet";
 
 
 declare global {
