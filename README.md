@@ -4,6 +4,12 @@
 ![npm](https://img.shields.io/npm/v/@sanctumterra/client)
 ![License](https://img.shields.io/badge/License-MIT-blue)
 
+<p align="center">
+  <a href="https://discord.gg/tBpMb6Hv7S">
+    <img src="https://img.shields.io/static/v1.svg?label=Discord&message=Join&color=blue&logo=discord&style=for-the-badge" alt="Discord">
+  </a>
+</p>
+
 A powerful and easy-to-use client library for Minecraft Bedrock Edition.
 
 ## 📦 Installation
