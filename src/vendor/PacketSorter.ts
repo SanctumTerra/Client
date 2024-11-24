@@ -1,6 +1,6 @@
 import {
 	Disconnect,
-	type Priority,
+	Priority,
 	Reliability,
 } from "@serenityjs/raknet";
 import { Logger } from "../vendor/Logger";
@@ -38,6 +38,7 @@ import { UpdateSubChunkBlocksPacket } from "./packets/UpdateSubChunkBlocksPacket
 import { Frame } from "@sanctumterra/raknet";
 
 export class PacketSorter {
+	private lastPacket: Buffer = Buffer.alloc(0);
 	constructor(private readonly connection: Connection) {
 		this.initializeListeners();
 	}
@@ -47,12 +48,14 @@ export class PacketSorter {
 			const serialized = packet.serialize();
 			const framed = Framer.frame(serialized);
 			const payload = this.preparePayload(framed);
-			const frame = new Frame();
-			frame.reliability = Reliability.ReliableOrdered;
-			frame.orderChannel = 0;
-			frame.splitFrameIndex = 0;
-			frame.payload = payload;
-			this.connection.raknet.framer.sendFrame(frame, priority);
+			if ('frameAndSend' in this.connection.raknet) {
+				this.connection.raknet.frameAndSend(payload);
+			} else {
+				const frame = new Frame()
+				frame.orderChannel = 0;
+				frame.payload = payload;
+				this.connection.raknet.sendFrame(frame, Priority.Immediate);
+			}
 		} catch (error) {
 			Logger.error(
 				`Error sending packet:  ${(error as Error).message}`, (error as Error),
@@ -72,6 +75,12 @@ export class PacketSorter {
 	}
 
 	private handleEncapsulatedPacket(payload: Buffer): void {
+		if(payload.length === this.lastPacket.length && payload.equals(this.lastPacket)) {
+			Logger.debug(`Duplicate packet detected, skipping`);
+			process.exit(0);
+			return;
+		}
+		this.lastPacket = payload;
 		const header = payload[0] as number;
 		try {
 			if (header === 254) {
@@ -96,7 +105,6 @@ export class PacketSorter {
 		if (!this.connection.data.sendDeflated) {
 			return Buffer.concat([Buffer.from([254]), framed]);
 		}
-
 		const deflated =
 			framed.byteLength > 256
 				? Buffer.from([CompressionMethod.Zlib, ...deflateRawSync(framed)])
@@ -105,10 +113,15 @@ export class PacketSorter {
 	}
 
 	private handleGamePacket(payload: Buffer): void {
+		if(this.connection.options.debug) {
+			console.log(`Payload: `, payload)
+		}
+
 		let decrypted = this.decryptPayload(payload.subarray(1));
 		if (!decrypted) return;
 
 		const algorithm = this.getCompressionAlgorithm(decrypted);
+
 		if (algorithm !== CompressionMethod.NotPresent) {
 			decrypted = decrypted.subarray(1);
 		}
@@ -171,7 +184,7 @@ export class PacketSorter {
 		for (const frame of frames) {
 			const id = getPacketId(frame);
 			if (id === SetScorePacket.id) continue;
-
+			// Logger.debug(`Processing packet ${id}`);
 			let PacketClass = Packets[id];
 			if (id === 52) {
 				PacketClass = CraftingDataPacket;

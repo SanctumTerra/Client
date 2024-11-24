@@ -1,0 +1,64 @@
+2024-11-24T19:35:10.784Z - [TIME START] Connection
+2024-11-24T19:35:10.785Z - Starting connection...
+2024-11-24T19:35:11.593Z - [LOG] handle
+2024-11-24T19:35:11.597Z - [TIME END] Connection: 813ms
+2024-11-24T19:35:11.598Z - Connected successfully: {"type":"MCPE","message":"PocketMine-MP Server","protocol":748,"version":"1.21.40","playerCount":1,"maxPlayers":20,"serverGUID":2446291095431307000,"serverName":"PocketMine-MP","gamemode":"Survival"}
+2024-11-24T19:35:11.909Z - [LOG] <21:35:11>: <DEBUG> Processing packet 143
+2024-11-24T19:35:11.911Z - [LOG] test
+2024-11-24T19:35:12.092Z - [LOG] <21:35:12>: <DEBUG> Processing packet 3
+2024-11-24T19:35:12.235Z - [LOG] <21:35:12>: <DEBUG> Processing packet 2
+2024-11-24T19:35:12.240Z - [LOG] <21:35:12>: <DEBUG> Processing packet 6
+2024-11-24T19:35:14.776Z - [LOG] <21:35:14>: <DEBUG> Processing packet 11
+2024-11-24T19:35:14.800Z - [LOG] <21:35:14>: <DEBUG> Processing packet 119
+2024-11-24T19:35:14.823Z - [LOG] <21:35:14>: <DEBUG> Processing packet 122
+2024-11-24T19:35:14.825Z - [LOG] <21:35:14>: <DEBUG> Processing packet 29
+2024-11-24T19:35:14.828Z - [LOG] <21:35:14>: <DEBUG> Processing packet 76
+2024-11-24T19:35:14.829Z - [LOG] <21:35:14>: <DEBUG> Processing packet 187
+2024-11-24T19:35:14.831Z - [LOG] <21:35:14>: <DEBUG> Processing packet 188
+2024-11-24T19:35:14.832Z - [LOG] <21:35:14>: <DEBUG> Processing packet 39
+2024-11-24T19:35:14.833Z - [LOG] <21:35:14>: <DEBUG> Processing packet 49
+2024-11-24T19:35:14.836Z - [LOG] <21:35:14>: <DEBUG> Processing packet 49
+2024-11-24T19:35:14.837Z - [LOG] <21:35:14>: <DEBUG> Processing packet 49
+2024-11-24T19:35:14.838Z - [LOG] <21:35:14>: <DEBUG> Processing packet 49
+2024-11-24T19:35:14.838Z - [LOG] <21:35:14>: <DEBUG> Processing packet 49
+2024-11-24T19:35:14.839Z - [LOG] <21:35:14>: <DEBUG> Processing packet 49
+2024-11-24T19:35:14.840Z - [LOG] <21:35:14>: <DEBUG> Processing packet 50
+2024-11-24T19:35:14.843Z - [LOG] <21:35:14>: <DEBUG> Processing packet 50
+2024-11-24T19:35:14.844Z - [LOG] <21:35:14>: <DEBUG> Processing packet 50
+2024-11-24T19:35:14.844Z - [LOG] <21:35:14>: <DEBUG> Processing packet 50
+2024-11-24T19:35:14.845Z - [LOG] <21:35:14>: <DEBUG> Processing packet 50
+2024-11-24T19:35:14.845Z - [LOG] <21:35:14>: <DEBUG> Processing packet 31
+2024-11-24T19:35:14.846Z - [LOG] <21:35:14>: <DEBUG> Processing packet 145
+2024-11-24T19:35:14.870Z - [LOG] <21:35:14>: <DEBUG> Processing packet 52
+2024-11-24T19:35:14.959Z - [LOG] <21:35:14>: <DEBUG> Processing packet 63
+2024-11-24T19:35:14.963Z - [LOG] <21:35:14>: <DEBUG> Processing packet 29
+2024-11-24T19:35:15.470Z - [LOG] <21:35:15>: <DEBUG> Processing packet 70
+2024-11-24T19:35:15.472Z - [LOG] <21:35:15>: <DEBUG> Processing packet 121
+2024-11-24T19:35:15.593Z - [LOG] <21:35:15>: <DEBUG> Processing packet 58
+2024-11-24T19:35:15.719Z - [LOG] <21:35:15>: <DEBUG> Processing packet 58
+2024-11-24T19:35:15.843Z - [LOG] <21:35:15>: <DEBUG> Processing packet 58
+2024-11-24T19:35:15.968Z - [LOG] <21:35:15>: <DEBUG> Processing packet 58
+2024-11-24T19:35:16.093Z - [LOG] <21:35:16>: <DEBUG> Processing packet 58
+2024-11-24T19:35:16.219Z - [LOG] <21:35:16>: <DEBUG> Processing packet 58
+2024-11-24T19:35:16.346Z - [LOG] <21:35:16>: <DEBUG> Processing packet 58
+2024-11-24T19:35:16.471Z - [LOG] <21:35:16>: <DEBUG> Processing packet 58
+2024-11-24T19:35:16.593Z - [LOG] <21:35:16>: <DEBUG> Processing packet 58
+2024-11-24T19:35:16.718Z - [LOG] <21:35:16>: <DEBUG> Processing packet 58
+2024-11-24T19:35:16.780Z - [LOG] <21:35:16>: <DEBUG> Processing packet 58
+2024-11-24T19:35:16.905Z - [LOG] <21:35:16>: <DEBUG> Processing packet 58
+2024-11-24T19:35:17.030Z - [LOG] <21:35:17>: <DEBUG> Processing packet 58
+2024-11-24T19:35:17.091Z - [LOG] <21:35:17>: <DEBUG> Processing packet 2
+2024-11-24T19:35:17.217Z - [LOG] <21:35:17>: <DEBUG> Processing packet 58
+2024-11-24T19:35:17.342Z - [LOG] <21:35:17>: <DEBUG> Processing packet 58
+2024-11-24T19:35:17.469Z - [LOG] <21:35:17>: <DEBUG> Processing packet 58
+2024-11-24T19:35:18.216Z - [LOG] <21:35:18>: <DEBUG> Processing packet 9
+2024-11-24T19:35:18.221Z - [LOG] <21:35:18>: <CHAT> SanctumTerra joined the game
+2024-11-24T19:35:18.223Z - [LOG] <21:35:18>: <DEBUG> Processing packet 39
+2024-11-24T19:35:19.038Z - [LOG] <21:35:19>: <DEBUG> Processing packet 10
+2024-11-24T19:35:28.458Z - [LOG] <21:35:28>: <DEBUG> Processing packet 10
+2024-11-24T19:35:38.475Z - [LOG] <21:35:38>: <DEBUG> Processing packet 10
+2024-11-24T19:35:48.472Z - [LOG] <21:35:48>: <DEBUG> Processing packet 10
+2024-11-24T19:35:58.769Z - [LOG] <21:35:58>: <DEBUG> Processing packet 10
+2024-11-24T19:36:08.472Z - [LOG] <21:36:8>: <DEBUG> Processing packet 10
+2024-11-24T19:36:18.490Z - [LOG] <21:36:18>: <DEBUG> Processing packet 10
+2024-11-24T19:36:28.476Z - [LOG] <21:36:28>: <DEBUG> Processing packet 10

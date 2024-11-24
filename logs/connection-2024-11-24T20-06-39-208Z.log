@@ -1,0 +1,6 @@
+2024-11-24T20:06:39.214Z - [TIME START] Connection
+2024-11-24T20:06:39.214Z - Starting connection...
+2024-11-24T20:06:40.070Z - [LOG] handle
+2024-11-24T20:06:40.073Z - [TIME END] Connection: 860ms
+2024-11-24T20:06:40.074Z - Connected successfully: {"type":"MCPE","message":"PocketMine-MP Server","protocol":748,"version":"1.21.40","playerCount":1,"maxPlayers":20,"serverGUID":2446291095431307000,"serverName":"PocketMine-MP","gamemode":"Survival"}
+2024-11-24T20:06:40.383Z - [LOG] test

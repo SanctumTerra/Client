@@ -1,0 +1,7 @@
+2024-11-24T20:07:03.344Z - [TIME START] Connection
+2024-11-24T20:07:03.352Z - Starting connection...
+2024-11-24T20:07:04.267Z - [LOG] handle
+2024-11-24T20:07:04.271Z - [TIME END] Connection: 928ms
+2024-11-24T20:07:04.272Z - Connected successfully: {"type":"MCPE","message":"PocketMine-MP Server","protocol":748,"version":"1.21.40","playerCount":1,"maxPlayers":20,"serverGUID":2446291095431307000,"serverName":"PocketMine-MP","gamemode":"Survival"}
+2024-11-24T20:07:04.581Z - [LOG] test
+2024-11-24T20:07:10.777Z - [LOG] <22:7:10>: <CHAT> SanctumTerra joined the game

@@ -3,6 +3,7 @@ import { Frame, Reliability } from "@serenityjs/raknet";
 import * as crypto from "node:crypto";
 import * as Zlib from "node:zlib";
 import type { Connection } from "src/Connection";
+import { Logger } from "./Logger";
 
 class PacketEncryptor {
 	public secretKeyBytes: Buffer;
@@ -26,23 +27,19 @@ class PacketEncryptor {
 
 	initializeCipher(iv: Buffer) {
 		if (this.cipher) return;
-		const cipher = this.createCipher(
-			this.secretKeyBytes,
-			iv.slice(0, 12),
+		this.cipher = crypto.createCipheriv(
 			"aes-256-gcm",
+			this.secretKeyBytes,
+			iv.slice(0, 12)
 		);
-		if (!cipher) {
-			throw new Error("Cipher not initialized");
-		}
-		this.cipher = cipher;
 	}
 
 	initializeDecipher(iv: Buffer) {
 		if (this.decipher) return;
 		this.decipher = crypto.createDecipheriv(
-			"aes-256-ctr",
+			"aes-256-gcm",
 			this.secretKeyBytes,
-			Buffer.concat([iv.slice(0, 12), Buffer.from([0, 0, 0, 2])]),
+			iv.slice(0, 12)
 		);
 	}
 
@@ -69,6 +66,7 @@ class PacketEncryptor {
 
 	encryptPacket(framed: Buffer): Frame {
 		let deflated: Buffer;
+
 		if (framed.byteLength > this.compressionThreshold) {
 			deflated = Buffer.from([
 				CompressionMethod.Zlib,
@@ -103,16 +101,19 @@ class PacketEncryptor {
 		if (!this.decipher) {
 			throw new Error("Decipher not initialized");
 		}
+		const old = this.receiveCounter;
+		this.receiveCounter++;
 
 		const decrypted = this.decipher.update(encryptedPayload);
 		const packet = decrypted.slice(0, decrypted.length - 8);
 		const receivedChecksum = decrypted.slice(decrypted.length - 8);
 
-		const computedChecksum = this.computeCheckSum(packet, this.receiveCounter);
-		this.receiveCounter++;
+		const computedChecksum = this.computeCheckSum(packet, old);
 
 		if (!receivedChecksum.equals(computedChecksum)) {
-			throw new Error("Checksum mismatch");
+			throw new Error(`Checksum mismatch ${receivedChecksum.toString('hex')} != ${computedChecksum.toString('hex')}`);
+		} else {
+			// Logger.debug(`Checksum matched ${receivedChecksum.toString('hex')} == ${computedChecksum.toString('hex')}`);
 		}
 
 		return packet;

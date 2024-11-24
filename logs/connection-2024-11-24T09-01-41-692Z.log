@@ -1,0 +1,129 @@
+2024-11-24T09:01:41.713Z - [TIME START] Spawn
+2024-11-24T09:01:41.716Z - Starting connection...
+2024-11-24T09:01:41.765Z - [LOG] <11:1:41>: <DEBUG> setupClientProfile execution time: 0.07ms
+2024-11-24T09:01:41.768Z - [LOG] <11:1:41>: <DEBUG> createOfflineSession execution time: 48.38ms
+2024-11-24T09:01:41.769Z - [LOG] <11:1:41>: <DEBUG> initializeSession execution time: 50.05ms
+2024-11-24T09:01:41.770Z - [LOG] <11:1:41>: <DEBUG> connect execution time: 50.95ms
+2024-11-24T09:01:41.794Z - [LOG] <11:1:41>: <DEBUG> setupClientChains execution time: 23.21ms
+2024-11-24T09:01:42.655Z - [LOG] <11:1:42>: <DEBUG> handleSessionStart execution time: 10.72ms
+2024-11-24T09:01:42.980Z - [LOG] handle
+2024-11-24T09:01:42.988Z - [LOG] <11:1:42>: <DEBUG> Sending Game PACKET --> 193 | 0xc1 2024-11-24T09:01:42.988Z
+2024-11-24T09:01:42.998Z - [LOG] <11:1:42>: <DEBUG> sendPacket execution time: 10.54ms
+2024-11-24T09:01:42.999Z - [TIME END] Spawn: 1286ms
+2024-11-24T09:01:43.035Z - [LOG] {  type: 'MCPE',  message: 'PocketMine-MP Server',  protocol: 748,  version: '1.21.40',  playerCount: 0,  maxPlayers: 20,  serverGUID: 959315177832208500,  serverName: 'PocketMine-MP',  gamemode: 'Survival'}
+2024-11-24T09:01:43.089Z - Connected successfully: {"type":"MCPE","message":"PocketMine-MP Server","protocol":748,"version":"1.21.40","playerCount":0,"maxPlayers":20,"serverGUID":959315177832208500,"serverName":"PocketMine-MP","gamemode":"Survival"}
+2024-11-24T09:01:43.608Z - [LOG] Header  254
+2024-11-24T09:01:43.616Z - [LOG] Payload:  Buffer(14) [Uint8Array] [  254, 12, 143, 1, 1, 0,    0,  0,   0, 0, 0, 0,    0,  0]
+2024-11-24T09:01:43.621Z - [LOG] id  143
+2024-11-24T09:01:43.624Z - [LOG] 143
+2024-11-24T09:01:43.625Z - [LOG] <11:1:43>: <DEBUG> S -> C NetworkSettingsPacket
+2024-11-24T09:01:43.627Z - [LOG] test
+2024-11-24T09:01:43.630Z - [LOG] <11:1:43>: <DEBUG> Sending Game PACKET --> 1 | 0x01 2024-11-24T09:01:43.630Z
+2024-11-24T09:01:43.705Z - [LOG] <11:1:43>: <DEBUG> sendPacket execution time: 75.54ms
+2024-11-24T09:01:43.709Z - [LOG] <11:1:43>: <DEBUG> sendLoginPacket execution time: 82.82ms
+2024-11-24T09:01:43.714Z - [LOG] <11:1:43>: <DEBUG> onNetworkSettings execution time: 88.25ms
+2024-11-24T09:01:44.486Z - [LOG] Header  254
+2024-11-24T09:01:44.492Z - [LOG] Payload:  Buffer(360) [Uint8Array] [  254,   0,  13, 207,  91, 114, 170,  48,   0,   0,  208,  15, 215, 115,  59,  65,  30, 142, 159,  69,   18, 132,  72,  40, 129,   4, 200,  79, 135, 135,  229,  21,   1, 133,  42, 176, 163,  59, 211,  69,  182,  43,  56, 115, 126, 118, 187, 255, 187, 235,  ... 310 more items]
+2024-11-24T09:01:44.503Z - [LOG] id  3
+2024-11-24T09:01:44.505Z - [LOG] 3
+2024-11-24T09:01:44.515Z - [LOG] <11:1:44>: <DEBUG> validateKeys execution time: 0.12ms
+2024-11-24T09:01:44.732Z - [LOG] <11:1:44>: <DEBUG> createSharedSecret execution time: 216.68ms
+2024-11-24T09:01:44.745Z - [LOG] <11:1:44>: <DEBUG> setupEncryption execution time: 9.97ms
+2024-11-24T09:01:44.747Z - [LOG] <11:1:44>: <DEBUG> Sending Game PACKET --> 4 | 0x04 2024-11-24T09:01:44.747Z
+2024-11-24T09:01:44.756Z - [LOG] <11:1:44>: <DEBUG> sendPacket execution time: 9.43ms
+2024-11-24T09:01:44.760Z - [LOG] <11:1:44>: <DEBUG> sendClientToServerHandshake execution time: 12.85ms
+2024-11-24T09:01:44.762Z - [LOG] <11:1:44>: <DEBUG> onServerToClientHandshake execution time: 251.48ms
+2024-11-24T09:01:44.893Z - [LOG] Header  254
+2024-11-24T09:01:44.899Z - [LOG] Payload:  Buffer(23) [Uint8Array] [  254,  37,  62, 97, 237,  61,  36,   69,  74, 188, 38,  99, 236, 210,  139, 163,  86,  5, 190, 143,  36,  215, 167]
+2024-11-24T09:01:44.902Z - [LOG] Receive Counter: 0
+2024-11-24T09:01:44.905Z - [LOG] Packet Length: 14 Checksum Length: 8
+2024-11-24T09:01:44.912Z - [LOG] <11:1:44>: <DEBUG> Checksum matched 7bafc656d93c1819 == 7bafc656d93c1819
+2024-11-24T09:01:44.913Z - [LOG] id  2
+2024-11-24T09:01:44.914Z - [LOG] 2
+2024-11-24T09:01:44.916Z - [LOG] <11:1:44>: <DEBUG> onPlayStatus execution time: 0.16ms
+2024-11-24T09:01:44.916Z - [LOG] id  6
+2024-11-24T09:01:44.917Z - [LOG] 6
+2024-11-24T09:01:44.918Z - [LOG] <11:1:44>: <DEBUG> Sending Game PACKET --> 8 | 0x08 2024-11-24T09:01:44.918Z
+2024-11-24T09:01:44.930Z - [LOG] <11:1:44>: <DEBUG> sendPacket execution time: 11.00ms
+2024-11-24T09:01:44.935Z - [LOG] <11:1:44>: <DEBUG> onResourcePack execution time: 17.39ms
+2024-11-24T09:01:48.098Z - [LOG] Header  254
+2024-11-24T09:01:48.364Z - [LOG] Payload:  Buffer(53356) [Uint8Array] [  254, 231,  92,  11, 251,  72,  22, 132, 157, 117,   69, 144, 249, 252,  56, 235,   7, 251, 249,   7,  194, 151, 122, 208, 122, 195, 124, 212, 177, 143,   96,  87,  59,  78, 246, 153,  17, 110,  82,  87,   36, 231,  61, 178,  63,  57,  72, 167, 170,  48,  ... 53306 more items]
+2024-11-24T09:01:48.383Z - [LOG] Receive Counter: 1
+2024-11-24T09:01:48.659Z - [LOG] Packet Length: 53347 Checksum Length: 8
+2024-11-24T09:01:48.665Z - [LOG] <11:1:48>: <DEBUG> Checksum matched 3eaef393467d8017 == 3eaef393467d8017
+2024-11-24T09:01:48.673Z - [LOG] id  11
+2024-11-24T09:01:48.676Z - [LOG] 11
+2024-11-24T09:01:48.710Z - [LOG] <11:1:48>: <DEBUG> Sending Game PACKET --> 69 | 0x45 2024-11-24T09:01:48.710Z
+2024-11-24T09:01:48.715Z - [LOG] <11:1:48>: <DEBUG> sendPacket execution time: 5.21ms
+2024-11-24T09:01:48.718Z - [LOG] <11:1:48>: <DEBUG> onStartGame execution time: 10.71ms
+2024-11-24T09:01:48.719Z - [LOG] id  119
+2024-11-24T09:01:48.720Z - [LOG] 119
+2024-11-24T09:01:48.746Z - [LOG] id  122
+2024-11-24T09:01:48.752Z - [LOG] 122
+2024-11-24T09:01:48.755Z - [LOG] id  29
+2024-11-24T09:01:48.767Z - [LOG] 29
+2024-11-24T09:01:48.778Z - [LOG] id  76
+2024-11-24T09:01:48.780Z - [LOG] 76
+2024-11-24T09:01:48.788Z - [LOG] id  187
+2024-11-24T09:01:48.802Z - [LOG] 187
+2024-11-24T09:01:48.811Z - [LOG] id  188
+2024-11-24T09:01:48.813Z - [LOG] 188
+2024-11-24T09:01:48.815Z - [LOG] id  39
+2024-11-24T09:01:48.817Z - [LOG] 39
+2024-11-24T09:01:48.826Z - [LOG] id  49
+2024-11-24T09:01:48.831Z - [LOG] 49
+2024-11-24T09:01:48.838Z - [LOG] id  49
+2024-11-24T09:01:48.844Z - [LOG] 49
+2024-11-24T09:01:48.846Z - [LOG] id  49
+2024-11-24T09:01:48.847Z - [LOG] 49
+2024-11-24T09:01:48.848Z - [LOG] id  49
+2024-11-24T09:01:48.849Z - [LOG] 49
+2024-11-24T09:01:48.849Z - [LOG] id  49
+2024-11-24T09:01:48.850Z - [LOG] 49
+2024-11-24T09:01:48.854Z - [LOG] id  49
+2024-11-24T09:01:48.865Z - [LOG] 49
+2024-11-24T09:01:48.871Z - [LOG] id  50
+2024-11-24T09:01:48.877Z - [LOG] 50
+2024-11-24T09:01:48.880Z - [LOG] id  50
+2024-11-24T09:01:48.882Z - [LOG] 50
+2024-11-24T09:01:48.883Z - [LOG] id  50
+2024-11-24T09:01:48.883Z - [LOG] 50
+2024-11-24T09:01:48.884Z - [LOG] id  50
+2024-11-24T09:01:48.886Z - [LOG] 50
+2024-11-24T09:01:48.888Z - [LOG] id  50
+2024-11-24T09:01:48.893Z - [LOG] 50
+2024-11-24T09:01:48.896Z - [LOG] id  31
+2024-11-24T09:01:48.897Z - [LOG] 31
+2024-11-24T09:01:48.899Z - [LOG] id  145
+2024-11-24T09:01:48.903Z - [LOG] 145
+2024-11-24T09:01:48.978Z - [LOG] id  52
+2024-11-24T09:01:48.982Z - [LOG] 52
+2024-11-24T09:01:49.286Z - [LOG] id  63
+2024-11-24T09:01:49.290Z - [LOG] 63
+2024-11-24T09:01:49.296Z - [LOG] id  29
+2024-11-24T09:01:49.338Z - [LOG] 29
+2024-11-24T09:01:54.946Z - [LOG] Header  254
+2024-11-24T09:01:54.957Z - [LOG] Payload:  Buffer(1840) [Uint8Array] [  254,   7,  44, 221, 174,  68,  13,  27,  57,  32,  178,  70,   2, 195, 255,  74, 109,  29,   1, 180,  141,  92, 241, 108, 127, 120,  46,  65, 242, 179,    3, 106, 246, 183, 127, 250, 161, 249,  33, 179,  187,  55, 215, 136,  66, 125, 225, 110,  27, 249,  ... 1790 more items]
+2024-11-24T09:01:54.967Z - [LOG] Receive Counter: 2
+2024-11-24T09:01:54.974Z - [LOG] Packet Length: 1831 Checksum Length: 8
+2024-11-24T09:01:54.981Z - [LOG] <11:1:54>: <ERROR> Decryption error: Checksum mismatch 77ca513a3c3d1aa4 != bdb9c011557f02e7
+2024-11-24T09:01:55.092Z - [LOG] Header  254
+2024-11-24T09:01:55.098Z - [LOG] Payload:  Buffer(1753) [Uint8Array] [  254, 177,  14, 125, 114, 136, 117,  43,  89,  59,   18,  38,  49, 197, 236, 202, 176, 112, 112, 227,   82,   4, 234, 147, 149, 187, 146,  91, 213,  11,  253,  41,   2,  39, 167, 198, 163, 107,  93, 120,  248,  94, 172, 220, 112, 244,  31,  87, 201, 173,  ... 1703 more items]
+2024-11-24T09:01:55.133Z - [LOG] Receive Counter: 3
+2024-11-24T09:01:55.149Z - [LOG] Packet Length: 1744 Checksum Length: 8
+2024-11-24T09:01:55.163Z - [LOG] <11:1:55>: <ERROR> Decryption error: Checksum mismatch e0f027228059b26b != 215e9b365cbf9551
+2024-11-24T09:01:55.232Z - [LOG] Header  254
+2024-11-24T09:01:55.240Z - [LOG] Payload:  Buffer(2012) [Uint8Array] [  254, 168,  46,  65, 189, 250, 122, 238, 239, 186,   36, 106,   6,  88,  56,  40, 230,  13,  73, 199,  189, 133, 110, 114, 240, 101, 186, 139, 229,  82,   28,  69, 208, 207, 158, 173, 212, 114,  68, 219,  241, 230, 225, 204, 155,  97, 167, 145, 246,  95,  ... 1962 more items]
+2024-11-24T09:01:55.249Z - [LOG] Receive Counter: 4
+2024-11-24T09:01:55.250Z - [LOG] Packet Length: 2003 Checksum Length: 8
+2024-11-24T09:01:55.252Z - [LOG] <11:1:55>: <ERROR> Decryption error: Checksum mismatch b9160a32ae1c7eb7 != f9d8cdb73938e1ce
+2024-11-24T09:01:55.398Z - [LOG] Header  254
+2024-11-24T09:01:55.414Z - [LOG] Payload:  Buffer(2129) [Uint8Array] [  254, 130,  18,  18,  80,  71,  50, 128,  92, 166,   84, 172,  80, 177, 245,  82, 176,  49,  89,  71,  122,  16, 227,  74, 157,  62,  69, 207,  88,  90,  201,  15,   9, 152,   0, 158,   7,  52,  35, 128,  174, 199, 177, 219,  49, 225,  36,  72, 121,  56,  ... 2079 more items]
+2024-11-24T09:01:55.444Z - [LOG] Receive Counter: 5
+2024-11-24T09:01:55.449Z - [LOG] Packet Length: 2120 Checksum Length: 8
+2024-11-24T09:01:55.463Z - [LOG] <11:1:55>: <ERROR> Decryption error: Checksum mismatch 0d0fdffb7bb385c8 != 386f44fd06854869
+2024-11-24T09:01:55.620Z - [LOG] Header  254
+2024-11-24T09:01:55.632Z - [LOG] Payload:  Buffer(1750) [Uint8Array] [  254,  80, 197, 158, 166,  79,  54, 190,  51, 133,  150,  10,  88, 208, 210,  82, 188, 247, 226, 135,  246, 244, 203, 144, 216, 250, 234, 160,  46, 124,   97, 122,  32, 125, 221,   7,  19, 175, 243,  69,  225, 250,   2, 192, 136, 242, 229, 122, 179,   6,  ... 1700 more items]
+2024-11-24T09:01:55.645Z - [LOG] Receive Counter: 6
+2024-11-24T09:01:55.650Z - [LOG] Packet Length: 1741 Checksum Length: 8
+2024-11-24T09:01:55.652Z - [LOG] <11:1:55>: <ERROR> Decryption error: Checksum mismatch 9ee0eddb435aba12 != b61ce55c432218f5

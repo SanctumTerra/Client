@@ -1,0 +1,150 @@
+2024-11-22T18:37:45.746Z - [TIME START] Spawn
+2024-11-22T18:37:45.749Z - Starting connection...
+2024-11-22T18:37:45.804Z - [LOG] <20:37:45>: <DEBUG> setupClientProfile execution time: 0.15ms
+2024-11-22T18:37:45.808Z - [LOG] <20:37:45>: <DEBUG> createOfflineSession execution time: 56.38ms
+2024-11-22T18:37:45.810Z - [LOG] <20:37:45>: <DEBUG> initializeSession execution time: 59.53ms
+2024-11-22T18:37:45.815Z - [LOG] <20:37:45>: <DEBUG> connect execution time: 64.29ms
+2024-11-22T18:37:45.854Z - [LOG] <20:37:45>: <DEBUG> setupClientChains execution time: 36.51ms
+2024-11-22T18:37:47.156Z - [LOG] <20:37:47>: <DEBUG> Sending 1, 33 bytes to 127.0.0.1:19132
+2024-11-22T18:37:47.206Z - [LOG] <20:37:47>: <DEBUG> handleSessionStart execution time: 66.48ms
+2024-11-22T18:37:47.834Z - [LOG] <20:37:47>: <DEBUG> Received packet 28 from 127.0.0.1:19132
+2024-11-22T18:37:47.839Z - [LOG] <20:37:47>: <DEBUG> Sending OpenConnectionRequestOne attempt 1/3
+2024-11-22T18:37:47.845Z - [LOG] <20:37:47>: <DEBUG> Sending 5, 1464 bytes to 127.0.0.1:19132
+2024-11-22T18:37:47.850Z - [LOG] <20:37:47>: <DEBUG> Received packet 6 from 127.0.0.1:19132
+2024-11-22T18:37:47.852Z - [LOG] <20:37:47>: <DEBUG> Received OpenConnectionReplyOne
+2024-11-22T18:37:47.857Z - [LOG] <20:37:47>: <DEBUG> Sending 7, 34 bytes to 127.0.0.1:19132
+2024-11-22T18:37:47.880Z - [LOG] <20:37:47>: <DEBUG> Received packet 8 from 127.0.0.1:19132
+2024-11-22T18:37:47.888Z - [LOG] <20:37:47>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:47.898Z - [LOG] <20:37:47>: <DEBUG> Received FrameSet Packet 0
+2024-11-22T18:37:47.901Z - [LOG] <20:37:47>: <DEBUG> Sending 128, 31 bytes to 127.0.0.1:19132
+2024-11-22T18:37:47.905Z - [LOG] <20:37:47>: <DEBUG> Received packet 192 from 127.0.0.1:19132
+2024-11-22T18:37:47.952Z - [LOG] <20:37:47>: <DEBUG> Sending 128, 15 bytes to 127.0.0.1:19132
+2024-11-22T18:37:47.969Z - [LOG] <20:37:47>: <DEBUG> Received packet 192 from 127.0.0.1:19132
+2024-11-22T18:37:48.897Z - [LOG] <20:37:48>: <DEBUG> Sending ConnectionRequest attempt 1/5
+2024-11-22T18:37:48.914Z - [LOG] <20:37:48>: <DEBUG> Sending 128, 32 bytes to 127.0.0.1:19132
+2024-11-22T18:37:48.922Z - [LOG] <20:37:48>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:48.927Z - [LOG] <20:37:48>: <DEBUG> Received FrameSet Packet 16
+2024-11-22T18:37:48.932Z - [LOG] <20:37:48>: <DEBUG> Received new incoming connection, clearing connection request interval
+2024-11-22T18:37:48.941Z - [LOG] <20:37:48>: <DEBUG> Sending 128, 178 bytes to 127.0.0.1:19132
+2024-11-22T18:37:48.948Z - [LOG] handle
+2024-11-22T18:37:48.953Z - [LOG] <20:37:48>: <DEBUG> Sending Game PACKET --> 193 | 0xc1 2024-11-22T18:37:48.953Z
+2024-11-22T18:37:48.957Z - [LOG] <20:37:48>: <DEBUG> Sending 128, 15 bytes to 127.0.0.1:19132
+2024-11-22T18:37:48.962Z - [LOG] <20:37:48>: <DEBUG> sendPacket execution time: 9.55ms
+2024-11-22T18:37:48.965Z - [TIME END] Spawn: 3219ms
+2024-11-22T18:37:48.973Z - [LOG] {  type: 'MCPE',  message: 'PocketMine-MP Server',  protocol: 748,  version: '1.21.40',  playerCount: 0,  maxPlayers: 20,  serverGUID: 959315177832208500,  serverName: 'PocketMine-MP',  gamemode: 'Survival'}
+2024-11-22T18:37:48.987Z - Connected successfully: {"type":"MCPE","message":"PocketMine-MP Server","protocol":748,"version":"1.21.40","playerCount":0,"maxPlayers":20,"serverGUID":959315177832208500,"serverName":"PocketMine-MP","gamemode":"Survival"}
+2024-11-22T18:37:48.988Z - [LOG] <20:37:48>: <DEBUG> Received packet 192 from 127.0.0.1:19132
+2024-11-22T18:37:48.990Z - [LOG] <20:37:48>: <DEBUG> Sending 128, 15 bytes to 127.0.0.1:19132
+2024-11-22T18:37:49.001Z - [LOG] <20:37:49>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:49.003Z - [LOG] <20:37:49>: <DEBUG> Received FrameSet Packet 0
+2024-11-22T18:37:49.006Z - [LOG] <20:37:49>: <DEBUG> Sending 128, 31 bytes to 127.0.0.1:19132
+2024-11-22T18:37:49.011Z - [LOG] <20:37:49>: <DEBUG> Received packet 192 from 127.0.0.1:19132
+2024-11-22T18:37:49.016Z - [LOG] <20:37:49>: <DEBUG> Received packet 192 from 127.0.0.1:19132
+2024-11-22T18:37:49.032Z - [LOG] <20:37:49>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:49.035Z - [LOG] <20:37:49>: <DEBUG> Received FrameSet Packet 254
+2024-11-22T18:37:49.037Z - [LOG] Header  254
+2024-11-22T18:37:49.047Z - [LOG] Payload:  Buffer(14) [Uint8Array] [  254, 12, 143, 1, 1, 0,    0,  0,   0, 0, 0, 0,    0,  0]
+2024-11-22T18:37:49.052Z - [LOG] id  143
+2024-11-22T18:37:49.055Z - [LOG] 143
+2024-11-22T18:37:49.057Z - [LOG] <20:37:49>: <DEBUG> S -> C NetworkSettingsPacket
+2024-11-22T18:37:49.065Z - [LOG] test
+2024-11-22T18:37:49.067Z - [LOG] <20:37:49>: <DEBUG> Sending Game PACKET --> 1 | 0x01 2024-11-22T18:37:49.066Z
+2024-11-22T18:37:49.168Z - [LOG] <20:37:49>: <DEBUG> Sending 128, 1473 bytes to 127.0.0.1:19132
+2024-11-22T18:37:49.181Z - [LOG] <20:37:49>: <DEBUG> Sending 128, 1473 bytes to 127.0.0.1:19132
+2024-11-22T18:37:49.185Z - [LOG] <20:37:49>: <DEBUG> Sending 128, 1473 bytes to 127.0.0.1:19132
+2024-11-22T18:37:49.188Z - [LOG] <20:37:49>: <DEBUG> Sending 128, 1473 bytes to 127.0.0.1:19132
+2024-11-22T18:37:49.197Z - [LOG] <20:37:49>: <DEBUG> Sending 128, 1473 bytes to 127.0.0.1:19132
+2024-11-22T18:37:49.200Z - [LOG] <20:37:49>: <DEBUG> Sending 128, 1473 bytes to 127.0.0.1:19132
+2024-11-22T18:37:49.231Z - [LOG] <20:37:49>: <DEBUG> Sending 128, 1473 bytes to 127.0.0.1:19132
+2024-11-22T18:37:49.238Z - [LOG] <20:37:49>: <DEBUG> Sending 128, 1473 bytes to 127.0.0.1:19132
+2024-11-22T18:37:49.241Z - [LOG] <20:37:49>: <DEBUG> Sending 128, 1473 bytes to 127.0.0.1:19132
+2024-11-22T18:37:49.312Z - [LOG] <20:37:49>: <DEBUG> Sending 128, 1473 bytes to 127.0.0.1:19132
+2024-11-22T18:37:49.316Z - [LOG] <20:37:49>: <DEBUG> Sending 128, 1473 bytes to 127.0.0.1:19132
+2024-11-22T18:37:49.321Z - [LOG] <20:37:49>: <DEBUG> Sending 128, 1473 bytes to 127.0.0.1:19132
+2024-11-22T18:37:49.323Z - [LOG] <20:37:49>: <DEBUG> Sending 128, 1473 bytes to 127.0.0.1:19132
+2024-11-22T18:37:49.334Z - [LOG] <20:37:49>: <DEBUG> Sending 128, 1473 bytes to 127.0.0.1:19132
+2024-11-22T18:37:49.336Z - [LOG] <20:37:49>: <DEBUG> Sending 128, 1473 bytes to 127.0.0.1:19132
+2024-11-22T18:37:49.340Z - [LOG] <20:37:49>: <DEBUG> Sending 128, 1473 bytes to 127.0.0.1:19132
+2024-11-22T18:37:49.350Z - [LOG] <20:37:49>: <DEBUG> Sending 128, 1473 bytes to 127.0.0.1:19132
+2024-11-22T18:37:49.354Z - [LOG] <20:37:49>: <DEBUG> Sending 128, 1473 bytes to 127.0.0.1:19132
+2024-11-22T18:37:49.358Z - [LOG] <20:37:49>: <DEBUG> Sending 128, 1347 bytes to 127.0.0.1:19132
+2024-11-22T18:37:49.369Z - [LOG] <20:37:49>: <DEBUG> sendPacket execution time: 302.21ms
+2024-11-22T18:37:49.371Z - [LOG] <20:37:49>: <DEBUG> sendLoginPacket execution time: 306.45ms
+2024-11-22T18:37:49.375Z - [LOG] <20:37:49>: <DEBUG> onNetworkSettings execution time: 317.98ms
+2024-11-22T18:37:49.383Z - [LOG] <20:37:49>: <DEBUG> Sending 128, 15 bytes to 127.0.0.1:19132
+2024-11-22T18:37:49.405Z - [LOG] <20:37:49>: <DEBUG> Received packet 192 from 127.0.0.1:19132
+2024-11-22T18:37:49.522Z - [LOG] <20:37:49>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:49.524Z - [LOG] <20:37:49>: <DEBUG> Received FrameSet Packet 254
+2024-11-22T18:37:49.527Z - [LOG] Header  254
+2024-11-22T18:37:49.530Z - [LOG] Payload:  Buffer(359) [Uint8Array] [  254,   0,  21, 143, 209, 146, 107,  48,   0,  64,   31, 250,  61, 123,  39, 168, 238, 244, 241,  90,   66, 108,  69,   5,   9, 121,  49,  68, 111,  75,   82, 108, 177, 197,  23, 221, 153, 251, 147, 183,  251, 126, 102, 206,  57, 255, 118, 187, 191, 187,  ... 309 more items]
+2024-11-22T18:37:49.534Z - [LOG] id  3
+2024-11-22T18:37:49.535Z - [LOG] 3
+2024-11-22T18:37:49.540Z - [LOG] <20:37:49>: <DEBUG> validateKeys execution time: 0.11ms
+2024-11-22T18:37:49.682Z - [LOG] <20:37:49>: <DEBUG> createSharedSecret execution time: 142.22ms
+2024-11-22T18:37:49.691Z - [LOG] <20:37:49>: <DEBUG> setupEncryption execution time: 7.49ms
+2024-11-22T18:37:49.696Z - [LOG] <20:37:49>: <DEBUG> Sending Game PACKET --> 4 | 0x04 2024-11-22T18:37:49.696Z
+2024-11-22T18:37:49.704Z - [LOG] <20:37:49>: <DEBUG> Sending 128, 21 bytes to 127.0.0.1:19132
+2024-11-22T18:37:49.705Z - [LOG] <20:37:49>: <DEBUG> sendPacket execution time: 9.58ms
+2024-11-22T18:37:49.707Z - [LOG] <20:37:49>: <DEBUG> sendClientToServerHandshake execution time: 11.20ms
+2024-11-22T18:37:49.708Z - [LOG] <20:37:49>: <DEBUG> onServerToClientHandshake execution time: 172.46ms
+2024-11-22T18:37:49.713Z - [LOG] <20:37:49>: <DEBUG> Sending 128, 15 bytes to 127.0.0.1:19132
+2024-11-22T18:37:49.729Z - [LOG] <20:37:49>: <DEBUG> Received packet 192 from 127.0.0.1:19132
+2024-11-22T18:37:49.800Z - [LOG] <20:37:49>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:49.801Z - [LOG] <20:37:49>: <DEBUG> Received FrameSet Packet 254
+2024-11-22T18:37:49.803Z - [LOG] Header  254
+2024-11-22T18:37:49.804Z - [LOG] Payload:  Buffer(23) [Uint8Array] [  254, 195, 234, 155, 147, 53,  93,  111,   6, 203,  47,  66, 28, 138,  185, 219, 212,  53, 145, 45, 142,   81, 104]
+2024-11-22T18:37:49.806Z - [LOG] Receive Counter: 0
+2024-11-22T18:37:49.807Z - [LOG] Packet Length: 14 Checksum Length: 8
+2024-11-22T18:37:49.809Z - [LOG] <20:37:49>: <DEBUG> Checksum matched 23688ae373439772 == 23688ae373439772
+2024-11-22T18:37:49.811Z - [LOG] id  2
+2024-11-22T18:37:49.811Z - [LOG] 2
+2024-11-22T18:37:49.814Z - [LOG] <20:37:49>: <DEBUG> onPlayStatus execution time: 0.16ms
+2024-11-22T18:37:49.815Z - [LOG] id  6
+2024-11-22T18:37:49.815Z - [LOG] 6
+2024-11-22T18:37:49.816Z - [LOG] <20:37:49>: <DEBUG> Sending Game PACKET --> 8 | 0x08 2024-11-22T18:37:49.816Z
+2024-11-22T18:37:49.818Z - [LOG] <20:37:49>: <DEBUG> Sending 128, 24 bytes to 127.0.0.1:19132
+2024-11-22T18:37:49.819Z - [LOG] <20:37:49>: <DEBUG> sendPacket execution time: 2.63ms
+2024-11-22T18:37:49.820Z - [LOG] <20:37:49>: <DEBUG> onResourcePack execution time: 4.20ms
+2024-11-22T18:37:49.840Z - [LOG] <20:37:49>: <DEBUG> Sending 128, 15 bytes to 127.0.0.1:19132
+2024-11-22T18:37:49.849Z - [LOG] <20:37:49>: <DEBUG> Received packet 192 from 127.0.0.1:19132
+2024-11-22T18:37:49.853Z - [LOG] <20:37:49>: <DEBUG> Received packet 192 from 127.0.0.1:19132
+2024-11-22T18:37:49.997Z - [LOG] <20:37:49>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.001Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.003Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.005Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.013Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.016Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.018Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.019Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.020Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.021Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.022Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.023Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.028Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.031Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.032Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.034Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.036Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.038Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.039Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.040Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.041Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.046Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.047Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.048Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.049Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.051Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.052Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.053Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.054Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.056Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.057Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.063Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.065Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.066Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.068Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.188Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.191Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.196Z - [LOG] <20:37:50>: <DEBUG> Received packet 128 from 127.0.0.1:19132
+2024-11-22T18:37:50.199Z - [LOG] <20:37:50>: <DEBUG> Received FrameSet Packet 254
+2024-11-22T18:37:50.205Z - [LOG] Header  254

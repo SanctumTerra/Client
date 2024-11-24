@@ -9,16 +9,13 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const client = new Client({
 	host: "127.0.0.1",
-	port: 19133,
+	port: 19132,
 	username: "SanctumTerra",
 	version: "1.21.30",
 	offline: true,
-	loadPlugins: false,
 	debug: false,
 	deviceOS: DeviceOS.Win10,
 });
-
-client.raknet.socket.on("error", (error: Error) => Logger.error(error));
 
 Logger.info("Connecting to server...");
 try {

@@ -63,12 +63,15 @@ export type Payload = {
 	GuiScale: number;
 	IsEditorMode: boolean;
 	LanguageCode: string;
+	MaxViewDistance: number;
+	MemoryTier: number;
 	OverrideSkin: boolean;
 	PersonaPieces: PersonaPieces[];
 	PersonaSkin: boolean;
 	PieceTintColors: PieceTintColors[];
 	PlatformOfflineId: string;
 	PlatformOnlineId: string;
+	PlatformType: number;
 	PlayFabId: string;
 	PremiumSkin: boolean;
 	SelfSignedId: string;
@@ -169,12 +172,15 @@ class ClientData {
 			GuiScale: 0,
 			IsEditorMode: false,
 			LanguageCode: "en_US",
+			MaxViewDistance: this.client.options.viewDistance,
+			MemoryTier: 0,
 			OverrideSkin: false,
 			PersonaPieces: skin.skinData.PersonaPieces,
 			PersonaSkin: skin.skinData.PersonaSkin,
 			PieceTintColors: skin.skinData.PieceTintColors,
 			PlatformOfflineId: "",
 			PlatformOnlineId: "",
+			PlatformType: 1,
 			PlayFabId: this.nextUUID().replace(/-/g, "").slice(0, 16),
 			PremiumSkin: skin.skinData.PremiumSkin,
 			SelfSignedId: this.nextUUID(),

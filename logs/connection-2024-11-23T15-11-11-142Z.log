@@ -1,0 +1,100 @@
+2024-11-23T15:11:11.165Z - [TIME START] Spawn
+2024-11-23T15:11:11.170Z - Starting connection...
+2024-11-23T15:11:11.213Z - [LOG] <17:11:11>: <DEBUG> setupClientProfile execution time: 0.09ms
+2024-11-23T15:11:11.215Z - [LOG] <17:11:11>: <DEBUG> createOfflineSession execution time: 42.58ms
+2024-11-23T15:11:11.217Z - [LOG] <17:11:11>: <DEBUG> initializeSession execution time: 44.97ms
+2024-11-23T15:11:11.220Z - [LOG] <17:11:11>: <DEBUG> connect execution time: 48.13ms
+2024-11-23T15:11:11.243Z - [LOG] <17:11:11>: <DEBUG> setupClientChains execution time: 22.12ms
+2024-11-23T15:11:12.020Z - [LOG] <17:11:12>: <DEBUG> handleSessionStart execution time: 2.78ms
+2024-11-23T15:11:12.494Z - [LOG] handle
+2024-11-23T15:11:12.508Z - [LOG] <17:11:12>: <DEBUG> Sending Game PACKET --> 193 | 0xc1 2024-11-23T15:11:12.508Z
+2024-11-23T15:11:12.514Z - [LOG] <17:11:12>: <DEBUG> sendPacket execution time: 5.68ms
+2024-11-23T15:11:12.516Z - [TIME END] Spawn: 1352ms
+2024-11-23T15:11:12.541Z - [LOG] {  type: 'MCPE',  message: 'PocketMine-MP Server',  protocol: 748,  version: '1.21.40',  playerCount: 0,  maxPlayers: 20,  serverGUID: 959315177832208500,  serverName: 'PocketMine-MP',  gamemode: 'Survival'}
+2024-11-23T15:11:12.560Z - Connected successfully: {"type":"MCPE","message":"PocketMine-MP Server","protocol":748,"version":"1.21.40","playerCount":0,"maxPlayers":20,"serverGUID":959315177832208500,"serverName":"PocketMine-MP","gamemode":"Survival"}
+2024-11-23T15:11:12.879Z - [LOG] Header  254
+2024-11-23T15:11:12.967Z - [LOG] Payload:  Buffer(14) [Uint8Array] [  254, 12, 143, 1, 1, 0,    0,  0,   0, 0, 0, 0,    0,  0]
+2024-11-23T15:11:12.978Z - [LOG] id  143
+2024-11-23T15:11:12.981Z - [LOG] 143
+2024-11-23T15:11:12.983Z - [LOG] <17:11:12>: <DEBUG> S -> C NetworkSettingsPacket
+2024-11-23T15:11:12.991Z - [LOG] test
+2024-11-23T15:11:12.994Z - [LOG] <17:11:12>: <DEBUG> Sending Game PACKET --> 1 | 0x01 2024-11-23T15:11:12.994Z
+2024-11-23T15:11:13.279Z - [LOG] <17:11:13>: <DEBUG> sendPacket execution time: 284.36ms
+2024-11-23T15:11:13.283Z - [LOG] <17:11:13>: <DEBUG> sendLoginPacket execution time: 291.68ms
+2024-11-23T15:11:13.294Z - [LOG] <17:11:13>: <DEBUG> onNetworkSettings execution time: 310.16ms
+2024-11-23T15:11:14.274Z - [LOG] Header  254
+2024-11-23T15:11:14.278Z - [LOG] Payload:  Buffer(360) [Uint8Array] [  254,   0,  21, 144, 205, 114, 170,  48,  24,  64,   23,  62, 143, 119,   2,   8, 213, 101, 185,  16,    1, 107,  40, 129, 124, 145, 108,  28,   2, 149,  191, 136,  94, 225, 150, 159,  39, 234,  76,  95,  178, 118, 127, 102, 206, 156, 243, 189,  90, 125,  ... 310 more items]
+2024-11-23T15:11:14.284Z - [LOG] id  3
+2024-11-23T15:11:14.289Z - [LOG] 3
+2024-11-23T15:11:14.299Z - [LOG] <17:11:14>: <DEBUG> validateKeys execution time: 0.18ms
+2024-11-23T15:11:14.460Z - [LOG] <17:11:14>: <DEBUG> createSharedSecret execution time: 162.58ms
+2024-11-23T15:11:14.475Z - [LOG] <17:11:14>: <DEBUG> setupEncryption execution time: 7.80ms
+2024-11-23T15:11:14.478Z - [LOG] <17:11:14>: <DEBUG> Sending Game PACKET --> 4 | 0x04 2024-11-23T15:11:14.478Z
+2024-11-23T15:11:14.486Z - [LOG] <17:11:14>: <DEBUG> sendPacket execution time: 8.00ms
+2024-11-23T15:11:14.487Z - [LOG] <17:11:14>: <DEBUG> sendClientToServerHandshake execution time: 9.87ms
+2024-11-23T15:11:14.490Z - [LOG] <17:11:14>: <DEBUG> onServerToClientHandshake execution time: 194.61ms
+2024-11-23T15:11:14.622Z - [LOG] Header  254
+2024-11-23T15:11:14.625Z - [LOG] Payload:  Buffer(23) [Uint8Array] [  254, 211, 126, 223, 238, 16,  135, 135, 214,  27, 125, 84,  161,  74, 129, 123, 194, 96,   65,   0, 186, 107, 150]
+2024-11-23T15:11:14.628Z - [LOG] Receive Counter: 0
+2024-11-23T15:11:14.634Z - [LOG] Packet Length: 14 Checksum Length: 8
+2024-11-23T15:11:14.640Z - [LOG] <17:11:14>: <DEBUG> Checksum matched bf73bdc209f185a2 == bf73bdc209f185a2
+2024-11-23T15:11:14.641Z - [LOG] id  2
+2024-11-23T15:11:14.642Z - [LOG] 2
+2024-11-23T15:11:14.642Z - [LOG] <17:11:14>: <DEBUG> onPlayStatus execution time: 0.16ms
+2024-11-23T15:11:14.644Z - [LOG] id  6
+2024-11-23T15:11:14.644Z - [LOG] 6
+2024-11-23T15:11:14.647Z - [LOG] <17:11:14>: <DEBUG> Sending Game PACKET --> 8 | 0x08 2024-11-23T15:11:14.647Z
+2024-11-23T15:11:14.655Z - [LOG] <17:11:14>: <DEBUG> sendPacket execution time: 4.31ms
+2024-11-23T15:11:14.658Z - [LOG] <17:11:14>: <DEBUG> onResourcePack execution time: 11.24ms
+2024-11-23T15:11:17.383Z - [LOG] Header  254
+2024-11-23T15:11:17.713Z - [LOG] Payload:  Buffer(53355) [Uint8Array] [  254, 241,  46, 143, 127,  95,  27, 225, 202,  158,   2, 221,  30, 238, 250,  74, 230,  27,  124,  50, 255, 102, 222, 174, 153, 187,  53,  148, 157, 224, 199, 120, 179, 148, 163, 189,   72,  17, 137, 183, 101,  78, 101, 139, 174,  205, 134,  94, 183, 230,  ... 53305 more items]
+2024-11-23T15:11:17.730Z - [LOG] Receive Counter: 1
+2024-11-23T15:11:17.976Z - [LOG] Packet Length: 53346 Checksum Length: 8
+2024-11-23T15:11:17.981Z - [LOG] <17:11:17>: <DEBUG> Checksum matched 439aaefa08a2aec9 == 439aaefa08a2aec9
+2024-11-23T15:11:17.992Z - [LOG] id  11
+2024-11-23T15:11:18.007Z - [LOG] 11
+2024-11-23T15:11:18.043Z - [LOG] <17:11:18>: <DEBUG> Sending Game PACKET --> 69 | 0x45 2024-11-23T15:11:18.043Z
+2024-11-23T15:11:18.047Z - [LOG] <17:11:18>: <DEBUG> sendPacket execution time: 4.04ms
+2024-11-23T15:11:18.049Z - [LOG] <17:11:18>: <DEBUG> onStartGame execution time: 7.85ms
+2024-11-23T15:11:18.050Z - [LOG] id  119
+2024-11-23T15:11:18.051Z - [LOG] 119
+2024-11-23T15:11:18.083Z - [LOG] id  122
+2024-11-23T15:11:18.087Z - [LOG] 122
+2024-11-23T15:11:18.089Z - [LOG] id  29
+2024-11-23T15:11:18.090Z - [LOG] 29
+2024-11-23T15:11:18.092Z - [LOG] id  76
+2024-11-23T15:11:18.094Z - [LOG] 76
+2024-11-23T15:11:18.097Z - [LOG] id  187
+2024-11-23T15:11:18.099Z - [LOG] 187
+2024-11-23T15:11:18.101Z - [LOG] id  188
+2024-11-23T15:11:18.104Z - [LOG] 188
+2024-11-23T15:11:18.105Z - [LOG] id  39
+2024-11-23T15:11:18.106Z - [LOG] 39
+2024-11-23T15:11:18.108Z - [LOG] id  49
+2024-11-23T15:11:18.110Z - [LOG] 49
+2024-11-23T15:11:18.112Z - [LOG] id  49
+2024-11-23T15:11:18.114Z - [LOG] 49
+2024-11-23T15:11:18.115Z - [LOG] id  49
+2024-11-23T15:11:18.116Z - [LOG] 49
+2024-11-23T15:11:18.116Z - [LOG] id  49
+2024-11-23T15:11:18.117Z - [LOG] 49
+2024-11-23T15:11:18.117Z - [LOG] id  49
+2024-11-23T15:11:18.117Z - [LOG] 49
+2024-11-23T15:11:18.120Z - [LOG] id  49
+2024-11-23T15:11:18.120Z - [LOG] 49
+2024-11-23T15:11:18.121Z - [LOG] id  50
+2024-11-23T15:11:18.122Z - [LOG] 50
+2024-11-23T15:11:18.123Z - [LOG] id  50
+2024-11-23T15:11:18.124Z - [LOG] 50
+2024-11-23T15:11:18.125Z - [LOG] id  50
+2024-11-23T15:11:18.127Z - [LOG] 50
+2024-11-23T15:11:18.128Z - [LOG] id  50
+2024-11-23T15:11:18.128Z - [LOG] 50
+2024-11-23T15:11:18.129Z - [LOG] id  50
+2024-11-23T15:11:18.130Z - [LOG] 50
+2024-11-23T15:11:18.130Z - [LOG] id  31
+2024-11-23T15:11:18.131Z - [LOG] 31
+2024-11-23T15:11:18.132Z - [LOG] id  145
+2024-11-23T15:11:18.133Z - [LOG] 145
+2024-11-23T15:11:18.207Z - [LOG] id  52
+2024-11-23T15:11:18.210Z - [LOG] 52

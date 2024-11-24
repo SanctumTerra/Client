@@ -1,10 +1,9 @@
 import {
-	ActionIds,
+	PlayerBlockActions,
 	BlockAction,
 	BlockFace,
 	BlockPosition,
 	ComplexInventoryTransaction,
-	InputDataFlags,
 	InputMode,
 	InputTransaction,
 	InteractionMode,
@@ -24,6 +23,9 @@ import {
 	TriggerType,
 	Vector2f,
 	Vector3f,
+	PlayerActionType,
+	PlayerBlockActionData,
+	InputData,
 } from "@serenityjs/protocol";
 import { Priority } from "@serenityjs/raknet";
 import type { ClientOptions } from "./client/ClientOptions";
@@ -64,38 +66,37 @@ class Client extends Connection {
 
 	private handleAuthInput(): void {
 		setInterval(() => {
-			const inputData = new PlayerAuthInputData();
-			inputData.setFlag(InputDataFlags.BlockBreakingDelayEnabled, true);
+			const inputData = new PlayerAuthInputData(0n);
+			inputData.setFlag(InputData.BlockBreakingDelayEnabled, true);
 			if (this.sneaking) {
 				if (this.firstSneak) {
 					this.firstSneak = false;
-					inputData.setFlag(InputDataFlags.StartSneaking, true);
-					inputData.setFlag(InputDataFlags.SneakDown, true);
+					inputData.setFlag(InputData.StartSneaking, true);
+					inputData.setFlag(InputData.SneakDown, true);
 				}
-				inputData.setFlag(InputDataFlags.Sneaking, true);
+				inputData.setFlag(InputData.Sneaking, true);
 			}
 
 			const packet = new PlayerAuthInputPacket();
-			packet.analogueMoveVector = new Vector2f(
+			packet.rotation = new Vector2f(
 				this.velocity.x,
 				this.velocity.z,
 			);
-			packet.blockActions = [];
-			packet.gazeDirection = undefined;
+			packet.position = this.position;
+			packet.motion = new Vector2f(this.velocity.x, this.velocity.z);
 			packet.headYaw = this.headYaw;
 			packet.inputData = inputData;
 			packet.inputMode = InputMode.Mouse;
-			packet.itemStackRequest = undefined;
-			packet.motion = new Vector2f(this.velocity.x, this.velocity.z);
-			packet.pitch = this.pitch;
 			packet.playMode = PlayMode.Screen;
 			packet.interactionMode = InteractionMode.Touch;
-			packet.position = this.position;
+			packet.interactRotation = new Vector2f(0, 0);
+			packet.inputTick = BigInt(this.tick);
 			packet.positionDelta = new Vector3f(0, 0, 0);
-			packet.tick = BigInt(this.tick);
-			packet.transaction = undefined;
-			packet.yaw = this.yaw;
-
+			packet.itemStackRequest = null;
+			packet.blockActions = null;
+			packet.predictedVehicle = null;
+			packet.analogueMotion = new Vector2f(0, 0);
+			packet.cameraOrientation = new Vector3f(0, 0, 0);
 			const cancel = false;
 			this.emit("PrePlayerAuthInputPacket", packet, cancel);
 			if (!cancel) {
@@ -257,53 +258,52 @@ class Client extends Connection {
 		const face = this.calculateFace(position);
 		// Start Break
 		await modifyNextPacket((packet: PlayerAuthInputPacket) => {
+			packet.blockActions = new PlayerBlockActions([
+				new PlayerBlockActionData(PlayerActionType.StartDestroyBlock, position, face),
+				new PlayerBlockActionData(PlayerActionType.CrackBlock, position, face),
+			]);
 			this.lookAt(position.x, position.y, position.z);
-			packet.blockActions.push(
-				new BlockAction(ActionIds.StartBreak, position, face),
-				new BlockAction(ActionIds.CrackBreak, position, face),
-			);
-			packet.inputData.setFlag(InputDataFlags.BlockAction, true);
+			packet.inputData.setFlag(InputData.PerformBlockActions, true);
 		});
 
 		// Crack Break
 		for (let tick = startTick + 1; tick < endTick; tick++) {
 			await modifyNextPacket((packet: PlayerAuthInputPacket) => {
 				this.lookAt(position.x, position.y, position.z);
-				packet.blockActions.push(
-					new BlockAction(ActionIds.CrackBreak, position, face),
-				);
-				packet.inputData.setFlag(InputDataFlags.BlockAction, true);
+				packet.blockActions = new PlayerBlockActions([
+					new PlayerBlockActionData(PlayerActionType.CrackBlock, position, face),
+				]);
+				packet.inputData.setFlag(InputData.PerformBlockActions, true);
 			});
 			await sleep(TICK_INTERVAL);
 		}
 
 		// Stop Break
 		await modifyNextPacket((packet: PlayerAuthInputPacket) => {
-			packet.inputData.setFlag(InputDataFlags.BlockAction, true);
-			packet.inputData.setFlag(InputDataFlags.ItemInteract, true);
-			this.lookAt(position.x, position.y, position.z);
+		// 	packet.inputData.setFlag(InputDataFlags.BlockAction, true);
+		// 	packet.inputData.setFlag(InputDataFlags.ItemInteract, true);
+		// 	this.lookAt(position.x, position.y, position.z);
 
-			packet.blockActions.push(
-				new BlockAction(ActionIds.StopBreak),
-				new BlockAction(ActionIds.CrackBreak, position, face),
-			);
+		// 	packet.blockActions = new PlayerBlockActions([
+		// 		new PlayerBlockActionData(PlayerActionType.StopDestroyBlock, position, face),
+		// 	]);
 
-			packet.transaction = new InputTransaction(
-				new LegacyTransaction(0, []),
-				[],
-				new ItemUseInventoryTransaction(
-					ItemUseInventoryTransactionType.Destroy,
-					TriggerType.Unknown,
-					position,
-					this.calculateFace(position),
-					0,
-					new NetworkItemStackDescriptor(0),
-					this.position,
-					new Vector3f(0, 0, 0),
-					0,
-					false,
-				),
-			);
+		// 	packet.transaction = new InputTransaction(
+		// 		new LegacyTransaction(0, []),
+		// 		[],
+		// 		new ItemUseInventoryTransaction(
+		// 			ItemUseInventoryTransactionType.Destroy,
+		// 			TriggerType.Unknown,
+		// 			position,
+		// 			this.calculateFace(position),
+		// 			0,
+		// 			new NetworkItemStackDescriptor(0),
+		// 			this.position,
+		// 			new Vector3f(0, 0, 0),
+		// 			0,
+		// 			false,
+		// 		),
+		// 	);
 		});
 		await sleep(TICK_INTERVAL);
 	}
@@ -321,67 +321,67 @@ class Client extends Connection {
 	 * @todo Finish this
 	 */
 	public place(position: Vector3f): void {
-		this.lookAt(position.x, position.y, position.z);
+		// this.lookAt(position.x, position.y, position.z);
 
-		const action1 = new PlayerActionPacket();
-		action1.entityRuntimeId = this.runtimeEntityId;
-		action1.action = ActionIds.StartItemUseOn;
-		action1.blockPosition = position.subtract(new Vector3f(0, 1, 0));
-		action1.face = this.calculateFace(position);
-		action1.resultPosition = position;
+		// const action1 = new PlayerActionPacket();
+		// action1.entityRuntimeId = this.runtimeEntityId;
+		// action1.action = ActionIds.StartItemUseOn;
+		// action1.blockPosition = position.subtract(new Vector3f(0, 1, 0));
+		// action1.face = this.calculateFace(position);
+		// action1.resultPosition = position;
 
-		this.sendPacket(action1, Priority.Normal);
+		// this.sendPacket(action1, Priority.Normal);
 
-		const transaction1 = new InventoryTransactionPacket();
-		transaction1.legacy = new LegacyTransaction(0);
-		transaction1.transaction = new InventoryTransaction(
-			ComplexInventoryTransaction.ItemUseTransaction,
-			[],
-			new ItemUseInventoryTransaction(
-				ItemUseInventoryTransactionType.Place,
-				TriggerType.PlayerInput,
-				new BlockPosition(position.x, position.y - 1, position.z),
-				this.calculateFace(position),
-				0,
-				this.inventory.getItem(0),
-				this.position,
-				new Vector3f(0, 0, 0),
-				this.inventory.getItem(0).networkBlockId ?? 0,
-				true,
-			),
-		);
+		// const transaction1 = new InventoryTransactionPacket();
+		// transaction1.legacy = new LegacyTransaction(0);
+		// transaction1.transaction = new InventoryTransaction(
+		// 	ComplexInventoryTransaction.ItemUseTransaction,
+		// 	[],
+		// 	new ItemUseInventoryTransaction(
+		// 		ItemUseInventoryTransactionType.Place,
+		// 		TriggerType.PlayerInput,
+		// 		new BlockPosition(position.x, position.y - 1, position.z),
+		// 		this.calculateFace(position),
+		// 		0,
+		// 		this.inventory.getItem(0),
+		// 		this.position,
+		// 		new Vector3f(0, 0, 0),
+		// 		this.inventory.getItem(0).networkBlockId ?? 0,
+		// 		true,
+		// 	),
+		// );
 
-		this.sendPacket(transaction1);
+		// this.sendPacket(transaction1);
 
-		const transaction2 = new InventoryTransactionPacket();
+		// const transaction2 = new InventoryTransactionPacket();
 
-		transaction2.legacy = new LegacyTransaction(0);
-		transaction2.transaction = new InventoryTransaction(
-			ComplexInventoryTransaction.ItemUseTransaction,
-			[],
-			new ItemUseInventoryTransaction(
-				ItemUseInventoryTransactionType.Use,
-				TriggerType.Unknown,
-				new BlockPosition(position.x, position.y - 1, position.z),
-				this.calculateFace(position),
-				0,
-				this.inventory.getItem(0),
-				this.position,
-				new Vector3f(0, 0, 0),
-				this.inventory.getItem(0).networkBlockId ?? 0,
-				false,
-			),
-		);
-		this.sendPacket(transaction2);
+		// transaction2.legacy = new LegacyTransaction(0);
+		// transaction2.transaction = new InventoryTransaction(
+		// 	ComplexInventoryTransaction.ItemUseTransaction,
+		// 	[],
+		// 	new ItemUseInventoryTransaction(
+		// 		ItemUseInventoryTransactionType.Use,
+		// 		TriggerType.Unknown,
+		// 		new BlockPosition(position.x, position.y - 1, position.z),
+		// 		this.calculateFace(position),
+		// 		0,
+		// 		this.inventory.getItem(0),
+		// 		this.position,
+		// 		new Vector3f(0, 0, 0),
+		// 		this.inventory.getItem(0).networkBlockId ?? 0,
+		// 		false,
+		// 	),
+		// );
+		// this.sendPacket(transaction2);
 
-		const action2 = new PlayerActionPacket();
-		action2.entityRuntimeId = this.runtimeEntityId;
-		action2.action = ActionIds.StopItemUseOn;
-		action2.blockPosition = position;
-		action2.face = this.calculateFace(position);
-		action2.resultPosition = new Vector3f(0, 0, 0);
+		// const action2 = new PlayerActionPacket();
+		// action2.entityRuntimeId = this.runtimeEntityId;
+		// action2.action = ActionIds.StopItemUseOn;
+		// action2.blockPosition = position;
+		// action2.face = this.calculateFace(position);
+		// action2.resultPosition = new Vector3f(0, 0, 0);
 
-		this.sendPacket(action2);
+		// this.sendPacket(action2);
 	}
 }
 

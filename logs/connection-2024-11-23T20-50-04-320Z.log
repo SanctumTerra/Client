@@ -1,0 +1,31 @@
+2024-11-23T20:50:04.330Z - [TIME START] Spawn
+2024-11-23T20:50:04.331Z - Starting connection...
+2024-11-23T20:50:04.341Z - [LOG] <22:50:4>: <DEBUG> setupClientProfile execution time: 0.09ms
+2024-11-23T20:50:04.345Z - [LOG] <22:50:4>: <DEBUG> createOfflineSession execution time: 10.29ms
+2024-11-23T20:50:04.346Z - [LOG] <22:50:4>: <DEBUG> initializeSession execution time: 13.97ms
+2024-11-23T20:50:04.346Z - [LOG] <22:50:4>: <DEBUG> connect execution time: 14.72ms
+2024-11-23T20:50:04.366Z - [LOG] <22:50:4>: <DEBUG> setupClientChains execution time: 18.72ms
+2024-11-23T20:50:05.096Z - [LOG] <22:50:5>: <DEBUG> handleSessionStart execution time: 0.96ms
+2024-11-23T20:50:05.478Z - [LOG] handle
+2024-11-23T20:50:05.482Z - [LOG] <22:50:5>: <DEBUG> Sending Game PACKET --> 193 | 0xc1 2024-11-23T20:50:05.482Z
+2024-11-23T20:50:05.485Z - [LOG] <22:50:5>: <DEBUG> sendPacket execution time: 3.87ms
+2024-11-23T20:50:05.487Z - [TIME END] Spawn: 1158ms
+2024-11-23T20:50:05.493Z - [LOG] {  type: 'MCPE',  message: 'PocketMine-MP Server',  protocol: 748,  version: '1.21.40',  playerCount: 0,  maxPlayers: 20,  serverGUID: 959315177832208500,  serverName: 'PocketMine-MP',  gamemode: 'Survival'}
+2024-11-23T20:50:05.496Z - Connected successfully: {"type":"MCPE","message":"PocketMine-MP Server","protocol":748,"version":"1.21.40","playerCount":0,"maxPlayers":20,"serverGUID":959315177832208500,"serverName":"PocketMine-MP","gamemode":"Survival"}
+2024-11-23T20:50:05.813Z - [LOG] Header  254
+2024-11-23T20:50:05.818Z - [LOG] Payload:  Buffer(14) [Uint8Array] [  254, 12, 143, 1, 1, 0,    0,  0,   0, 0, 0, 0,    0,  0]
+2024-11-23T20:50:05.848Z - [LOG] id  143
+2024-11-23T20:50:05.853Z - [LOG] 143
+2024-11-23T20:50:05.858Z - [LOG] <22:50:5>: <DEBUG> S -> C NetworkSettingsPacket
+2024-11-23T20:50:05.867Z - [LOG] test
+2024-11-23T20:50:05.871Z - [LOG] <22:50:5>: <DEBUG> Sending Game PACKET --> 1 | 0x01 2024-11-23T20:50:05.871Z
+2024-11-23T20:50:05.957Z - [LOG] <22:50:5>: <DEBUG> sendPacket execution time: 86.13ms
+2024-11-23T20:50:05.964Z - [LOG] <22:50:5>: <DEBUG> sendLoginPacket execution time: 96.58ms
+2024-11-23T20:50:05.966Z - [LOG] <22:50:5>: <DEBUG> onNetworkSettings execution time: 108.68ms
+2024-11-23T20:50:15.016Z - [LOG] Header  254
+2024-11-23T20:50:15.021Z - [LOG] Payload:  Buffer(48) [Uint8Array] [  254, 255, 45,   5,   0,   0,  40,  76, 111, 103,  105, 110, 32, 116, 105, 109, 101, 111, 117, 116,   32,  40, 69, 114, 114, 111, 114,  32,  73,  68,   58,  32, 48,  54,  50,  52,  45,  97,  56,  49,   55,  45, 53,  99,  50, 102,  41,   0]
+2024-11-23T20:50:15.030Z - [LOG] id  5
+2024-11-23T20:50:15.032Z - [LOG] 5
+2024-11-23T20:50:15.036Z - [LOG] <22:50:15>: <INFO> Disconnecting: Login timeout (Error ID: 0624-a817-5c2f)
+2024-11-23T20:50:15.039Z - [LOG] DisconnectPacket {  reason: 0,  hideDisconnectScreen: false,  message: DisconnectMessage {    message: 'Login timeout (Error ID: 0624-a817-5c2f)',    filtered: ''  }}
+2024-11-23T20:50:15.048Z - Disconnected: {"reason":0,"hideDisconnectScreen":false,"message":{"message":"Login timeout (Error ID: 0624-a817-5c2f)","filtered":""}}

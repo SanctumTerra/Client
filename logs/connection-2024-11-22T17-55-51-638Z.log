@@ -1,0 +1,53 @@
+2024-11-22T17:55:51.663Z - [TIME START] Spawn
+2024-11-22T17:55:51.668Z - Starting connection...
+2024-11-22T17:55:51.710Z - [LOG] <19:55:51>: <DEBUG> setupClientProfile execution time: 0.11ms
+2024-11-22T17:55:51.712Z - [LOG] <19:55:51>: <DEBUG> createOfflineSession execution time: 40.88ms
+2024-11-22T17:55:51.713Z - [LOG] <19:55:51>: <DEBUG> initializeSession execution time: 42.35ms
+2024-11-22T17:55:51.720Z - [LOG] <19:55:51>: <DEBUG> connect execution time: 48.97ms
+2024-11-22T17:55:51.744Z - [LOG] <19:55:51>: <DEBUG> setupClientChains execution time: 21.01ms
+2024-11-22T17:55:52.742Z - [LOG] <19:55:52>: <DEBUG> handleSessionStart execution time: 0.96ms
+2024-11-22T17:55:53.158Z - [LOG] handle
+2024-11-22T17:55:53.163Z - [LOG] <19:55:53>: <DEBUG> Sending Game PACKET --> 193 | 0xc1 2024-11-22T17:55:53.163Z
+2024-11-22T17:55:53.169Z - [LOG] <19:55:53>: <DEBUG> sendPacket execution time: 3.80ms
+2024-11-22T17:55:53.174Z - [TIME END] Spawn: 1511ms
+2024-11-22T17:55:53.181Z - [LOG] {  type: 'MCPE',  message: 'PocketMine-MP Server',  protocol: 748,  version: '1.21.40',  playerCount: 0,  maxPlayers: 20,  serverGUID: 959315177832208500,  serverName: 'PocketMine-MP',  gamemode: 'Survival'}
+2024-11-22T17:55:53.193Z - Connected successfully: {"type":"MCPE","message":"PocketMine-MP Server","protocol":748,"version":"1.21.40","playerCount":0,"maxPlayers":20,"serverGUID":959315177832208500,"serverName":"PocketMine-MP","gamemode":"Survival"}
+2024-11-22T17:55:53.741Z - [LOG] Header  254
+2024-11-22T17:55:53.747Z - [LOG] Payload:  Buffer(14) [Uint8Array] [  254, 12, 143, 1, 1, 0,    0,  0,   0, 0, 0, 0,    0,  0]
+2024-11-22T17:55:53.754Z - [LOG] id  143
+2024-11-22T17:55:53.755Z - [LOG] 143
+2024-11-22T17:55:53.756Z - [LOG] <19:55:53>: <DEBUG> S -> C NetworkSettingsPacket
+2024-11-22T17:55:53.757Z - [LOG] test
+2024-11-22T17:55:53.758Z - [LOG] <19:55:53>: <DEBUG> Sending Game PACKET --> 1 | 0x01 2024-11-22T17:55:53.758Z
+2024-11-22T17:55:53.875Z - [LOG] <19:55:53>: <DEBUG> sendPacket execution time: 117.15ms
+2024-11-22T17:55:53.878Z - [LOG] <19:55:53>: <DEBUG> sendLoginPacket execution time: 120.82ms
+2024-11-22T17:55:53.881Z - [LOG] <19:55:53>: <DEBUG> onNetworkSettings execution time: 125.00ms
+2024-11-22T17:55:54.154Z - [LOG] Header  254
+2024-11-22T17:55:54.158Z - [LOG] Payload:  Buffer(360) [Uint8Array] [  254,   0,  13, 207,  73, 110, 171,  48,   0,   0,  208,  69, 206, 147, 202, 140, 253,  44,  33,  96,  102,  19,  12,  54, 195, 166,   2, 252,  21,   6,  135, 146,   0,  41, 112, 163,  74,  61, 100, 123,  130, 167, 247, 115,  58, 125, 159, 254, 239, 158,  ... 310 more items]
+2024-11-22T17:55:54.168Z - [LOG] id  3
+2024-11-22T17:55:54.171Z - [LOG] 3
+2024-11-22T17:55:54.182Z - [LOG] <19:55:54>: <DEBUG> validateKeys execution time: 0.13ms
+2024-11-22T17:55:54.355Z - [LOG] <19:55:54>: <DEBUG> createSharedSecret execution time: 172.82ms
+2024-11-22T17:55:54.453Z - [LOG] <19:55:54>: <DEBUG> setupEncryption execution time: 7.40ms
+2024-11-22T17:55:54.456Z - [LOG] <19:55:54>: <DEBUG> Sending Game PACKET --> 4 | 0x04 2024-11-22T17:55:54.455Z
+2024-11-22T17:55:54.460Z - [LOG] <19:55:54>: <DEBUG> sendPacket execution time: 4.28ms
+2024-11-22T17:55:54.468Z - [LOG] <19:55:54>: <DEBUG> sendClientToServerHandshake execution time: 12.59ms
+2024-11-22T17:55:54.473Z - [LOG] <19:55:54>: <DEBUG> onServerToClientHandshake execution time: 296.14ms
+2024-11-22T17:55:54.610Z - [LOG] Header  254
+2024-11-22T17:55:54.621Z - [LOG] Payload:  Buffer(23) [Uint8Array] [  254,  77, 20, 175, 236,  69,  71,   40,  43, 55,  60, 245, 207, 252,  215, 251, 79,  13,  93,  92,  68,   64, 241]
+2024-11-22T17:55:54.627Z - [LOG] Receive Counter: 0
+2024-11-22T17:55:54.632Z - [LOG] Packet Length: 14 Checksum Length: 8
+2024-11-22T17:55:54.638Z - [LOG] <19:55:54>: <DEBUG> Checksum matched 3f43510a6b256235 == 3f43510a6b256235
+2024-11-22T17:55:54.653Z - [LOG] id  2
+2024-11-22T17:55:54.657Z - [LOG] 2
+2024-11-22T17:55:54.665Z - [LOG] <19:55:54>: <DEBUG> onPlayStatus execution time: 0.25ms
+2024-11-22T17:55:54.674Z - [LOG] id  6
+2024-11-22T17:55:54.707Z - [LOG] 6
+2024-11-22T17:55:54.711Z - [LOG] <19:55:54>: <DEBUG> Sending Game PACKET --> 8 | 0x08 2024-11-22T17:55:54.711Z
+2024-11-22T17:55:54.726Z - [LOG] <19:55:54>: <DEBUG> sendPacket execution time: 15.13ms
+2024-11-22T17:55:54.741Z - [LOG] <19:55:54>: <DEBUG> onResourcePack execution time: 29.56ms
+2024-11-22T17:55:54.980Z - [LOG] Header  254
+2024-11-22T17:55:54.994Z - [LOG] Payload:  Buffer(1432) [Uint8Array] [  254, 160, 233, 110, 182, 108,  61,  30, 133, 222,  109, 203, 248,  64, 141, 195,  45, 215,  78, 108,   97, 203, 143,  42,  98,  39,  14, 111,   4,  40,  187, 150, 100, 180, 182, 200, 202,  96,  16,  15,  178,  62,  63, 211, 210,  47,  31,  66,  11,  17,  ... 1382 more items]
+2024-11-22T17:55:55.011Z - [LOG] Receive Counter: 1
+2024-11-22T17:55:55.044Z - [LOG] Packet Length: 1423 Checksum Length: 8
+2024-11-22T17:55:55.129Z - [LOG] <19:55:55>: <ERROR> Decryption error: Checksum mismatch 733066e8507eda89 != f8f84584d190dfdb

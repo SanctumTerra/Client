@@ -100,7 +100,7 @@ class CraftingDataEntry extends DataType {
 					break;
 				}
 
-				case CraftingDataEntryType.ShulkerBoxRecipe: {
+				case CraftingDataEntryType.UserDataShapelessRecipe: {
 					shulkerBox = ShapelessRecipe.read(stream);
 					break;
 				}
@@ -195,7 +195,7 @@ class CraftingDataEntry extends DataType {
 					break;
 				}
 
-				case CraftingDataEntryType.ShulkerBoxRecipe: {
+				case CraftingDataEntryType.UserDataShapelessRecipe: {
 					ShapelessRecipe.write(stream, entry.shulkerBox as ShapelessRecipe);
 					break;
 				}

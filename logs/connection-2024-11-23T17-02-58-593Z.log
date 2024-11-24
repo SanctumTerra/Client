@@ -1,0 +1,48 @@
+2024-11-23T17:02:58.615Z - [TIME START] Spawn
+2024-11-23T17:02:58.617Z - Starting connection...
+2024-11-23T17:02:58.658Z - [LOG] <19:2:58>: <DEBUG> setupClientProfile execution time: 0.08ms
+2024-11-23T17:02:58.660Z - [LOG] <19:2:58>: <DEBUG> createOfflineSession execution time: 39.16ms
+2024-11-23T17:02:58.661Z - [LOG] <19:2:58>: <DEBUG> initializeSession execution time: 41.08ms
+2024-11-23T17:02:58.662Z - [LOG] <19:2:58>: <DEBUG> connect execution time: 41.79ms
+2024-11-23T17:02:58.680Z - [LOG] <19:2:58>: <DEBUG> setupClientChains execution time: 17.51ms
+2024-11-23T17:02:59.389Z - [LOG] <19:2:59>: <DEBUG> handleSessionStart execution time: 1.43ms
+2024-11-23T17:02:59.811Z - [LOG] handle
+2024-11-23T17:02:59.817Z - [LOG] <19:2:59>: <DEBUG> Sending Game PACKET --> 193 | 0xc1 2024-11-23T17:02:59.817Z
+2024-11-23T17:02:59.827Z - [LOG] <19:2:59>: <DEBUG> sendPacket execution time: 10.00ms
+2024-11-23T17:02:59.828Z - [TIME END] Spawn: 1213ms
+2024-11-23T17:02:59.841Z - [LOG] {  type: 'MCPE',  message: 'PocketMine-MP Server',  protocol: 748,  version: '1.21.40',  playerCount: 0,  maxPlayers: 20,  serverGUID: 959315177832208500,  serverName: 'PocketMine-MP',  gamemode: 'Survival'}
+2024-11-23T17:02:59.866Z - Connected successfully: {"type":"MCPE","message":"PocketMine-MP Server","protocol":748,"version":"1.21.40","playerCount":0,"maxPlayers":20,"serverGUID":959315177832208500,"serverName":"PocketMine-MP","gamemode":"Survival"}
+2024-11-23T17:03:00.184Z - [LOG] Header  254
+2024-11-23T17:03:00.202Z - [LOG] Payload:  Buffer(14) [Uint8Array] [  254, 12, 143, 1, 1, 0,    0,  0,   0, 0, 0, 0,    0,  0]
+2024-11-23T17:03:00.216Z - [LOG] id  143
+2024-11-23T17:03:00.218Z - [LOG] 143
+2024-11-23T17:03:00.224Z - [LOG] <19:3:0>: <DEBUG> S -> C NetworkSettingsPacket
+2024-11-23T17:03:00.228Z - [LOG] test
+2024-11-23T17:03:00.231Z - [LOG] <19:3:0>: <DEBUG> Sending Game PACKET --> 1 | 0x01 2024-11-23T17:03:00.231Z
+2024-11-23T17:03:00.568Z - [LOG] <19:3:0>: <DEBUG> sendPacket execution time: 337.00ms
+2024-11-23T17:03:00.571Z - [LOG] <19:3:0>: <DEBUG> sendLoginPacket execution time: 342.84ms
+2024-11-23T17:03:00.574Z - [LOG] <19:3:0>: <DEBUG> onNetworkSettings execution time: 350.18ms
+2024-11-23T17:03:01.392Z - [LOG] Header  254
+2024-11-23T17:03:01.396Z - [LOG] Payload:  Buffer(360) [Uint8Array] [  254,   0,  21, 143, 205, 146, 162,  48,  24,   0,   15,  62, 143,  91,  65, 135, 113,  60,  14,  66,  248,  25,   9, 155,  64,  62,  36,  23, 138, 128,  139,  64,  68,  20,  20, 225, 137, 182, 106,  94,  114, 156, 123,  87, 117, 247, 247,  98, 241, 127,  ... 310 more items]
+2024-11-23T17:03:01.403Z - [LOG] id  3
+2024-11-23T17:03:01.404Z - [LOG] 3
+2024-11-23T17:03:01.411Z - [LOG] <19:3:1>: <DEBUG> validateKeys execution time: 0.11ms
+2024-11-23T17:03:01.548Z - [LOG] <19:3:1>: <DEBUG> createSharedSecret execution time: 137.62ms
+2024-11-23T17:03:01.564Z - [LOG] <19:3:1>: <DEBUG> setupEncryption execution time: 10.49ms
+2024-11-23T17:03:01.568Z - [LOG] <19:3:1>: <DEBUG> Sending Game PACKET --> 4 | 0x04 2024-11-23T17:03:01.568Z
+2024-11-23T17:03:01.579Z - [LOG] <19:3:1>: <DEBUG> sendPacket execution time: 11.67ms
+2024-11-23T17:03:01.583Z - [LOG] <19:3:1>: <DEBUG> sendClientToServerHandshake execution time: 15.56ms
+2024-11-23T17:03:01.585Z - [LOG] <19:3:1>: <DEBUG> onServerToClientHandshake execution time: 176.70ms
+2024-11-23T17:03:01.658Z - [LOG] Header  254
+2024-11-23T17:03:01.659Z - [LOG] Payload:  Buffer(23) [Uint8Array] [  254, 213,  77, 135, 180, 236,  114, 181,  82,  14, 115, 140,  110,  27, 190, 147, 229, 251,   42, 154,  40,  80, 127]
+2024-11-23T17:03:01.662Z - [LOG] Receive Counter: 0
+2024-11-23T17:03:01.666Z - [LOG] Packet Length: 14 Checksum Length: 8
+2024-11-23T17:03:01.667Z - [LOG] <19:3:1>: <DEBUG> Checksum matched 91f60a05163c4239 == 91f60a05163c4239
+2024-11-23T17:03:01.668Z - [LOG] id  2
+2024-11-23T17:03:01.668Z - [LOG] 2
+2024-11-23T17:03:01.669Z - [LOG] <19:3:1>: <DEBUG> onPlayStatus execution time: 0.19ms
+2024-11-23T17:03:01.671Z - [LOG] id  6
+2024-11-23T17:03:01.675Z - [LOG] 6
+2024-11-23T17:03:01.678Z - [LOG] <19:3:1>: <DEBUG> Sending Game PACKET --> 8 | 0x08 2024-11-23T17:03:01.677Z
+2024-11-23T17:03:01.682Z - [LOG] <19:3:1>: <DEBUG> sendPacket execution time: 4.46ms
+2024-11-23T17:03:01.683Z - [LOG] <19:3:1>: <DEBUG> onResourcePack execution time: 6.14ms

@@ -72,7 +72,8 @@ class Connection extends Listener {
 		this.raknet = new RakNetClient({
 			address: this.options.host,
 			port: this.options.port,
-			debug: false, // this.options.debug,
+			debug: this.options.debug,
+			mtuSize: 1492
 		});
 		this.data = new ClientData(this);
 		this.packetSorter = new PacketSorter(this);
