@@ -78,10 +78,7 @@ class Client extends Connection {
 			}
 
 			const packet = new PlayerAuthInputPacket();
-			packet.rotation = new Vector2f(
-				this.velocity.x,
-				this.velocity.z,
-			);
+			packet.rotation = new Vector2f(this.velocity.x, this.velocity.z);
 			packet.position = this.position;
 			packet.motion = new Vector2f(this.velocity.x, this.velocity.z);
 			packet.headYaw = this.headYaw;
@@ -259,7 +256,11 @@ class Client extends Connection {
 		// Start Break
 		await modifyNextPacket((packet: PlayerAuthInputPacket) => {
 			packet.blockActions = new PlayerBlockActions([
-				new PlayerBlockActionData(PlayerActionType.StartDestroyBlock, position, face),
+				new PlayerBlockActionData(
+					PlayerActionType.StartDestroyBlock,
+					position,
+					face,
+				),
 				new PlayerBlockActionData(PlayerActionType.CrackBlock, position, face),
 			]);
 			this.lookAt(position.x, position.y, position.z);
@@ -271,7 +272,11 @@ class Client extends Connection {
 			await modifyNextPacket((packet: PlayerAuthInputPacket) => {
 				this.lookAt(position.x, position.y, position.z);
 				packet.blockActions = new PlayerBlockActions([
-					new PlayerBlockActionData(PlayerActionType.CrackBlock, position, face),
+					new PlayerBlockActionData(
+						PlayerActionType.CrackBlock,
+						position,
+						face,
+					),
 				]);
 				packet.inputData.setFlag(InputData.PerformBlockActions, true);
 			});
@@ -280,30 +285,28 @@ class Client extends Connection {
 
 		// Stop Break
 		await modifyNextPacket((packet: PlayerAuthInputPacket) => {
-		// 	packet.inputData.setFlag(InputDataFlags.BlockAction, true);
-		// 	packet.inputData.setFlag(InputDataFlags.ItemInteract, true);
-		// 	this.lookAt(position.x, position.y, position.z);
-
-		// 	packet.blockActions = new PlayerBlockActions([
-		// 		new PlayerBlockActionData(PlayerActionType.StopDestroyBlock, position, face),
-		// 	]);
-
-		// 	packet.transaction = new InputTransaction(
-		// 		new LegacyTransaction(0, []),
-		// 		[],
-		// 		new ItemUseInventoryTransaction(
-		// 			ItemUseInventoryTransactionType.Destroy,
-		// 			TriggerType.Unknown,
-		// 			position,
-		// 			this.calculateFace(position),
-		// 			0,
-		// 			new NetworkItemStackDescriptor(0),
-		// 			this.position,
-		// 			new Vector3f(0, 0, 0),
-		// 			0,
-		// 			false,
-		// 		),
-		// 	);
+			// 	packet.inputData.setFlag(InputDataFlags.BlockAction, true);
+			// 	packet.inputData.setFlag(InputDataFlags.ItemInteract, true);
+			// 	this.lookAt(position.x, position.y, position.z);
+			// 	packet.blockActions = new PlayerBlockActions([
+			// 		new PlayerBlockActionData(PlayerActionType.StopDestroyBlock, position, face),
+			// 	]);
+			// 	packet.transaction = new InputTransaction(
+			// 		new LegacyTransaction(0, []),
+			// 		[],
+			// 		new ItemUseInventoryTransaction(
+			// 			ItemUseInventoryTransactionType.Destroy,
+			// 			TriggerType.Unknown,
+			// 			position,
+			// 			this.calculateFace(position),
+			// 			0,
+			// 			new NetworkItemStackDescriptor(0),
+			// 			this.position,
+			// 			new Vector3f(0, 0, 0),
+			// 			0,
+			// 			false,
+			// 		),
+			// 	);
 		});
 		await sleep(TICK_INTERVAL);
 	}
@@ -322,16 +325,13 @@ class Client extends Connection {
 	 */
 	public place(position: Vector3f): void {
 		// this.lookAt(position.x, position.y, position.z);
-
 		// const action1 = new PlayerActionPacket();
 		// action1.entityRuntimeId = this.runtimeEntityId;
 		// action1.action = ActionIds.StartItemUseOn;
 		// action1.blockPosition = position.subtract(new Vector3f(0, 1, 0));
 		// action1.face = this.calculateFace(position);
 		// action1.resultPosition = position;
-
 		// this.sendPacket(action1, Priority.Normal);
-
 		// const transaction1 = new InventoryTransactionPacket();
 		// transaction1.legacy = new LegacyTransaction(0);
 		// transaction1.transaction = new InventoryTransaction(
@@ -350,11 +350,8 @@ class Client extends Connection {
 		// 		true,
 		// 	),
 		// );
-
 		// this.sendPacket(transaction1);
-
 		// const transaction2 = new InventoryTransactionPacket();
-
 		// transaction2.legacy = new LegacyTransaction(0);
 		// transaction2.transaction = new InventoryTransaction(
 		// 	ComplexInventoryTransaction.ItemUseTransaction,
@@ -373,14 +370,12 @@ class Client extends Connection {
 		// 	),
 		// );
 		// this.sendPacket(transaction2);
-
 		// const action2 = new PlayerActionPacket();
 		// action2.entityRuntimeId = this.runtimeEntityId;
 		// action2.action = ActionIds.StopItemUseOn;
 		// action2.blockPosition = position;
 		// action2.face = this.calculateFace(position);
 		// action2.resultPosition = new Vector3f(0, 0, 0);
-
 		// this.sendPacket(action2);
 	}
 }

@@ -1,8 +1,4 @@
-import {
-	Disconnect,
-	Priority,
-	Reliability,
-} from "@serenityjs/raknet";
+import { Disconnect, Priority, Reliability } from "@serenityjs/raknet";
 import { Logger } from "../vendor/Logger";
 import {
 	CompressionMethod,
@@ -48,17 +44,18 @@ export class PacketSorter {
 			const serialized = packet.serialize();
 			const framed = Framer.frame(serialized);
 			const payload = this.preparePayload(framed);
-			if ('frameAndSend' in this.connection.raknet) {
+			if ("frameAndSend" in this.connection.raknet) {
 				this.connection.raknet.frameAndSend(payload);
 			} else {
-				const frame = new Frame()
+				const frame = new Frame();
 				frame.orderChannel = 0;
 				frame.payload = payload;
 				this.connection.raknet.sendFrame(frame, Priority.Immediate);
 			}
 		} catch (error) {
 			Logger.error(
-				`Error sending packet:  ${(error as Error).message}`, (error as Error),
+				`Error sending packet:  ${(error as Error).message}`,
+				error as Error,
 			);
 		}
 	}
@@ -75,9 +72,11 @@ export class PacketSorter {
 	}
 
 	private handleEncapsulatedPacket(payload: Buffer): void {
-		if(payload.length === this.lastPacket.length && payload.equals(this.lastPacket)) {
-			Logger.debug(`Duplicate packet detected, skipping`);
-			process.exit(0);
+		if (
+			payload.length === this.lastPacket.length &&
+			payload.equals(this.lastPacket)
+		) {
+			Logger.debug("Duplicate packet detected, skipping");
 			return;
 		}
 		this.lastPacket = payload;
@@ -113,10 +112,6 @@ export class PacketSorter {
 	}
 
 	private handleGamePacket(payload: Buffer): void {
-		if(this.connection.options.debug) {
-			console.log(`Payload: `, payload)
-		}
-
 		let decrypted = this.decryptPayload(payload.subarray(1));
 		if (!decrypted) return;
 

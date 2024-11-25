@@ -40,8 +40,10 @@ import {
 } from "node:crypto";
 import { measureExecutionTime } from "./vendor/debug-tools";
 
-import { Client as RakNetClient, type Advertisement } from "@sanctumterra/raknet";
-
+import {
+	Client as RakNetClient,
+	type Advertisement,
+} from "@sanctumterra/raknet";
 
 declare global {
 	var __DEBUG: boolean;
@@ -73,7 +75,7 @@ class Connection extends Listener {
 			address: this.options.host,
 			port: this.options.port,
 			debug: this.options.debug,
-			mtuSize: 1492
+			mtuSize: 1492,
 		});
 		this.data = new ClientData(this);
 		this.packetSorter = new PacketSorter(this);
@@ -116,10 +118,8 @@ class Connection extends Listener {
 		try {
 			this.packetSorter.sendPacket(packet, priority);
 		} catch (error) {
-			console.log(error)
-			Logger.error(
-				"Error sending packet: ", (error as Error),
-			);
+			console.log(error);
+			Logger.error("Error sending packet: ", error as Error);
 		}
 	}
 
@@ -144,7 +144,7 @@ class Connection extends Listener {
 	}
 
 	private handleConnect(): void {
-		console.log("handle")
+		console.log("handle");
 		const networkSettingsPacket = new RequestNetworkSettingsPacket();
 		networkSettingsPacket.protocol = this.protocol;
 		this.sendPacket(networkSettingsPacket);
@@ -249,7 +249,7 @@ class Connection extends Listener {
 		const login = new LoginPacket();
 		login.protocol = this.protocol;
 		login.tokens = new LoginTokens(userChain, encodedChain);
-		console.log("test")
+		console.log("test");
 		this.sendPacket(login, Priority.Immediate);
 	}
 

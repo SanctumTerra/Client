@@ -30,7 +30,7 @@ class PacketEncryptor {
 		this.cipher = crypto.createCipheriv(
 			"aes-256-gcm",
 			this.secretKeyBytes,
-			iv.slice(0, 12)
+			iv.slice(0, 12),
 		);
 	}
 
@@ -39,7 +39,7 @@ class PacketEncryptor {
 		this.decipher = crypto.createDecipheriv(
 			"aes-256-gcm",
 			this.secretKeyBytes,
-			iv.slice(0, 12)
+			iv.slice(0, 12),
 		);
 	}
 
@@ -111,10 +111,13 @@ class PacketEncryptor {
 		const computedChecksum = this.computeCheckSum(packet, old);
 
 		if (!receivedChecksum.equals(computedChecksum)) {
-			throw new Error(`Checksum mismatch ${receivedChecksum.toString('hex')} != ${computedChecksum.toString('hex')}`);
-		} else {
-			// Logger.debug(`Checksum matched ${receivedChecksum.toString('hex')} == ${computedChecksum.toString('hex')}`);
+			throw new Error(
+				`Checksum mismatch ${receivedChecksum.toString("hex")} != ${computedChecksum.toString("hex")}`,
+			);
 		}
+		// else {
+		// Logger.debug(`Checksum matched ${receivedChecksum.toString('hex')} == ${computedChecksum.toString('hex')}`);
+		// }
 
 		return packet;
 	}

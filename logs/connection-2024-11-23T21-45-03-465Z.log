@@ -1,9 +1,0 @@
-2024-11-23T21:45:03.497Z - [TIME START] Spawn
-2024-11-23T21:45:03.503Z - Starting connection...
-2024-11-23T21:45:03.832Z - [LOG] <23:45:3>: <DEBUG> setupClientProfile execution time: 0.08ms
-2024-11-23T21:45:03.963Z - [LOG] <23:45:3>: <DEBUG> createOfflineSession execution time: 455.75ms
-2024-11-23T21:45:03.974Z - [LOG] <23:45:3>: <DEBUG> initializeSession execution time: 461.08ms
-2024-11-23T21:45:03.986Z - [LOG] <23:45:3>: <DEBUG> connect execution time: 478.60ms
-2024-11-23T21:45:04.029Z - [LOG] <23:45:4>: <DEBUG> setupClientChains execution time: 20.74ms
-2024-11-23T21:45:04.993Z - [LOG] <23:45:4>: <DEBUG> handleSessionStart execution time: 14.45ms
-2024-11-23T21:45:10.171Z - [UNHANDLED REJECTION] at: [object Promise]Reason: Error: Ping timeout

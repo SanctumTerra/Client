@@ -1,13 +1,9 @@
-const Versions = [
-	"1.21.20",
-	"1.21.30",
-	"1.21.40"
-] as const;
+const Versions = ["1.21.20", "1.21.30", "1.21.40"] as const;
 
 enum ProtocolList {
 	"1.21.20" = 712,
 	"1.21.30" = 729,
-	"1.21.40" = 748
+	"1.21.40" = 748,
 }
 
 enum DeviceOS {

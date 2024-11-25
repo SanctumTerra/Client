@@ -1,8 +1,0 @@
-2024-11-22T18:03:56.878Z - [TIME START] Spawn
-2024-11-22T18:03:56.883Z - Starting connection...
-2024-11-22T18:03:56.942Z - [LOG] <20:3:56>: <DEBUG> setupClientProfile execution time: 0.16ms
-2024-11-22T18:03:56.948Z - [LOG] <20:3:56>: <DEBUG> createOfflineSession execution time: 60.95ms
-2024-11-22T18:03:56.949Z - [LOG] <20:3:56>: <DEBUG> initializeSession execution time: 63.22ms
-2024-11-22T18:03:56.951Z - [LOG] <20:3:56>: <DEBUG> connect execution time: 66.18ms
-2024-11-22T18:03:56.976Z - [LOG] <20:3:56>: <DEBUG> setupClientChains execution time: 23.69ms
-2024-11-22T18:03:58.020Z - [LOG] <20:3:58>: <DEBUG> handleSessionStart execution time: 4.07ms
