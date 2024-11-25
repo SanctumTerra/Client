@@ -2,7 +2,7 @@ import type { TextPacket } from "@serenityjs/protocol";
 import { Client } from "../Client";
 // import fs from "fs";
 // import path from "path";
-import { Logger } from "src/vendor/Logger";
+import { Logger } from "../vendor/Logger";
 // import util from "util";
 
 // const logsDir = path.join(process.cwd(), "logs");
@@ -113,12 +113,13 @@ console.time("Connection");
 
 client.connect().then(([ad, packet]) => {
 	console.timeEnd("Connection");
-    console.log(ad)
+	// console.log(ad);
 	// writeToLog(`Connected successfully: ${JSON.stringify(ad)}`);
 });
 
 client.on("DisconnectPacket", (packet) => {
-	console.log(packet);
+	Logger.chat(packet.message.message);
+	// console.log(packet);
 	// writeToLog(`Disconnected: ${JSON.stringify(packet)}`);
 });
 

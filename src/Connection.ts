@@ -144,7 +144,6 @@ class Connection extends Listener {
 	}
 
 	private handleConnect(): void {
-		console.log("handle");
 		const networkSettingsPacket = new RequestNetworkSettingsPacket();
 		networkSettingsPacket.protocol = this.protocol;
 		this.sendPacket(networkSettingsPacket);
@@ -253,7 +252,6 @@ class Connection extends Listener {
 		const login = new LoginPacket();
 		login.protocol = this.protocol;
 		login.tokens = new LoginTokens(userChain, encodedChain);
-		console.log("test");
 		this.sendPacket(login, Priority.Immediate);
 	}
 
