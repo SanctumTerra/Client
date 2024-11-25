@@ -29,7 +29,7 @@ npm i @sanctumterra/client
 |----------------|-------------------|-------------------|
 | 2.0.10         | 712               | 1.21.20           |
 | 2.1.5          | 729               | 1.21.30           |
-
+| 2.1.12         | 748               | 1.21.40           |
 
 ## 🚀 Usage Example
 
@@ -86,6 +86,11 @@ client.on("spawn", () => {
 - Easier to use and understand
 
 ## 📜 Changelog
+
+### 2.1.12
+- Added support for Minecraft 1.21.40.
+- New Raknet! It now uses NAPI as Rust is faster.
+- connect function now returns [Advertisement, StartGamePacket]
 
 ### 2.1.5
 - Added DeviceOS to the Client.
