@@ -83,7 +83,7 @@ class Connection extends Listener {
 	}
 
 	@measureExecutionTime
-	public async connect(): Promise<Advertisement> {
+	public async connect(): Promise<[Advertisement, StartGamePacket]> {
 		return await this.initializeSession();
 	}
 
@@ -151,10 +151,14 @@ class Connection extends Listener {
 	}
 
 	@measureExecutionTime
-	private initializeSession(): Promise<Advertisement> {
+	private initializeSession(): Promise<[Advertisement, StartGamePacket]> {
 		return new Promise((resolve, reject) => {
-			this.on("session", async () => {
-				resolve(await this.handleSessionStart());
+			let Advertisement_: Advertisement;
+			this.once("session", async () => {
+				Advertisement_ = await this.handleSessionStart();
+			});
+			this.once("StartGamePacket", (packet: StartGamePacket) => {
+				resolve([Advertisement_, packet]);
 			});
 			this.options.offline ? createOfflineSession(this) : authenticate(this);
 		});

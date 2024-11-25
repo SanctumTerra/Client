@@ -111,8 +111,9 @@ const client = new Client({
 console.time("Connection");
 // writeToLog("Starting connection...");
 
-client.connect().then((ad) => {
+client.connect().then(([ad, packet]) => {
 	console.timeEnd("Connection");
+    console.log(ad)
 	// writeToLog(`Connected successfully: ${JSON.stringify(ad)}`);
 });
 
