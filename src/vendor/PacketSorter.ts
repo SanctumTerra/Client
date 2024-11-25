@@ -46,10 +46,11 @@ export class PacketSorter {
 			const payload = this.preparePayload(framed);
 			if ("frameAndSend" in this.connection.raknet) {
 				this.connection.raknet.frameAndSend(payload);
-			} else {
+			} else if ("sendFrame" in this.connection.raknet) {
 				const frame = new Frame();
 				frame.orderChannel = 0;
 				frame.payload = payload;
+				// @ts-expect-error 'sendFrame only exists in older versions.
 				this.connection.raknet.sendFrame(frame, Priority.Immediate);
 			}
 		} catch (error) {

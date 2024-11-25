@@ -122,15 +122,15 @@ client.on("DisconnectPacket", (packet) => {
 });
 
 // process.on("uncaughtException", (error) => {
-	// writeToLog(
-		// `[UNCAUGHT EXCEPTION] ${sanitizeToLatin(error.message)}\n${sanitizeToLatin(error.stack || "")}`,
-	// );
+// writeToLog(
+// `[UNCAUGHT EXCEPTION] ${sanitizeToLatin(error.message)}\n${sanitizeToLatin(error.stack || "")}`,
+// );
 // });
 
 // process.on("unhandledRejection", (reason, promise) => {
-	// writeToLog(
-	// 	`[UNHANDLED REJECTION] at: ${sanitizeToLatin(String(promise))}\nReason: ${sanitizeToLatin(String(reason))}`,
-	// );
+// writeToLog(
+// 	`[UNHANDLED REJECTION] at: ${sanitizeToLatin(String(promise))}\nReason: ${sanitizeToLatin(String(reason))}`,
+// );
 // });
 
 client.on("TextPacket", handleTextPacket);
