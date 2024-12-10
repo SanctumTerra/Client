@@ -1,6 +1,6 @@
 # 🛠️ Minecraft Bedrock Edition Client Library
 
-![Version](https://img.shields.io/badge/Supported%20Version-1.21.30-brightgreen)
+![Version](https://img.shields.io/badge/Supported%20Version-1.21.50-brightgreen)
 ![npm](https://img.shields.io/npm/v/@sanctumterra/client)
 ![License](https://img.shields.io/badge/License-MIT-blue)
 
@@ -30,6 +30,7 @@ npm i @sanctumterra/client
 | 2.0.10         | 712               | 1.21.20           |
 | 2.1.5          | 729               | 1.21.30           |
 | 2.1.12         | 748               | 1.21.40           |
+| 2.1.13         | 766               | 1.21.50           |
 
 ## 🚀 Usage Example
 
@@ -42,7 +43,7 @@ const client = new Client({
     offline: true,
     username: "SanctumTerra",
     tokensFolder: "./cache/tokens",
-    version: "1.21.30",
+    version: "1.21.50",
     deviceOS: DeviceOS.Android
 });
 
@@ -75,7 +76,7 @@ client.on("spawn", () => {
 
 ### 🎛️ Client Configuration
 - **Required Parameters**: `host`, `port`
-- **Optional Parameters**: `offline`, `username`, `tokensFolder`, `version`, `deviceOS`
+- **Optional Parameters**: `offline`, `username`, `tokensFolder`, `version`, `deviceOS`, `viewDistance`
 
 ### 📡 Event Handling
 - Events allow you to listen to any implemented packet if it is not implemented you will receive a warning and it should not crash if there is a crash then make an issue on github.
@@ -86,6 +87,11 @@ client.on("spawn", () => {
 - Easier to use and understand
 
 ## 📜 Changelog
+
+### 2.1.13
+- Added support for Minecraft 1.21.50.
+- Fixed many bugs.
+- Slightly Improved performance.
 
 ### 2.1.12
 - Added support for Minecraft 1.21.40.

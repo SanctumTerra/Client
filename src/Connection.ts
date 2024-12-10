@@ -38,6 +38,7 @@ import {
 	createPublicKey,
 	KeyObject,
 } from "node:crypto";
+import * as crypto from "node:crypto";
 import { measureExecutionTime } from "./vendor/debug-tools";
 
 import {
@@ -61,6 +62,7 @@ class Connection extends Listener {
 	public position!: Vector3f;
 	public tick = 0;
 	public _encryption = false;
+	public compression = false;
 	public options: ClientOptions;
 	public data: ClientData;
 
@@ -147,6 +149,7 @@ class Connection extends Listener {
 		const networkSettingsPacket = new RequestNetworkSettingsPacket();
 		networkSettingsPacket.protocol = this.protocol;
 		this.sendPacket(networkSettingsPacket);
+		this.compression = true;
 	}
 
 	@measureExecutionTime
@@ -155,6 +158,8 @@ class Connection extends Listener {
 			let Advertisement_: Advertisement;
 			this.once("session", async () => {
 				Advertisement_ = await this.handleSessionStart();
+				console.timeEnd("RakConnect");
+				// this.raknet.frameAndSend(Buffer.from([254, 0, 236, 151, 151, 151]))
 			});
 			this.once("StartGamePacket", (packet: StartGamePacket) => {
 				resolve([Advertisement_, packet]);
@@ -173,6 +178,7 @@ class Connection extends Listener {
 		if (this.options.debug) Logger.debug("S -> C NetworkSettingsPacket");
 		this.data.sendDeflated = true;
 		this.data.compressionThreshold = instance.compressionThreshold;
+		this.data.compressionMethod = instance.compressionMethod;
 		this.sendLoginPacket();
 	}
 
@@ -206,6 +212,8 @@ class Connection extends Listener {
 			this.data.loginData.ecdhKeyPair.privateKey,
 			pubKeyDer,
 		);
+
+		// this.data.sharedSecret = diffieHellman({ privateKey: this.data.loginData.ecdhKeyPair.privateKey, publicKey: pubKeyDer })
 
 		this.setupEncryption(salt);
 		this.sendClientToServerHandshake();
@@ -283,7 +291,7 @@ class Connection extends Listener {
 
 		ecdh.setPrivateKey(Buffer.from(privateKeyJwk.d, "base64"));
 		const publicKeyBuffer = Buffer.concat([
-			Buffer.from([0x04]), // Uncompressed point format
+			Buffer.from([0x04]),
 			Buffer.from(publicKeyJwk.x, "base64"),
 			Buffer.from(publicKeyJwk.y, "base64"),
 		]);

@@ -8,8 +8,8 @@
     "forceConsistentCasingInFileNames": true,           
     "strict": true,   
     "skipLibCheck": true, 
-    "emitDecoratorMetadata": true,
     "declaration": true,
+    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "paths": {
       "*": ["./*"]

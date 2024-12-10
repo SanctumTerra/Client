@@ -32,6 +32,7 @@ import { AddItemActorPacket } from "./packets/add-item-actor";
 import { LegacyTelemetryEventPacket } from "./packets/LegacyTelemetryEventPacket";
 import { UpdateSubChunkBlocksPacket } from "./packets/UpdateSubChunkBlocksPacket";
 import { Frame } from "@sanctumterra/raknet";
+import * as crypto from "node:crypto";
 
 export class PacketSorter {
 	private lastPacket: Buffer = Buffer.alloc(0);
@@ -44,14 +45,15 @@ export class PacketSorter {
 			const serialized = packet.serialize();
 			const framed = Framer.frame(serialized);
 			const payload = this.preparePayload(framed);
-			if ("frameAndSend" in this.connection.raknet) {
-				this.connection.raknet.frameAndSend(payload);
-			} else if ("sendFrame" in this.connection.raknet) {
+
+			if ("sendFrame" in this.connection.raknet) {
 				const frame = new Frame();
 				frame.orderChannel = 0;
 				frame.payload = payload;
 				// @ts-expect-error 'sendFrame only exists in older versions.
 				this.connection.raknet.sendFrame(frame, Priority.Immediate);
+			} else if ("frameAndSend" in this.connection.raknet) {
+				this.connection.raknet.frameAndSend(payload);
 			}
 		} catch (error) {
 			Logger.error(
@@ -102,13 +104,18 @@ export class PacketSorter {
 			return this.connection._encryptor.encryptPacket(framed).payload;
 		}
 
-		if (!this.connection.data.sendDeflated) {
-			return Buffer.concat([Buffer.from([254]), framed]);
-		}
-		const deflated =
-			framed.byteLength > 256
-				? Buffer.from([CompressionMethod.Zlib, ...deflateRawSync(framed)])
-				: Buffer.from([CompressionMethod.None, ...framed]);
+		const shouldCompress =
+			framed.byteLength > this.connection.data.compressionThreshold &&
+			this.connection.compression;
+		const deflated = shouldCompress
+			? Buffer.concat([
+					Buffer.from([this.connection.data.compressionMethod]),
+					deflateRawSync(framed),
+				])
+			: this.connection.compression
+				? Buffer.concat([Buffer.from([CompressionMethod.None]), framed])
+				: framed;
+
 		return Buffer.concat([Buffer.from([254]), deflated]);
 	}
 
@@ -180,79 +187,8 @@ export class PacketSorter {
 		for (const frame of frames) {
 			const id = getPacketId(frame);
 			if (id === SetScorePacket.id) continue;
-			// Logger.debug(`Processing packet ${id}`);
-			let PacketClass = Packets[id];
-			if (id === 52) {
-				PacketClass = CraftingDataPacket;
-			}
 
-			if ((id as number) === 124) {
-				PacketClass = LevelEventGenericPacket;
-			}
-
-			if ((id as number) === 314) {
-				PacketClass = CurrectStructureFeaturePacket;
-			}
-
-			if ((id as number) === 302) {
-				PacketClass = TrimDataPacket;
-			}
-
-			if ((id as number) === 160) {
-				PacketClass = PlayerFogPacket;
-			}
-
-			if ((id as number) === 72) {
-				PacketClass = GameRulesChangedPacket;
-			}
-
-			if ((id as number) === 60) {
-				PacketClass = SetDifficultyPacket;
-			}
-
-			if ((id as number) === 43) {
-				PacketClass = SetSpawnPositionPacket;
-			}
-
-			if ((id as number) === 42) {
-				PacketClass = SetHealthPacket;
-			}
-
-			if ((id as number) === 199) {
-				PacketClass = UnlockedRecipesPacket;
-			}
-
-			if ((id as number) === 165) {
-				PacketClass = SyncActorPropertyPacket;
-			}
-
-			if ((id as number) === 111) {
-				PacketClass = MoveActorDeltaPacket;
-			}
-
-			if ((id as number) === 162) {
-				PacketClass = ItemComponentPacket;
-			}
-
-			if ((id as number) === 39) {
-				PacketClass = SetActorDataPacket;
-			}
-
-			if ((id as number) === 13) {
-				PacketClass = AddEntityPacket;
-			}
-
-			if ((id as number) === 15) {
-				PacketClass = AddItemActorPacket;
-			}
-
-			if ((id as number) === 65) {
-				PacketClass = LegacyTelemetryEventPacket;
-			}
-
-			if ((id as number) === 172) {
-				PacketClass = UpdateSubChunkBlocksPacket;
-			}
+			const PacketClass = Packets[id];
 
 			if (!PacketClass) {
 				Logger.warn(`Packet with ID ${id} not found`);
@@ -260,8 +196,10 @@ export class PacketSorter {
 			}
 
 			try {
-				const instance = new PacketClass(frame).deserialize();
-				this.connection.emit(PacketClass.name, instance);
+				if (this.connection.listenerCount(PacketClass.name) > 0) {
+					const instance = new PacketClass(frame).deserialize();
+					this.connection.emit(PacketClass.name, instance);
+				}
 			} catch (error) {
 				Logger.warn(
 					`Error processing packet ${id}: ${error instanceof Error ? error.message : String(error)}\n`,

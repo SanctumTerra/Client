@@ -1,4 +1,5 @@
-import type { TextPacket } from "@serenityjs/protocol";
+import "reflect-metadata";
+import { Vector3f, type TextPacket } from "@serenityjs/protocol";
 import { Client } from "../Client";
 // import fs from "fs";
 // import path from "path";
@@ -102,19 +103,25 @@ const client = new Client({
 	host: "127.0.0.1",
 	offline: true,
 	username: "SanctumTerra",
-	version: "1.21.40",
+	version: "1.21.50",
 	port: 19132,
-	viewDistance: 1,
+	viewDistance: 4,
 	// debug: true
 });
 
 console.time("Connection");
+console.time("RakConnect");
 // writeToLog("Starting connection...");
 
 client.connect().then(([ad, packet]) => {
 	console.timeEnd("Connection");
+
 	// console.log(ad);
 	// writeToLog(`Connected successfully: ${JSON.stringify(ad)}`);
+	setTimeout(() => {
+		const vec = new Vector3f(260, 65, 236);
+		// client.breakBlock(vec);
+	}, 1000);
 });
 
 client.on("DisconnectPacket", (packet) => {

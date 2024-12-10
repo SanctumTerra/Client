@@ -117,6 +117,7 @@ class ClientData {
 	public accessToken!: string[];
 	public sendDeflated = false;
 	public compressionThreshold!: number;
+	public compressionMethod = 0;
 	public sharedSecret!: Buffer;
 	public secretKeyBytes!: Buffer;
 	private defaultPayload: Payload | null = null;

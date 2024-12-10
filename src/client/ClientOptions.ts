@@ -1,9 +1,10 @@
-const Versions = ["1.21.20", "1.21.30", "1.21.40"] as const;
+const Versions = ["1.21.20", "1.21.30", "1.21.40", "1.21.50"] as const;
 
 enum ProtocolList {
 	"1.21.20" = 712,
 	"1.21.30" = 729,
 	"1.21.40" = 748,
+	"1.21.50" = 766,
 }
 
 enum DeviceOS {
@@ -36,21 +37,23 @@ type ClientOptions = {
 	port: number;
 	skinData: object | null;
 	debug: boolean;
+	compressionThreshold: number;
 	tokensFolder: string;
 	viewDistance: number;
 	deviceOS: DeviceOS;
 };
 
 const defaultOptions: ClientOptions = {
-	version: "1.21.30",
+	version: "1.21.50",
 	offline: false,
 	username: "defaultUser",
 	host: "127.0.0.1",
 	port: 19132,
 	skinData: null,
 	debug: false,
+	compressionThreshold: 512,
 	tokensFolder: `${process.cwd()}/tokens`,
-	viewDistance: 6,
+	viewDistance: 4,
 	deviceOS: DeviceOS.Win10,
 };
 

@@ -16,7 +16,6 @@ import {
 	NetworkItemStackDescriptor,
 	PlayerActionPacket,
 	PlayerAuthInputData,
-	PlayerAuthInputPacket,
 	PlayMode,
 	TextPacket,
 	TextPacketType,
@@ -33,6 +32,8 @@ import { Inventory } from "./client/inventory/Inventory";
 import { Connection } from "./Connection";
 import { Logger } from "./vendor/Logger";
 import { Queue } from "./vendor/Queue";
+import { PlayerAuthInputPacket } from "./vendor/packets/player-auth-input";
+import type { PlayerAuthInputPacket as PAIP } from "@serenityjs/protocol";
 
 class Client extends Connection {
 	private sneaking = false;
@@ -87,7 +88,7 @@ class Client extends Connection {
 			packet.playMode = PlayMode.Screen;
 			packet.interactionMode = InteractionMode.Touch;
 			packet.interactRotation = new Vector2f(0, 0);
-			packet.inputTick = BigInt(this.tick);
+			packet.tick = BigInt(this.tick);
 			packet.positionDelta = new Vector3f(0, 0, 0);
 			packet.itemStackRequest = null;
 			packet.blockActions = null;
@@ -97,7 +98,7 @@ class Client extends Connection {
 			const cancel = false;
 			this.emit("PrePlayerAuthInputPacket", packet, cancel);
 			if (!cancel) {
-				this.sendPacket(packet, Priority.Immediate);
+				// this.sendPacket(packet, Priority.Immediate);
 			}
 		}, 100);
 	}
@@ -208,7 +209,7 @@ class Client extends Connection {
 	 * @param position The position of the block
 	 * @param ticks The number of ticks to break the block
 	 */
-	private async breakBlock(position: Vector3f, ticks = 5): Promise<void> {
+	public async breakBlock(position: Vector3f, ticks = 5): Promise<void> {
 		const MAX_DISTANCE = 5;
 		const TICK_INTERVAL = 100;
 
@@ -229,7 +230,8 @@ class Client extends Connection {
 			return new Promise((resolve) => {
 				this.once(
 					"PrePlayerAuthInputPacket",
-					(packet: PlayerAuthInputPacket) => {
+					// @ts-expect-error meh
+					(packet: PlayerAuthInputPacket, _cancel: boolean) => {
 						modifier(packet);
 						resolve();
 					},
@@ -285,9 +287,33 @@ class Client extends Connection {
 
 		// Stop Break
 		await modifyNextPacket((packet: PlayerAuthInputPacket) => {
-			// 	packet.inputData.setFlag(InputDataFlags.BlockAction, true);
-			// 	packet.inputData.setFlag(InputDataFlags.ItemInteract, true);
-			// 	this.lookAt(position.x, position.y, position.z);
+			packet.inputData.setFlag(InputData.PerformBlockActions, true);
+			packet.inputData.setFlag(InputData.StartUsingItem, true);
+			this.lookAt(position.x, position.y, position.z);
+			packet.blockActions = new PlayerBlockActions([
+				new PlayerBlockActionData(
+					PlayerActionType.StopDestroyBlock,
+					position,
+					face,
+				),
+			]);
+			packet.inputTransaction = new InputTransaction(
+				new LegacyTransaction(0, []),
+				[],
+				new ItemUseInventoryTransaction(
+					ItemUseInventoryTransactionType.Destroy,
+					TriggerType.Unknown,
+					position,
+					face,
+					0,
+					new NetworkItemStackDescriptor(0),
+					this.position,
+					new Vector3f(0, 0, 0),
+					0,
+					false,
+				),
+			);
+
 			// 	packet.blockActions = new PlayerBlockActions([
 			// 		new PlayerBlockActionData(PlayerActionType.StopDestroyBlock, position, face),
 			// 	]);

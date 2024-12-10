@@ -1,9 +1,9 @@
+import { GAME_BYTE } from "@serenityjs/network";
 import { CompressionMethod } from "@serenityjs/protocol";
 import { Frame, Reliability } from "@serenityjs/raknet";
 import * as crypto from "node:crypto";
 import * as Zlib from "node:zlib";
 import type { Connection } from "src/Connection";
-import { Logger } from "./Logger";
 
 class PacketEncryptor {
 	public secretKeyBytes: Buffer;
@@ -12,6 +12,7 @@ class PacketEncryptor {
 	public receiveCounter: bigint;
 	public cipher: crypto.Cipher | null;
 	public decipher: crypto.Decipher | null;
+	public client: Connection;
 
 	constructor(client: Connection, secretKey: Buffer, compressionThreshold = 1) {
 		this.secretKeyBytes = Buffer.from(secretKey);
@@ -20,6 +21,7 @@ class PacketEncryptor {
 		this.receiveCounter = 0n;
 		this.cipher = null;
 		this.decipher = null;
+		this.client = client;
 
 		this.initializeCipher(client.data.iv);
 		this.initializeDecipher(client.data.iv);
@@ -66,11 +68,11 @@ class PacketEncryptor {
 
 	encryptPacket(framed: Buffer): Frame {
 		let deflated: Buffer;
-
-		if (framed.byteLength > this.compressionThreshold) {
+		// framed.byteLength > this.client.data.compressionThreshold
+		if (framed.byteLength > this.client.data.compressionThreshold) {
 			deflated = Buffer.from([
 				CompressionMethod.Zlib,
-				...Zlib.deflateRawSync(framed),
+				...Zlib.deflateRawSync(framed, { level: 7 }),
 			]);
 		} else {
 			deflated = Buffer.from([CompressionMethod.None, ...framed]);
@@ -101,23 +103,17 @@ class PacketEncryptor {
 		if (!this.decipher) {
 			throw new Error("Decipher not initialized");
 		}
-		const old = this.receiveCounter;
-		this.receiveCounter++;
 
 		const decrypted = this.decipher.update(encryptedPayload);
 		const packet = decrypted.slice(0, decrypted.length - 8);
 		const receivedChecksum = decrypted.slice(decrypted.length - 8);
 
-		const computedChecksum = this.computeCheckSum(packet, old);
+		const computedChecksum = this.computeCheckSum(packet, this.receiveCounter);
+		this.receiveCounter++;
 
 		if (!receivedChecksum.equals(computedChecksum)) {
-			throw new Error(
-				`Checksum mismatch ${receivedChecksum.toString("hex")} != ${computedChecksum.toString("hex")}`,
-			);
+			throw new Error("Checksum mismatch");
 		}
-		// else {
-		// Logger.debug(`Checksum matched ${receivedChecksum.toString('hex')} == ${computedChecksum.toString('hex')}`);
-		// }
 
 		return packet;
 	}
