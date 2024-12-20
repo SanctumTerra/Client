@@ -1,21 +1,14 @@
 import {
 	PlayerBlockActions,
-	BlockAction,
 	BlockFace,
-	BlockPosition,
-	ComplexInventoryTransaction,
 	InputMode,
-	InputTransaction,
 	InteractionMode,
-	InventoryTransaction,
-	InventoryTransactionPacket,
 	ItemUseInventoryTransaction,
 	ItemUseInventoryTransactionType,
 	LegacyTransaction,
 	type MovePlayerPacket,
 	NetworkItemStackDescriptor,
 	PlayerActionPacket,
-	PlayerAuthInputData,
 	PlayMode,
 	TextPacket,
 	TextPacketType,
@@ -25,6 +18,7 @@ import {
 	PlayerActionType,
 	PlayerBlockActionData,
 	InputData,
+	type PlayerAuthInputPacket as ProtocolPlayerAuthInputPacket,
 } from "@serenityjs/protocol";
 import { Priority } from "@serenityjs/raknet";
 import type { ClientOptions } from "./client/ClientOptions";
@@ -32,8 +26,11 @@ import { Inventory } from "./client/inventory/Inventory";
 import { Connection } from "./Connection";
 import { Logger } from "./vendor/Logger";
 import { Queue } from "./vendor/Queue";
-import { PlayerAuthInputPacket } from "./vendor/packets/player-auth-input";
-import type { PlayerAuthInputPacket as PAIP } from "@serenityjs/protocol";
+import {
+	InputTransaction,
+	PlayerAuthInputData,
+	PlayerAuthInputPacket as CustomPlayerAuthInputPacket,
+} from "./vendor/packets/player-auth-input";
 
 class Client extends Connection {
 	private sneaking = false;
@@ -62,7 +59,12 @@ class Client extends Connection {
 	}
 
 	private onMovePlayer(instance: MovePlayerPacket): void {
-		this.position = instance.position;
+		if (instance.runtimeId === this.runtimeEntityId) {
+			this.position = instance.position;
+			this.pitch = instance.pitch;
+			this.yaw = instance.yaw;
+			this.headYaw = instance.headYaw;
+		}
 	}
 
 	private handleAuthInput(): void {
@@ -78,8 +80,8 @@ class Client extends Connection {
 				inputData.setFlag(InputData.Sneaking, true);
 			}
 
-			const packet = new PlayerAuthInputPacket();
-			packet.rotation = new Vector2f(this.velocity.x, this.velocity.z);
+			const packet = new CustomPlayerAuthInputPacket();
+			packet.rotation = new Vector2f(this.pitch, this.yaw);
 			packet.position = this.position;
 			packet.motion = new Vector2f(this.velocity.x, this.velocity.z);
 			packet.headYaw = this.headYaw;
@@ -88,19 +90,20 @@ class Client extends Connection {
 			packet.playMode = PlayMode.Screen;
 			packet.interactionMode = InteractionMode.Touch;
 			packet.interactRotation = new Vector2f(0, 0);
-			packet.tick = BigInt(this.tick);
+			packet.inputTick = BigInt(this.tick);
 			packet.positionDelta = new Vector3f(0, 0, 0);
 			packet.itemStackRequest = null;
 			packet.blockActions = null;
 			packet.predictedVehicle = null;
 			packet.analogueMotion = new Vector2f(0, 0);
 			packet.cameraOrientation = new Vector3f(0, 0, 0);
+			packet.rawMoveVector = new Vector2f(0, 0);
 			const cancel = false;
 			this.emit("PrePlayerAuthInputPacket", packet, cancel);
 			if (!cancel) {
-				// this.sendPacket(packet, Priority.Immediate);
+				this.sendPacket(packet, Priority.Immediate);
 			}
-		}, 100);
+		}, 50);
 	}
 
 	public sendMessage(text: string): void {
@@ -211,7 +214,7 @@ class Client extends Connection {
 	 */
 	public async breakBlock(position: Vector3f, ticks = 5): Promise<void> {
 		const MAX_DISTANCE = 5;
-		const TICK_INTERVAL = 100;
+		const TICK_INTERVAL = 50;
 
 		const isBlockTooFar = (
 			playerPosition: Vector3f,
@@ -225,22 +228,20 @@ class Client extends Connection {
 		};
 
 		const modifyNextPacket = (
-			modifier: (packet: PlayerAuthInputPacket) => void,
+			modifier: (packet: CustomPlayerAuthInputPacket) => void,
 		): Promise<void> => {
 			return new Promise((resolve) => {
-				this.once(
-					"PrePlayerAuthInputPacket",
-					// @ts-expect-error meh
-					(packet: PlayerAuthInputPacket, _cancel: boolean) => {
-						modifier(packet);
-						resolve();
-					},
-				);
+				const handler = (
+					packet: ProtocolPlayerAuthInputPacket,
+					cancel: boolean,
+				) => {
+					modifier(packet as unknown as CustomPlayerAuthInputPacket);
+					this.removeListener("PrePlayerAuthInputPacket", handler);
+					resolve();
+				};
+				this.on("PrePlayerAuthInputPacket", handler);
 			});
 		};
-
-		const sleep = (ms: number): Promise<void> =>
-			new Promise((resolve) => setTimeout(resolve, ms));
 
 		if (isBlockTooFar(this.position, position)) {
 			Logger.warn(
@@ -249,14 +250,11 @@ class Client extends Connection {
 			return;
 		}
 
-		const startTick = Number(this.tick);
-		const endTick = startTick + ticks;
-
 		this.lookAt(position.x, position.y, position.z);
-
 		const face = this.calculateFace(position);
+
 		// Start Break
-		await modifyNextPacket((packet: PlayerAuthInputPacket) => {
+		await modifyNextPacket((packet: CustomPlayerAuthInputPacket) => {
 			packet.blockActions = new PlayerBlockActions([
 				new PlayerBlockActionData(
 					PlayerActionType.StartDestroyBlock,
@@ -265,13 +263,12 @@ class Client extends Connection {
 				),
 				new PlayerBlockActionData(PlayerActionType.CrackBlock, position, face),
 			]);
-			this.lookAt(position.x, position.y, position.z);
 			packet.inputData.setFlag(InputData.PerformBlockActions, true);
 		});
 
 		// Crack Break
-		for (let tick = startTick + 1; tick < endTick; tick++) {
-			await modifyNextPacket((packet: PlayerAuthInputPacket) => {
+		for (let i = 0; i < ticks; i++) {
+			await modifyNextPacket((packet: CustomPlayerAuthInputPacket) => {
 				this.lookAt(position.x, position.y, position.z);
 				packet.blockActions = new PlayerBlockActions([
 					new PlayerBlockActionData(
@@ -282,14 +279,15 @@ class Client extends Connection {
 				]);
 				packet.inputData.setFlag(InputData.PerformBlockActions, true);
 			});
-			await sleep(TICK_INTERVAL);
+			await new Promise((resolve) => setTimeout(resolve, TICK_INTERVAL));
 		}
 
 		// Stop Break
-		await modifyNextPacket((packet: PlayerAuthInputPacket) => {
+		await modifyNextPacket((packet: CustomPlayerAuthInputPacket) => {
+			this.lookAt(position.x, position.y, position.z);
 			packet.inputData.setFlag(InputData.PerformBlockActions, true);
 			packet.inputData.setFlag(InputData.StartUsingItem, true);
-			this.lookAt(position.x, position.y, position.z);
+			packet.inputData.setFlag(InputData.PerformItemInteraction, true);
 			packet.blockActions = new PlayerBlockActions([
 				new PlayerBlockActionData(
 					PlayerActionType.StopDestroyBlock,
@@ -313,28 +311,7 @@ class Client extends Connection {
 					false,
 				),
 			);
-
-			// 	packet.blockActions = new PlayerBlockActions([
-			// 		new PlayerBlockActionData(PlayerActionType.StopDestroyBlock, position, face),
-			// 	]);
-			// 	packet.transaction = new InputTransaction(
-			// 		new LegacyTransaction(0, []),
-			// 		[],
-			// 		new ItemUseInventoryTransaction(
-			// 			ItemUseInventoryTransactionType.Destroy,
-			// 			TriggerType.Unknown,
-			// 			position,
-			// 			this.calculateFace(position),
-			// 			0,
-			// 			new NetworkItemStackDescriptor(0),
-			// 			this.position,
-			// 			new Vector3f(0, 0, 0),
-			// 			0,
-			// 			false,
-			// 		),
-			// 	);
 		});
-		await sleep(TICK_INTERVAL);
 	}
 
 	/**

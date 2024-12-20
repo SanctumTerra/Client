@@ -45,6 +45,7 @@ class Inventory {
 	}
 
 	dropItem(slot: number, count = 1) {
+		console.log("Dropping Item");
 		const packet = new InventoryTransactionPacket();
 		packet.legacy = new LegacyTransaction(-this.client.tick, [
 			{ containerId: ContainerId.Inventory, changedSlots: [slot] },

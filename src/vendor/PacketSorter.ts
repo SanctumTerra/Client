@@ -1,41 +1,19 @@
-import { Disconnect, Priority, Reliability } from "@serenityjs/raknet";
+import { Priority } from "@serenityjs/raknet";
 import { Logger } from "../vendor/Logger";
 import {
 	CompressionMethod,
 	type DataPacket,
-	DisconnectPacket,
 	Framer,
 	getPacketId,
-	Packet,
 	Packets,
 	SetScorePacket,
 } from "@serenityjs/protocol";
 import { deflateRawSync, inflateRawSync } from "node:zlib";
-import { CraftingDataPacket } from "./packets/CraftingDataPacket";
 import type { Connection } from "../Connection";
-import { LevelEventGenericPacket } from "./packets/LevelEventGenericPacket";
-import { identity } from "lodash";
-import { CurrectStructureFeaturePacket } from "./packets/current-structure-feature-packet";
-import { TrimDataPacket } from "./packets/trim-data-packet";
-import { PlayerFogPacket } from "./packets/player-fog-packet";
-import { GameRulesChangedPacket } from "./packets/game-rules-changed";
-import { SetDifficultyPacket } from "./packets/set-difficulty-packet";
-import { SetSpawnPositionPacket } from "./packets/set-spawn-position-packet";
-import { SetHealthPacket } from "./packets/set-health";
-import { UnlockedRecipesPacket } from "./packets/unlocked-recipes";
-import { SyncActorPropertyPacket } from "./packets/SyncActorPropertyPacket";
-import { MoveActorDeltaPacket } from "./packets/MoveActorDeltaPacket";
-import { ItemComponentPacket } from "./packets/ItemComponentPacket";
-import { SetActorDataPacket } from "./packets/SetActorDataPacket";
-import { AddEntityPacket } from "./packets/AddActorPacket";
-import { AddItemActorPacket } from "./packets/add-item-actor";
-import { LegacyTelemetryEventPacket } from "./packets/LegacyTelemetryEventPacket";
-import { UpdateSubChunkBlocksPacket } from "./packets/UpdateSubChunkBlocksPacket";
 import { Frame } from "@sanctumterra/raknet";
-import * as crypto from "node:crypto";
 
 export class PacketSorter {
-	private lastPacket: Buffer = Buffer.alloc(0);
+	// private lastPacket: Buffer = Buffer.alloc(0);
 	constructor(private readonly connection: Connection) {
 		this.initializeListeners();
 	}
@@ -46,15 +24,14 @@ export class PacketSorter {
 			const framed = Framer.frame(serialized);
 			const payload = this.preparePayload(framed);
 
-			if ("sendFrame" in this.connection.raknet) {
-				const frame = new Frame();
-				frame.orderChannel = 0;
-				frame.payload = payload;
-				// @ts-expect-error 'sendFrame only exists in older versions.
-				this.connection.raknet.sendFrame(frame, Priority.Immediate);
-			} else if ("frameAndSend" in this.connection.raknet) {
-				this.connection.raknet.frameAndSend(payload);
-			}
+			// if ("sendFrame" in this.connection.raknet) {
+			const frame = new Frame();
+			frame.orderChannel = 0;
+			frame.payload = payload;
+			this.connection.raknet.sendFrame(frame, Priority.Immediate);
+			// } else if ("frameAndSend" in this.connection.raknet) {
+			// 	this.connection.raknet.frameAndSend(payload);
+			// }
 		} catch (error) {
 			Logger.error(
 				`Error sending packet:  ${(error as Error).message}`,
@@ -75,14 +52,14 @@ export class PacketSorter {
 	}
 
 	private handleEncapsulatedPacket(payload: Buffer): void {
-		if (
-			payload.length === this.lastPacket.length &&
-			payload.equals(this.lastPacket)
-		) {
-			Logger.debug("Duplicate packet detected, skipping");
-			return;
-		}
-		this.lastPacket = payload;
+		// if (
+		// payload.length === this.lastPacket.length &&
+		// payload.equals(this.lastPacket)
+		// ) {
+		// Logger.debug("Duplicate packet detected, skipping");
+		// return;
+		// }
+		// this.lastPacket = payload;
 		const header = payload[0] as number;
 		try {
 			if (header === 254) {
@@ -194,7 +171,9 @@ export class PacketSorter {
 				Logger.warn(`Packet with ID ${id} not found`);
 				continue;
 			}
-
+			if (this.connection.options.debug) {
+				Logger.debug(`Received packet ${PacketClass.name}`);
+			}
 			try {
 				if (this.connection.listenerCount(PacketClass.name) > 0) {
 					const instance = new PacketClass(frame).deserialize();

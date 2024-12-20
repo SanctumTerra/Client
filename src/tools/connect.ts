@@ -115,19 +115,32 @@ console.time("RakConnect");
 
 client.connect().then(([ad, packet]) => {
 	console.timeEnd("Connection");
+	client.sendMessage("Hello");
 
-	// console.log(ad);
-	// writeToLog(`Connected successfully: ${JSON.stringify(ad)}`);
 	setTimeout(() => {
-		const vec = new Vector3f(260, 65, 236);
+		const vec = new Vector3f(264, 66, 242);
+		// console.log("Vec: ", vec);
 		// client.breakBlock(vec);
-	}, 1000);
+	}, 5000);
 });
 
 client.on("DisconnectPacket", (packet) => {
 	Logger.chat(packet.message.message);
 	// console.log(packet);
 	// writeToLog(`Disconnected: ${JSON.stringify(packet)}`);
+});
+
+let last = Date.now();
+client.on("UpdateBlockPacket", (packet) => {
+	if (packet.networkBlockId === 6870) {
+		if (Date.now() - last > 50) {
+			client.breakBlock(
+				new Vector3f(packet.position.x, packet.position.y, packet.position.z),
+				3,
+			);
+			last = Date.now();
+		}
+	}
 });
 
 // process.on("uncaughtException", (error) => {
@@ -161,4 +174,14 @@ async function handleTextPacket(packet: TextPacket): Promise<void> {
 		packet.message.includes(key),
 	);
 	handler ? handler[1]() : console.log(packet.message);
+	textHandler(packet);
 }
+
+const textHandler = (packet: TextPacket) => {
+	// console.log("TextHandler", packet.parameters);
+	if (packet.parameters?.includes("drop")) {
+		client.inventory.dropItem(0, 1);
+	} else if (packet.parameters?.includes("hi")) {
+		client.sendMessage("Hello");
+	}
+};

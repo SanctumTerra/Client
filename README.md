@@ -88,6 +88,10 @@ client.on("spawn", () => {
 
 ## 📜 Changelog
 
+### 2.1.14
+- Use latest version of Raknet
+- Fixes
+
 ### 2.1.13
 - Added support for Minecraft 1.21.50.
 - Fixed many bugs.

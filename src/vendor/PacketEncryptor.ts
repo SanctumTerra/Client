@@ -1,9 +1,8 @@
-import { GAME_BYTE } from "@serenityjs/network";
 import { CompressionMethod } from "@serenityjs/protocol";
 import { Frame, Reliability } from "@serenityjs/raknet";
 import * as crypto from "node:crypto";
 import * as Zlib from "node:zlib";
-import type { Connection } from "src/Connection";
+import type { Connection } from "../Connection";
 
 class PacketEncryptor {
 	public secretKeyBytes: Buffer;
@@ -109,12 +108,11 @@ class PacketEncryptor {
 		const receivedChecksum = decrypted.slice(decrypted.length - 8);
 
 		const computedChecksum = this.computeCheckSum(packet, this.receiveCounter);
-		this.receiveCounter++;
 
+		this.receiveCounter++;
 		if (!receivedChecksum.equals(computedChecksum)) {
 			throw new Error("Checksum mismatch");
 		}
-
 		return packet;
 	}
 }

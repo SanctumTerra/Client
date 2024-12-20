@@ -86,7 +86,12 @@ class Connection extends Listener {
 
 	@measureExecutionTime
 	public async connect(): Promise<[Advertisement, StartGamePacket]> {
-		return await this.initializeSession();
+		try {
+			return await this.initializeSession();
+		} catch (error) {
+			Logger.error("Connection failed:", error as Error);
+			throw error;
+		}
 	}
 
 	public disconnect(clientSide = true, packet: DisconnectPacket | null = null) {
@@ -98,12 +103,10 @@ class Connection extends Listener {
 			disconnectPacket.message = new DisconnectMessage();
 			disconnectPacket.hideDisconnectScreen = true;
 			this.sendPacket(disconnectPacket, Priority.Immediate);
-			// this.raknet.close();
-		} else {
-			// this.raknet.close();
 		}
 		clearInterval(this.ticker);
 		this.removeAllListeners();
+		// this.raknet.close();
 	}
 
 	@measureExecutionTime
@@ -113,15 +116,16 @@ class Connection extends Listener {
 	): void {
 		const packetId = packet.getId();
 		const hexId = packetId.toString(16).padStart(2, "0");
-		if (this.options.debug)
+		if (this.options.debug) {
 			Logger.debug(
 				`Sending Game PACKET --> ${packetId} | 0x${hexId} ${new Date().toISOString()}`,
 			);
+		}
 		try {
 			this.packetSorter.sendPacket(packet, priority);
 		} catch (error) {
-			console.log(error);
-			Logger.error("Error sending packet: ", error as Error);
+			Logger.error("Error sending packet:", error as Error);
+			throw error;
 		}
 	}
 
@@ -153,16 +157,19 @@ class Connection extends Listener {
 	}
 
 	@measureExecutionTime
-	private initializeSession(): Promise<[Advertisement, StartGamePacket]> {
+	private async initializeSession(): Promise<[Advertisement, StartGamePacket]> {
 		return new Promise((resolve, reject) => {
 			let Advertisement_: Advertisement;
 			this.once("session", async () => {
 				Advertisement_ = await this.handleSessionStart();
 				console.timeEnd("RakConnect");
-				// this.raknet.frameAndSend(Buffer.from([254, 0, 236, 151, 151, 151]))
 			});
+			let startGamePacket: StartGamePacket;
 			this.once("StartGamePacket", (packet: StartGamePacket) => {
-				resolve([Advertisement_, packet]);
+				startGamePacket = packet;
+				this.once("spawn", () => {
+					resolve([Advertisement_, startGamePacket]);
+				});
 			});
 			this.options.offline ? createOfflineSession(this) : authenticate(this);
 		});
@@ -170,7 +177,12 @@ class Connection extends Listener {
 
 	@measureExecutionTime
 	private async handleSessionStart(): Promise<Advertisement> {
-		return await this.raknet.connect();
+		try {
+			return await this.raknet.connect();
+		} catch (error) {
+			Logger.error("RakNet connection error:", error as Error);
+			throw error;
+		}
 	}
 
 	@measureExecutionTime
@@ -269,34 +281,40 @@ class Connection extends Listener {
 		publicKey: KeyObject,
 	): Buffer {
 		this.validateKeys(privateKey, publicKey);
+
 		const curve = privateKey.asymmetricKeyDetails?.namedCurve;
 		if (!curve) {
-			throw new Error(
-				"Invalid private key format. Expected JWK with named curve.",
-			);
+			throw new Error("Invalid private key format. Named curve is missing.");
 		}
 
-		const ecdh = createECDH(curve);
-		const privateKeyJwk = privateKey.export({ format: "jwk" }) as {
-			d?: string;
-		};
-		const publicKeyJwk = publicKey.export({ format: "jwk" }) as {
-			x?: string;
-			y?: string;
-		};
+		try {
+			const ecdh = createECDH(curve);
+			const privateKeyJwk = privateKey.export({ format: "jwk" }) as {
+				d?: string;
+			};
+			const publicKeyJwk = publicKey.export({ format: "jwk" }) as {
+				x?: string;
+				y?: string;
+			};
 
-		if (!privateKeyJwk.d || !publicKeyJwk.x || !publicKeyJwk.y) {
-			throw new Error("Invalid key format");
+			if (!privateKeyJwk.d || !publicKeyJwk.x || !publicKeyJwk.y) {
+				throw new Error(
+					"Invalid key format. Missing 'd', 'x', or 'y' parameters.",
+				);
+			}
+
+			ecdh.setPrivateKey(Buffer.from(privateKeyJwk.d, "base64"));
+			const publicKeyBuffer = Buffer.concat([
+				Buffer.from([0x04]),
+				Buffer.from(publicKeyJwk.x, "base64"),
+				Buffer.from(publicKeyJwk.y, "base64"),
+			]);
+
+			return ecdh.computeSecret(publicKeyBuffer);
+		} catch (error) {
+			Logger.error("Error computing shared secret:", error as Error);
+			throw new Error("Failed to create shared secret."); // More general error message
 		}
-
-		ecdh.setPrivateKey(Buffer.from(privateKeyJwk.d, "base64"));
-		const publicKeyBuffer = Buffer.concat([
-			Buffer.from([0x04]),
-			Buffer.from(publicKeyJwk.x, "base64"),
-			Buffer.from(publicKeyJwk.y, "base64"),
-		]);
-
-		return ecdh.computeSecret(publicKeyBuffer);
 	}
 
 	@measureExecutionTime
