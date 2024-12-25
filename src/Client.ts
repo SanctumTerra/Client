@@ -53,7 +53,7 @@ class Client extends Connection {
 	public velocity: Vector3f = new Vector3f(0, 0, 0);
 
 	public inventory: Inventory;
-	
+
 	private breakQueue: Queue<Vector3f> = new Queue();
 	private isBreaking = false;
 	private requestId = -2;

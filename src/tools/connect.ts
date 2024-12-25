@@ -184,9 +184,8 @@ const textHandler = (packet: TextPacket) => {
 	} else if (packet.parameters?.includes("hi")) {
 		client.sendMessage("Hello");
 	} else if (packet.parameters?.includes("spin")) {
-		let interval: NodeJS.Timeout;
 		client.yaw = 1;
-		interval = setInterval(() => {
+		const interval = setInterval(() => {
 			client.yaw += 3;
 			if (client.yaw > 356) {
 				clearInterval(interval);
