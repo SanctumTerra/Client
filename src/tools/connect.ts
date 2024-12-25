@@ -183,5 +183,16 @@ const textHandler = (packet: TextPacket) => {
 		client.inventory.dropItem(0, 1);
 	} else if (packet.parameters?.includes("hi")) {
 		client.sendMessage("Hello");
+	} else if (packet.parameters?.includes("spin")) {
+		let interval: NodeJS.Timeout;
+		client.yaw = 1;
+		interval = setInterval(() => {
+			client.yaw += 3;
+			if (client.yaw > 356) {
+				clearInterval(interval);
+			}
+		}, 30);
+	} else if (packet.parameters?.includes("chest")) {
+		client.openChest(new Vector3f(287, 176, 145));
 	}
 };

@@ -19,6 +19,17 @@ import {
 	PlayerBlockActionData,
 	InputData,
 	type PlayerAuthInputPacket as ProtocolPlayerAuthInputPacket,
+	InventoryTransactionPacket,
+	InventoryTransaction,
+	AnimatePacket,
+	AnimateId,
+	ComplexInventoryTransaction,
+	BlockPosition,
+	ItemStackRequestPacket,
+	ItemStackRequestActionType,
+	ItemStackRequest,
+	ItemStackRequestAction,
+	ItemStackActionTakePlace,
 } from "@serenityjs/protocol";
 import { Priority } from "@serenityjs/raknet";
 import type { ClientOptions } from "./client/ClientOptions";
@@ -36,15 +47,16 @@ class Client extends Connection {
 	private sneaking = false;
 	private firstSneak = false;
 
-	private headYaw = 0;
-	private pitch = 0;
-	private yaw = 0;
-	private velocity: Vector3f = new Vector3f(0, 0, 0);
+	public headYaw = 0;
+	public pitch = 0;
+	public yaw = 0;
+	public velocity: Vector3f = new Vector3f(0, 0, 0);
 
 	public inventory: Inventory;
-
+	
 	private breakQueue: Queue<Vector3f> = new Queue();
 	private isBreaking = false;
+	private requestId = -2;
 
 	constructor(options: Partial<ClientOptions> = {}) {
 		super(options);
@@ -380,6 +392,71 @@ class Client extends Connection {
 		// action2.face = this.calculateFace(position);
 		// action2.resultPosition = new Vector3f(0, 0, 0);
 		// this.sendPacket(action2);
+	}
+
+	public openChest(position: Vector3f): void {
+		this.lookAt(position.x, position.y, position.z);
+		const action = new PlayerActionPacket();
+		action.entityRuntimeId = this.runtimeEntityId;
+		action.action = PlayerActionType.StartItemUseOn;
+		action.blockPosition = position;
+		action.face = this.calculateFace(position);
+		action.resultPosition = position;
+		this.sendPacket(action, Priority.Normal);
+
+		const animate = new AnimatePacket();
+		animate.id = AnimateId.SwingArm;
+		animate.runtimeEntityId = this.runtimeEntityId;
+		animate.boatRowingTime = 0;
+		this.sendPacket(animate, Priority.Normal);
+
+		const transaction = new InventoryTransactionPacket();
+		transaction.legacy = new LegacyTransaction(0);
+		transaction.transaction = new InventoryTransaction(
+			ComplexInventoryTransaction.ItemUseTransaction,
+			[],
+			new ItemUseInventoryTransaction(
+				ItemUseInventoryTransactionType.Use,
+				TriggerType.PlayerInput,
+				new BlockPosition(position.x, position.y, position.z),
+				this.calculateFace(position),
+				0,
+				new NetworkItemStackDescriptor(0),
+				this.position,
+				new Vector3f(0, 0, 0),
+				0,
+				true,
+			),
+		);
+		this.sendPacket(transaction, Priority.Normal);
+
+		const action2 = new PlayerActionPacket();
+		action2.entityRuntimeId = this.runtimeEntityId;
+		action2.action = PlayerActionType.StopItemUseOn;
+		action2.blockPosition = position;
+		action2.face = this.calculateFace(position);
+		action2.resultPosition = new Vector3f(0, 0, 0);
+		this.sendPacket(action2, Priority.Normal);
+
+		// const itemStackRequest = new ItemStackRequestPacket();
+		// const requests: ItemStackRequest[] = [];
+		// const itemStackRequestAction = new ItemStackRequestAction(
+		// 	ItemStackRequestActionType.Place,
+		// 	new ItemStackActionTakePlace(
+
+		// 	)
+
+		// );
+
+		// requests.push(
+		// 	new ItemStackRequest(
+		// 		this.requestId,
+		// 		[itemStackRequestAction],
+		// 		[],
+		// 		0
+		// 	),
+		// );
+		// this.sendPacket(itemStackRequest, Priority.Normal);
 	}
 }
 
