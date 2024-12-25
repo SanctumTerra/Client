@@ -41,6 +41,9 @@ type ClientOptions = {
 	tokensFolder: string;
 	viewDistance: number;
 	deviceOS: DeviceOS;
+	sendAuthInput: boolean;
+	logPacketErrors: boolean;
+	tickRate: number;
 };
 
 const defaultOptions: ClientOptions = {
@@ -55,6 +58,9 @@ const defaultOptions: ClientOptions = {
 	tokensFolder: `${process.cwd()}/tokens`,
 	viewDistance: 4,
 	deviceOS: DeviceOS.Win10,
+	sendAuthInput: true,
+	logPacketErrors: false,
+	tickRate: 50,
 };
 
 export {

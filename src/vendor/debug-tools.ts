@@ -11,6 +11,9 @@ export function measureExecutionTime(
 		const result = originalMethod.apply(this, args);
 		const end = performance.now();
 		const duration = end - start;
+		if (propertyKey === "decryptPacket") {
+			console.log(duration);
+		}
 		if (globalThis.__DEBUG)
 			Logger.debug(`${propertyKey} execution time: ${duration.toFixed(2)}ms`);
 		return result;

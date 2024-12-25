@@ -22,6 +22,8 @@ import {
 	ResourcePackResponse,
 	type ResourcePacksInfoPacket,
 	ResourcePackStackPacket,
+	ServerboundLoadingScreenPacketPacket,
+	ServerboundLoadingScreenType,
 	type ServerToClientHandshakePacket,
 	SetLocalPlayerAsInitializedPacket,
 	type StartGamePacket,
@@ -96,6 +98,7 @@ class Connection extends Listener {
 
 	public disconnect(clientSide = true, packet: DisconnectPacket | null = null) {
 		const reason = packet?.message?.message ?? "Raknet Closed.";
+
 		Logger.info(`Disconnecting: ${reason}`);
 		if (clientSide) {
 			const disconnectPacket = new DisconnectPacket();
@@ -105,7 +108,7 @@ class Connection extends Listener {
 			this.sendPacket(disconnectPacket, Priority.Immediate);
 		}
 		clearInterval(this.ticker);
-		this.removeAllListeners();
+		this.removeAll();
 		// this.raknet.close();
 	}
 
@@ -115,6 +118,7 @@ class Connection extends Listener {
 		priority: Priority = Priority.Normal,
 	): void {
 		const packetId = packet.getId();
+		console.log(packetId);
 		const hexId = packetId.toString(16).padStart(2, "0");
 		if (this.options.debug) {
 			Logger.debug(
@@ -133,7 +137,7 @@ class Connection extends Listener {
 		this.raknet.once("connect", this.handleConnect.bind(this));
 		this.ticker = setInterval(() => {
 			this.emit("tick", this.tick++);
-		}, 50);
+		}, this.options.tickRate);
 		this.once("close", () => {
 			this.disconnect(false);
 		});
@@ -160,16 +164,29 @@ class Connection extends Listener {
 	private async initializeSession(): Promise<[Advertisement, StartGamePacket]> {
 		return new Promise((resolve, reject) => {
 			let Advertisement_: Advertisement;
+			this.onceAfter("StartGamePacket", (packet: StartGamePacket) => {
+				startGamePacket = packet;
+			});
+
 			this.once("session", async () => {
 				Advertisement_ = await this.handleSessionStart();
 				console.timeEnd("RakConnect");
 			});
 			let startGamePacket: StartGamePacket;
-			this.once("StartGamePacket", (packet: StartGamePacket) => {
-				startGamePacket = packet;
-				this.once("spawn", () => {
-					resolve([Advertisement_, startGamePacket]);
-				});
+
+			this.once("spawn", () => {
+				try {
+					if (startGamePacket) {
+						resolve([Advertisement_, startGamePacket]);
+					} else {
+						this.once("StartGamePacket", (packet: StartGamePacket) => {
+							startGamePacket = packet;
+							resolve([Advertisement_, startGamePacket]);
+						});
+					}
+				} catch (e) {
+					console.log(e);
+				}
 			});
 			this.options.offline ? createOfflineSession(this) : authenticate(this);
 		});
@@ -237,6 +254,12 @@ class Connection extends Listener {
 		if (instance.status === PlayStatus.PlayerSpawn) {
 			const init = new SetLocalPlayerAsInitializedPacket();
 			init.runtimeEntityId = this.runtimeEntityId;
+			const ServerBoundLoadingScreen =
+				new ServerboundLoadingScreenPacketPacket();
+			ServerBoundLoadingScreen.type =
+				ServerboundLoadingScreenType.EndLoadingScreen;
+			ServerBoundLoadingScreen.hasScreenId = false;
+			// this.sendPacket(ServerBoundLoadingScreen, Priority.Immediate);
 			this.sendPacket(init, Priority.Immediate);
 			this.emit("spawn");
 		}
@@ -313,7 +336,7 @@ class Connection extends Listener {
 			return ecdh.computeSecret(publicKeyBuffer);
 		} catch (error) {
 			Logger.error("Error computing shared secret:", error as Error);
-			throw new Error("Failed to create shared secret."); // More general error message
+			throw new Error("Failed to create shared secret.");
 		}
 	}
 

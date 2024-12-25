@@ -25,11 +25,7 @@ import {
 	AnimateId,
 	ComplexInventoryTransaction,
 	BlockPosition,
-	ItemStackRequestPacket,
-	ItemStackRequestActionType,
-	ItemStackRequest,
-	ItemStackRequestAction,
-	ItemStackActionTakePlace,
+	type DisconnectPacket,
 } from "@serenityjs/protocol";
 import { Priority } from "@serenityjs/raknet";
 import type { ClientOptions } from "./client/ClientOptions";
@@ -58,6 +54,8 @@ class Client extends Connection {
 	private isBreaking = false;
 	private requestId = -2;
 
+	private _authInputInterval!: NodeJS.Timeout;
+
 	constructor(options: Partial<ClientOptions> = {}) {
 		super(options);
 		this.inventory = new Inventory(this);
@@ -79,8 +77,19 @@ class Client extends Connection {
 		}
 	}
 
+	public disconnect(
+		clientSide?: boolean,
+		packet?: DisconnectPacket | null,
+	): void {
+		clearInterval(this._authInputInterval);
+		super.disconnect(clientSide, packet);
+	}
+
 	private handleAuthInput(): void {
-		setInterval(() => {
+		this._authInputInterval = setInterval(() => {
+			// So people can switch it live.
+			if (!this.options.sendAuthInput) return;
+
 			const inputData = new PlayerAuthInputData(0n);
 			inputData.setFlag(InputData.BlockBreakingDelayEnabled, true);
 			if (this.sneaking) {
@@ -110,12 +119,9 @@ class Client extends Connection {
 			packet.analogueMotion = new Vector2f(0, 0);
 			packet.cameraOrientation = new Vector3f(0, 0, 0);
 			packet.rawMoveVector = new Vector2f(0, 0);
-			const cancel = false;
-			this.emit("PrePlayerAuthInputPacket", packet, cancel);
-			if (!cancel) {
-				this.sendPacket(packet, Priority.Immediate);
-			}
-		}, 50);
+			this.emit("PrePlayerAuthInputPacket", packet);
+			this.sendPacket(packet, Priority.Normal);
+		}, 100);
 	}
 
 	public sendMessage(text: string): void {
@@ -243,12 +249,9 @@ class Client extends Connection {
 			modifier: (packet: CustomPlayerAuthInputPacket) => void,
 		): Promise<void> => {
 			return new Promise((resolve) => {
-				const handler = (
-					packet: ProtocolPlayerAuthInputPacket,
-					cancel: boolean,
-				) => {
+				const handler = (packet: ProtocolPlayerAuthInputPacket) => {
 					modifier(packet as unknown as CustomPlayerAuthInputPacket);
-					this.removeListener("PrePlayerAuthInputPacket", handler);
+					this.remove("PrePlayerAuthInputPacket", handler);
 					resolve();
 				};
 				this.on("PrePlayerAuthInputPacket", handler);

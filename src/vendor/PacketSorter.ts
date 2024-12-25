@@ -1,4 +1,4 @@
-import { Priority } from "@serenityjs/raknet";
+import type { Priority } from "@serenityjs/raknet";
 import { Logger } from "../vendor/Logger";
 import {
 	CompressionMethod,
@@ -13,7 +13,6 @@ import type { Connection } from "../Connection";
 import { Frame } from "@sanctumterra/raknet";
 
 export class PacketSorter {
-	// private lastPacket: Buffer = Buffer.alloc(0);
 	constructor(private readonly connection: Connection) {
 		this.initializeListeners();
 	}
@@ -24,14 +23,10 @@ export class PacketSorter {
 			const framed = Framer.frame(serialized);
 			const payload = this.preparePayload(framed);
 
-			// if ("sendFrame" in this.connection.raknet) {
 			const frame = new Frame();
 			frame.orderChannel = 0;
 			frame.payload = payload;
-			this.connection.raknet.sendFrame(frame, Priority.Immediate);
-			// } else if ("frameAndSend" in this.connection.raknet) {
-			// 	this.connection.raknet.frameAndSend(payload);
-			// }
+			this.connection.raknet.sendFrame(frame, priority);
 		} catch (error) {
 			Logger.error(
 				`Error sending packet:  ${(error as Error).message}`,
@@ -168,22 +163,25 @@ export class PacketSorter {
 			const PacketClass = Packets[id];
 
 			if (!PacketClass) {
-				Logger.warn(`Packet with ID ${id} not found`);
+				if (this.connection.options.logPacketErrors) {
+					Logger.warn(`Packet with ID ${id} not found`);
+				}
 				continue;
 			}
 			if (this.connection.options.debug) {
 				Logger.debug(`Received packet ${PacketClass.name}`);
 			}
 			try {
-				if (this.connection.listenerCount(PacketClass.name) > 0) {
-					const instance = new PacketClass(frame).deserialize();
-					this.connection.emit(PacketClass.name, instance);
-				}
+				const instance = new PacketClass(frame).deserialize();
+				//  @ts-ignore
+				this.connection.emit(PacketClass.name, instance);
 			} catch (error) {
-				Logger.warn(
-					`Error processing packet ${id}: ${error instanceof Error ? error.message : String(error)}\n`,
-					(error as Error).stack,
-				);
+				if (this.connection.options.logPacketErrors) {
+					Logger.warn(
+						`Error processing packet ${id}: ${error instanceof Error ? error.message : String(error)}\n`,
+						(error as Error).stack,
+					);
+				}
 			}
 		}
 	}

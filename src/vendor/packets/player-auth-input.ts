@@ -183,6 +183,7 @@ class PlayerAuthItemStackRequest extends DataType {
 	}
 }
 
+// @ts-ignore
 @Proto(Packet.PlayerAuthInput)
 export class PlayerAuthInputPacket extends DataPacket {
 	@Serialize(Vector2f) public rotation!: Vector2f;

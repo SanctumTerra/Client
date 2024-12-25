@@ -143,18 +143,6 @@ client.on("UpdateBlockPacket", (packet) => {
 	}
 });
 
-// process.on("uncaughtException", (error) => {
-// writeToLog(
-// `[UNCAUGHT EXCEPTION] ${sanitizeToLatin(error.message)}\n${sanitizeToLatin(error.stack || "")}`,
-// );
-// });
-
-// process.on("unhandledRejection", (reason, promise) => {
-// writeToLog(
-// 	`[UNHANDLED REJECTION] at: ${sanitizeToLatin(String(promise))}\nReason: ${sanitizeToLatin(String(reason))}`,
-// );
-// });
-
 client.on("TextPacket", handleTextPacket);
 
 async function handleTextPacket(packet: TextPacket): Promise<void> {

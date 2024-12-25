@@ -30,7 +30,7 @@ npm i @sanctumterra/client
 | 2.0.10         | 712               | 1.21.20           |
 | 2.1.5          | 729               | 1.21.30           |
 | 2.1.12         | 748               | 1.21.40           |
-| 2.1.13         | 766               | 1.21.50           |
+| 2.1.16         | 766               | 1.21.50           |
 
 ## 🚀 Usage Example
 
@@ -44,7 +44,10 @@ const client = new Client({
     username: "SanctumTerra",
     tokensFolder: "./cache/tokens",
     version: "1.21.50",
-    deviceOS: DeviceOS.Android
+    deviceOS: DeviceOS.Android,
+    sendAuthInput: true,
+    logPacketErrors: false,
+    tickRate: 50 // 50 is the default tick rate
 });
 
 client.connect();
@@ -76,7 +79,8 @@ client.on("spawn", () => {
 
 ### 🎛️ Client Configuration
 - **Required Parameters**: `host`, `port`
-- **Optional Parameters**: `offline`, `username`, `tokensFolder`, `version`, `deviceOS`, `viewDistance`
+- **Optional Parameters**: 
+`offline`, `username`, `tokensFolder`, `version`, `deviceOS`, `viewDistance`, `sendAuthInput`, `logPacketErrors`, `tickRate`
 
 ### 📡 Event Handling
 - Events allow you to listen to any implemented packet if it is not implemented you will receive a warning and it should not crash if there is a crash then make an issue on github.
@@ -87,6 +91,11 @@ client.on("spawn", () => {
 - Easier to use and understand
 
 ## 📜 Changelog
+
+### 2.1.16
+- Fixed bugs with BDS.
+- Added more options.
+- New Listener Events.
 
 ### 2.1.14
 - Use latest version of Raknet
