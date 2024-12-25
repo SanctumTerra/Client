@@ -1,6 +1,6 @@
 {
   "name": "@sanctumterra/client",
-  "version": "2.1.16",
+  "version": "2.1.17",
   "minecraft": "1.21.50",
   "description": "MCBE Client",
   "main": "./dist/index.js",

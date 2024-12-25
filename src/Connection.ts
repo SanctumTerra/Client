@@ -118,7 +118,6 @@ class Connection extends Listener {
 		priority: Priority = Priority.Normal,
 	): void {
 		const packetId = packet.getId();
-		console.log(packetId);
 		const hexId = packetId.toString(16).padStart(2, "0");
 		if (this.options.debug) {
 			Logger.debug(
