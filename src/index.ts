@@ -3,6 +3,8 @@ import { Logger } from "./vendor/Logger";
 import { Connection } from "./Connection";
 import { DeviceOS } from "./client/ClientOptions";
 
+// @ts-ignore
+process.noDeprecation = true;
 declare global {
 	var shieldID: number;
 }

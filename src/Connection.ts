@@ -173,13 +173,15 @@ class Connection extends Listener {
 			});
 			let startGamePacket: StartGamePacket;
 
-			this.once("spawn", () => {
+			this.once("ready", () => {
 				try {
 					if (startGamePacket) {
+						this.emit("spawn", [Advertisement_, startGamePacket]);
 						resolve([Advertisement_, startGamePacket]);
 					} else {
 						this.once("StartGamePacket", (packet: StartGamePacket) => {
 							startGamePacket = packet;
+							this.emit("spawn", [Advertisement_, startGamePacket]);
 							resolve([Advertisement_, startGamePacket]);
 						});
 					}
@@ -260,7 +262,7 @@ class Connection extends Listener {
 			ServerBoundLoadingScreen.hasScreenId = false;
 			// this.sendPacket(ServerBoundLoadingScreen, Priority.Immediate);
 			this.sendPacket(init, Priority.Immediate);
-			this.emit("spawn");
+			this.emit("ready");
 		}
 	}
 

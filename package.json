@@ -6,6 +6,7 @@
   "main": "./dist/index.js",
   "type": "commonjs",
   "scripts": {
+    "watch": "tsc --watch",
     "test": "node ./dist/tools/test.js",
     "dev": "node ./src/tools/build.js && npm run test",
     "build": "tsc --build tsconfig.json",
@@ -40,13 +41,15 @@
     "@serenityjs/block": "^0.4.4",
     "@serenityjs/emitter": "^0.6.4",
     "@serenityjs/network": "^0.4.4",
-    "@serenityjs/protocol": "^0.6.4-beta-20241210051348",
+    "@serenityjs/protocol": "^0.7.0-beta-20250101024648",
     "@serenityjs/raknet": "^0.6.2-beta-20241128210118",
     "@serenityjs/world": "^0.4.4",
     "@types/node": "^22.7.5",
     "crypto": "^1.0.1",
     "fast-json-stable-stringify": "^2.1.0",
+    "i": "^0.3.7",
     "lodash": "^4.17.21",
+    "npm": "^11.0.0",
     "prismarine-auth": "github:AnyBananaGAME/prismarine-auth",
     "uuid-1345": "^1.0.2"
   }

@@ -1,4 +1,5 @@
 import {
+	AttributeName,
 	PlayerBlockActions,
 	BlockFace,
 	InputMode,
@@ -26,6 +27,13 @@ import {
 	ComplexInventoryTransaction,
 	BlockPosition,
 	type DisconnectPacket,
+	type UpdateAttributesPacket,
+	InteractPacket,
+	InteractAction,
+	PredictedResult,
+	PlayerAuthInputData,
+	PlayerAuthInputPacket,
+	InputTransaction,
 } from "@serenityjs/protocol";
 import { Priority } from "@serenityjs/raknet";
 import type { ClientOptions } from "./client/ClientOptions";
@@ -33,11 +41,8 @@ import { Inventory } from "./client/inventory/Inventory";
 import { Connection } from "./Connection";
 import { Logger } from "./vendor/Logger";
 import { Queue } from "./vendor/Queue";
-import {
-	InputTransaction,
-	PlayerAuthInputData,
-	PlayerAuthInputPacket as CustomPlayerAuthInputPacket,
-} from "./vendor/packets/player-auth-input";
+import { ClientAtributes } from "./client/entity";
+import { Container } from "./client/inventory/container/container";
 
 class Client extends Connection {
 	private sneaking = false;
@@ -55,12 +60,28 @@ class Client extends Connection {
 	private requestId = -2;
 
 	private _authInputInterval!: NodeJS.Timeout;
-
+	public atributes: ClientAtributes = new ClientAtributes();
+	/*
+		Container is currently under development.
+		Do not use it.
+	*/
+	public container: Container | null = null;
 	constructor(options: Partial<ClientOptions> = {}) {
 		super(options);
 		this.inventory = new Inventory(this);
 		this.on("spawn", this.handleAuthInput.bind(this));
 		this.on("MovePlayerPacket", this.onMovePlayer.bind(this));
+		this.on("UpdateAttributesPacket", this.onUpdateAttributes.bind(this));
+
+		this.on("ContainerOpenPacket", (container) => {
+			this.container = new Container(
+				this,
+				container.type,
+				container.uniqueId,
+				container.identifier,
+			);
+			console.log("New Container created");
+		});
 	}
 
 	public async sneak() {
@@ -74,6 +95,13 @@ class Client extends Connection {
 			this.pitch = instance.pitch;
 			this.yaw = instance.yaw;
 			this.headYaw = instance.headYaw;
+		}
+	}
+
+	private onUpdateAttributes(instance: UpdateAttributesPacket): void {
+		if (instance.runtimeActorId !== this.runtimeEntityId) return;
+		for (const attribute of instance.attributes) {
+			this.atributes.attributes.set(attribute.name, attribute);
 		}
 	}
 
@@ -101,7 +129,7 @@ class Client extends Connection {
 				inputData.setFlag(InputData.Sneaking, true);
 			}
 
-			const packet = new CustomPlayerAuthInputPacket();
+			const packet = new PlayerAuthInputPacket();
 			packet.rotation = new Vector2f(this.pitch, this.yaw);
 			packet.position = this.position;
 			packet.motion = new Vector2f(this.velocity.x, this.velocity.z);
@@ -125,6 +153,7 @@ class Client extends Connection {
 	}
 
 	public sendMessage(text: string): void {
+		if (this.container) this.container.close();
 		const textPacket = new TextPacket();
 		textPacket.filtered = "";
 		textPacket.message = text.replace(/^\s+/, "");
@@ -145,6 +174,8 @@ class Client extends Connection {
 	 * @param aimWithHead Whether to adjust the pitch (true) or only yaw (false)
 	 */
 	public lookAt(x: number, y: number, z: number, aimWithHead = true): void {
+		if (this.container) this.container.close();
+
 		const view = {
 			x: x - this.position.x,
 			y: y - this.position.y,
@@ -178,7 +209,7 @@ class Client extends Connection {
 	 * @param blockPosition The position of the block
 	 * @returns The face of the block
 	 */
-	private calculateFace(blockPosition: Vector3f): number {
+	public calculateFace(blockPosition: Vector3f): number {
 		const dx = blockPosition.x - this.position.x;
 		const dy = blockPosition.y - this.position.y;
 		const dz = blockPosition.z - this.position.z;
@@ -231,6 +262,7 @@ class Client extends Connection {
 	 * @param ticks The number of ticks to break the block
 	 */
 	public async breakBlock(position: Vector3f, ticks = 5): Promise<void> {
+		if (this.container) this.container.close();
 		const MAX_DISTANCE = 5;
 		const TICK_INTERVAL = 50;
 
@@ -246,11 +278,11 @@ class Client extends Connection {
 		};
 
 		const modifyNextPacket = (
-			modifier: (packet: CustomPlayerAuthInputPacket) => void,
+			modifier: (packet: PlayerAuthInputPacket) => void,
 		): Promise<void> => {
 			return new Promise((resolve) => {
 				const handler = (packet: ProtocolPlayerAuthInputPacket) => {
-					modifier(packet as unknown as CustomPlayerAuthInputPacket);
+					modifier(packet as unknown as PlayerAuthInputPacket);
 					this.remove("PrePlayerAuthInputPacket", handler);
 					resolve();
 				};
@@ -269,7 +301,7 @@ class Client extends Connection {
 		const face = this.calculateFace(position);
 
 		// Start Break
-		await modifyNextPacket((packet: CustomPlayerAuthInputPacket) => {
+		await modifyNextPacket((packet: PlayerAuthInputPacket) => {
 			packet.blockActions = new PlayerBlockActions([
 				new PlayerBlockActionData(
 					PlayerActionType.StartDestroyBlock,
@@ -283,7 +315,7 @@ class Client extends Connection {
 
 		// Crack Break
 		for (let i = 0; i < ticks; i++) {
-			await modifyNextPacket((packet: CustomPlayerAuthInputPacket) => {
+			await modifyNextPacket((packet: PlayerAuthInputPacket) => {
 				this.lookAt(position.x, position.y, position.z);
 				packet.blockActions = new PlayerBlockActions([
 					new PlayerBlockActionData(
@@ -298,7 +330,7 @@ class Client extends Connection {
 		}
 
 		// Stop Break
-		await modifyNextPacket((packet: CustomPlayerAuthInputPacket) => {
+		await modifyNextPacket((packet: PlayerAuthInputPacket) => {
 			this.lookAt(position.x, position.y, position.z);
 			packet.inputData.setFlag(InputData.PerformBlockActions, true);
 			packet.inputData.setFlag(InputData.StartUsingItem, true);
@@ -323,7 +355,7 @@ class Client extends Connection {
 					this.position,
 					new Vector3f(0, 0, 0),
 					0,
-					false,
+					PredictedResult.Success,
 				),
 			);
 		});
@@ -398,37 +430,39 @@ class Client extends Connection {
 	}
 
 	public openChest(position: Vector3f): void {
+		if (this.container) this.container.close();
 		this.lookAt(position.x, position.y, position.z);
+
 		const action = new PlayerActionPacket();
 		action.entityRuntimeId = this.runtimeEntityId;
 		action.action = PlayerActionType.StartItemUseOn;
 		action.blockPosition = position;
 		action.face = this.calculateFace(position);
-		action.resultPosition = position;
+		action.resultPosition = position.subtract(new Vector3f(1, 0, 0));
 		this.sendPacket(action, Priority.Normal);
 
 		const animate = new AnimatePacket();
 		animate.id = AnimateId.SwingArm;
 		animate.runtimeEntityId = this.runtimeEntityId;
-		animate.boatRowingTime = 0;
+		animate.boatRowingTime = null;
 		this.sendPacket(animate, Priority.Normal);
 
 		const transaction = new InventoryTransactionPacket();
-		transaction.legacy = new LegacyTransaction(0);
+		transaction.legacy = new LegacyTransaction(0, []);
 		transaction.transaction = new InventoryTransaction(
 			ComplexInventoryTransaction.ItemUseTransaction,
 			[],
 			new ItemUseInventoryTransaction(
-				ItemUseInventoryTransactionType.Use,
+				ItemUseInventoryTransactionType.Place,
 				TriggerType.PlayerInput,
 				new BlockPosition(position.x, position.y, position.z),
 				this.calculateFace(position),
-				0,
-				new NetworkItemStackDescriptor(0),
+				this.inventory.getSlot(),
+				this.inventory.getItem(this.inventory.getSlot()),
 				this.position,
-				new Vector3f(0, 0, 0),
+				new Vector3f(0.252352235, 0.523523523, 0.23131231),
 				0,
-				true,
+				PredictedResult.Success,
 			),
 		);
 		this.sendPacket(transaction, Priority.Normal);
@@ -436,7 +470,7 @@ class Client extends Connection {
 		const action2 = new PlayerActionPacket();
 		action2.entityRuntimeId = this.runtimeEntityId;
 		action2.action = PlayerActionType.StopItemUseOn;
-		action2.blockPosition = position;
+		action2.blockPosition = position.subtract(new Vector3f(1, 0, 0));
 		action2.face = this.calculateFace(position);
 		action2.resultPosition = new Vector3f(0, 0, 0);
 		this.sendPacket(action2, Priority.Normal);

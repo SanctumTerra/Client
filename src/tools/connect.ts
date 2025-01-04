@@ -1,103 +1,12 @@
 import "reflect-metadata";
-import { Vector3f, type TextPacket } from "@serenityjs/protocol";
+import {
+	PlayerAuthInputData,
+	PlayerAuthInputPacket,
+	Vector3f,
+	type TextPacket,
+} from "@serenityjs/protocol";
 import { Client } from "../Client";
-// import fs from "fs";
-// import path from "path";
 import { Logger } from "../vendor/Logger";
-// import util from "util";
-
-// const logsDir = path.join(process.cwd(), "logs");
-// if (!fs.existsSync(logsDir)) {
-// 	fs.mkdirSync(logsDir);
-// }
-
-// const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-// const logFile = path.join(logsDir, `connection-${timestamp}.log`);
-
-// const sanitizeToLatin = (str: string): string => {
-// 	return str
-// 		.replace(/\u001b\[\d{1,2}m/g, "")
-// 		.replace(/\u001b\[0m/g, "")
-// 		.replace(/[^\x20-\x7E\n]/g, "")
-// 		.replace(/[\x00-\x1F\x7F]/g, "");
-// };
-
-// const writeToLog = (message: string) => {
-// 	const sanitizedMessage = sanitizeToLatin(message);
-// 	fs.appendFileSync(
-// 		logFile,
-// 		`${new Date().toISOString()} - ${sanitizedMessage}\n`,
-// 	);
-// };
-
-// const originalConsoleLog = console.log;
-// const originalConsoleError = console.error;
-// const originalConsoleWarn = console.warn;
-// const originalConsoleInfo = console.info;
-
-// console.log = (...args) => {
-// 	const message = args
-// 		.map((arg) =>
-// 			typeof arg === "object"
-// 				? util.inspect(arg, { colors: false })
-// 				: String(arg),
-// 		)
-// 		.join(" ");
-// 	writeToLog(`[LOG] ${message}`);
-// 	originalConsoleLog.apply(console, args);
-// };
-
-// console.error = (...args) => {
-// 	const message = args
-// 		.map((arg) =>
-// 			typeof arg === "object"
-// 				? util.inspect(arg, { colors: false })
-// 				: String(arg),
-// 		)
-// 		.join(" ");
-// 	writeToLog(`[ERROR] ${message}`);
-// 	originalConsoleError.apply(console, args);
-// };
-
-// console.warn = (...args) => {
-// 	const message = args
-// 		.map((arg) =>
-// 			typeof arg === "object"
-// 				? util.inspect(arg, { colors: false })
-// 				: String(arg),
-// 		)
-// 		.join(" ");
-// 	writeToLog(`[WARN] ${message}`);
-// 	originalConsoleWarn.apply(console, args);
-// };
-
-// console.info = (...args) => {
-// 	const message = args
-// 		.map((arg) =>
-// 			typeof arg === "object"
-// 				? util.inspect(arg, { colors: false })
-// 				: String(arg),
-// 		)
-// 		.join(" ");
-// 	writeToLog(`[INFO] ${message}`);
-// 	originalConsoleInfo.apply(console, args);
-// };
-
-// const timers: { [key: string]: number } = {};
-// const originalConsoleTime = console.time;
-// const originalConsoleTimeEnd = console.timeEnd;
-
-// console.time = (label: string) => {
-// 	timers[label] = Date.now();
-// 	writeToLog(`[TIME START] ${sanitizeToLatin(label)}`);
-// 	originalConsoleTime.call(console, label);
-// };
-
-// console.timeEnd = (label: string) => {
-// 	const duration = Date.now() - (timers[label] || 0);
-// 	writeToLog(`[TIME END] ${sanitizeToLatin(label)}: ${duration}ms`);
-// 	originalConsoleTimeEnd.call(console, label);
-// };
 
 const client = new Client({
 	host: "127.0.0.1",
@@ -105,46 +14,46 @@ const client = new Client({
 	username: "SanctumTerra",
 	version: "1.21.50",
 	port: 19132,
-	viewDistance: 4,
-	// debug: true
+	viewDistance: 11,
 });
 
 console.time("Connection");
-console.time("RakConnect");
-// writeToLog("Starting connection...");
-
-client.connect().then(([ad, packet]) => {
+client.connect();
+client.on("spawn", ([ad, packet]) => {
 	console.timeEnd("Connection");
 	client.sendMessage("Hello");
-
-	setTimeout(() => {
-		const vec = new Vector3f(264, 66, 242);
-		// console.log("Vec: ", vec);
-		// client.breakBlock(vec);
-	}, 5000);
 });
 
 client.on("DisconnectPacket", (packet) => {
 	Logger.chat(packet.message.message);
-	// console.log(packet);
-	// writeToLog(`Disconnected: ${JSON.stringify(packet)}`);
 });
 
-let last = Date.now();
-client.on("UpdateBlockPacket", (packet) => {
-	if (packet.networkBlockId === 6870) {
-		if (Date.now() - last > 50) {
-			client.breakBlock(
-				new Vector3f(packet.position.x, packet.position.y, packet.position.z),
-				3,
-			);
-			last = Date.now();
+// client.on("containerOpen", (container) => {
+// 	console.log("Opened a chest")
+// 	const messages: string[] = [];
+// 	for(const item of container.items) {
+// 		// messages.push(`${item.network}`)
+// 		const slot = container.items.indexOf(item);
+// 		container.take(slot, 9, 0);
+// 	}
+// 	// client.sendMessage(`Container ${container.id} opened that has ${container.slots} slots`);
+// 	// sendMessages(messages);
+// })
+
+function sendMessages(messages: string[]) {
+	const perMessage = 30;
+	let current = 0;
+	for (let i = 0; i < messages.length / 10; i++) {
+		let string = "Found: ";
+		for (let j = 0; j < perMessage; j++) {
+			string += `${messages[current + j]}, `;
 		}
+		client.sendMessage(string);
+		current += perMessage;
 	}
-});
+}
 
 client.on("TextPacket", handleTextPacket);
-
 async function handleTextPacket(packet: TextPacket): Promise<void> {
 	if (!packet.parameters) return Logger.chat(packet.message);
 
@@ -166,7 +75,7 @@ async function handleTextPacket(packet: TextPacket): Promise<void> {
 }
 
 const textHandler = (packet: TextPacket) => {
-	// console.log("TextHandler", packet.parameters);
+	console.log("TextHandler", packet.parameters);
 	if (packet.parameters?.includes("drop")) {
 		client.inventory.dropItem(0, 1);
 	} else if (packet.parameters?.includes("hi")) {
@@ -181,5 +90,35 @@ const textHandler = (packet: TextPacket) => {
 		}, 30);
 	} else if (packet.parameters?.includes("chest")) {
 		client.openChest(new Vector3f(287, 176, 145));
+	} else if (packet.parameters?.includes("use")) {
+		client.inventory.useItem("right");
+	} else if (packet.parameters?.includes("useleft")) {
+		client.inventory.useItem("left");
+	}
+	if (packet.parameters === null) return;
+	if (packet.parameters.length < 2) return;
+
+	// TextHandler [ 'AnyBananaGAME', 'slot 1' ]
+	const param = packet.parameters[1].split(" ");
+
+	for (let i = 0; i < param.length; i++) {
+		// avoiding loops
+		if (packet.parameters[0] === "SanctumTerra") return;
+		if (param[i] === "slot") {
+			const slot = Number(param[i + 1]);
+			client.sendMessage(`Switching to slot ${slot}`);
+			client.inventory.switchSlot(slot);
+		}
+	}
+	for (let i = 0; i < param.length; i++) {
+		// avoiding loops
+		if (packet.parameters[0] === "SanctumTerra") return;
+		if (param[i] === "mine") {
+			const x = Number(param[i + 1]);
+			const y = Number(param[i + 2]);
+			const z = Number(param[i + 3]);
+			client.sendMessage(`Mining block at ${x}, ${y}, ${z}`);
+			client.breakBlock(new Vector3f(x, y, z), 5);
+		}
 	}
 };
