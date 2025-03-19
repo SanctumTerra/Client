@@ -1,5 +1,8 @@
 # 🛠️ Minecraft Bedrock Edition Client Library
 
+We have moved to [Baltica](https://github.com/SanctumTerra/Baltica)!
+For newer versions go and take a look there.
+
 ![Version](https://img.shields.io/badge/Supported%20Version-1.21.50-brightgreen)
 ![npm](https://img.shields.io/npm/v/@sanctumterra/client)
 ![License](https://img.shields.io/badge/License-MIT-blue)
